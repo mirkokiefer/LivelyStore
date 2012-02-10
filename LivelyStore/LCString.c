@@ -2,7 +2,6 @@
 #include "LCString.h"
 
 struct LCString {
-  size_t length;
   LCInteger rCount;
   char content[];
 };
@@ -10,10 +9,9 @@ struct LCString {
 static inline void LCStringDealloc(LCStringRef string);
 
 LCStringRef LCStringCreate(char* string) {
-  LCStringRef newString = malloc(sizeof(struct LCString) + strlen(string));
+  LCStringRef newString = malloc(sizeof(struct LCString) + strlen(string)+1);
   if (newString != NULL) {
-    newString->length = strlen(string);
-    memcpy(newString->content, string, newString->length);
+    memcpy(newString->content, string, strlen(string)+1);
   }
   return newString;
 };
@@ -33,17 +31,20 @@ char LCStringCharAtIndex(LCStringRef string, LCInteger index) {
   return string->content[index];
 }
 
-size_t LCStringSize(LCStringRef string) {
-  return string->length+1;
+size_t LCStringLength(LCStringRef string) {
+  return strlen(string->content)+1;
 }
 
 void LCStringString(LCStringRef string, char* buffer) {
-  memcpy(buffer, string->content, string->length);
-  buffer[string->length] = '\0';
+  memcpy(buffer, string->content, strlen(string->content)+1);
+}
+
+LCBlobRef LCStringBlob(LCStringRef string) {
+  return LCBlobCreate((LCByte*)string->content, strlen(string->content)+1);
 }
 
 void LCStringPrint(LCStringRef string) {
-  char content[LCStringSize(string)];
+  char content[LCStringLength(string)];
   LCStringString(string, content);
   printf("%s\n", content);
 }
