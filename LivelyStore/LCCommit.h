@@ -7,6 +7,8 @@
 
 LCCommitRef LCCommitCreate();
 void LCCommitAddEntry(LCCommitRef commit, LCKeyValueRef keyValue);
+size_t LCCommitEntryCount(LCCommitRef commit);
+void LCCommitEntries(LCCommitRef commit, LCKeyValueRef buffer[]);
 LCSHARef LCCommitSHA1(LCCommitRef commit);
 
 

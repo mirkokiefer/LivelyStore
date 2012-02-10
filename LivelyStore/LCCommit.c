@@ -23,6 +23,14 @@ void LCCommitAddEntry(LCCommitRef commit, LCKeyValueRef keyValue) {
   commit->length = commit->length + 1;
 }
 
+size_t LCCommitEntryCount(LCCommitRef commit) {
+  return commit->length;
+}
+
+void LCCommitEntries(LCCommitRef commit, LCKeyValueRef buffer[]) {
+  memcpy(buffer, commit->keyValues, commit->length*sizeof(LCKeyValueRef));
+}
+
 void LCCommitDealloc(void* object) {
 
 }

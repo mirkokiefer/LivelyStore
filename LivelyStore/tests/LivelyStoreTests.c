@@ -81,12 +81,33 @@ static char* test_keyValue() {
   return 0;
 }
 
+static char* test_commit() {
+  LCStringRef key1 = LCStringCreate("key1");
+  LCStringRef key2 = LCStringCreate("key2");
+  LCBlobRef value1 = LCBlobCreate((LCByte*)"12345", 6);
+  LCBlobRef value2 = LCBlobCreate((LCByte*)"67890", 6);
+  LCKeyValueRef entry1 = LCKeyValueCreate(key1, value1);
+  LCKeyValueRef entry2 = LCKeyValueCreate(key2, value2);
+  
+  LCCommitRef commit = LCCommitCreate();
+  LCCommitAddEntry(commit, entry1);
+  LCCommitAddEntry(commit, entry2);
+
+  mu_assert("LCCommit entry adding works", LCCommitEntryCount(commit)==2);
+  
+  LCKeyValueRef entries[LCCommitEntryCount(commit)];
+  LCCommitEntries(commit, entries);
+  mu_assert("LCCommit stores entries correctly", (entries[0] == entry1) && (entries[1] == entry2));
+  return 0;
+}
+
 static char* all_tests() {
   mu_run_test(test_retain_counting);
   mu_run_test(test_string);
   mu_run_test(test_blob);
   mu_run_test(test_sha1);
   mu_run_test(test_keyValue);
+  mu_run_test(test_commit);
   return 0;
 }
 
