@@ -101,6 +101,32 @@ static char* test_commit() {
   return 0;
 }
 
+static char* test_tree() {
+  LCStringRef key1 = LCStringCreate("key1");
+  LCStringRef key2 = LCStringCreate("key2");
+  LCStringRef key3 = LCStringCreate("key3");
+  LCBlobRef value1 = LCBlobCreate((LCByte*)"12345", 6);
+  LCBlobRef value2 = LCBlobCreate((LCByte*)"67890", 6);
+  LCKeyValueRef entry1 = LCKeyValueCreate(key1, value1);
+  LCKeyValueRef entry2 = LCKeyValueCreate(key2, value2);
+  LCKeyValueRef entry3 = LCKeyValueCreate(key3, value2);
+  
+  LCKeyValueRef entries1[] = {entry1};
+  LCKeyValueRef entries2[] = {entry2, entry3};
+  
+  LCTreeRef tree1 = LCTreeCreate(NULL, 0, entries1, 1);
+  LCTreeRef tree2 = LCTreeCreate(&tree1, 1, entries2, 2);
+  
+  LCKeyValueRef* tree1Entries = LCTreeChildEntries(tree1);
+  LCKeyValueRef* tree2Entries = LCTreeChildEntries(tree2);
+  LCTreeRef* tree2ChildTrees = LCTreeChildTrees(tree2);
+  
+  LCBool correct = (tree1Entries[0]==entry1) && (tree2Entries[0]==entry2) && (tree2Entries[1]==entry3);
+  mu_assert("LCTree stores entries correctly", correct);
+  mu_assert("LCTree stores child trees correctly", tree2ChildTrees[0] == tree1);
+  return 0;
+}
+
 static char* all_tests() {
   mu_run_test(test_retain_counting);
   mu_run_test(test_string);
@@ -108,6 +134,7 @@ static char* all_tests() {
   mu_run_test(test_sha1);
   mu_run_test(test_keyValue);
   mu_run_test(test_commit);
+  mu_run_test(test_tree);
   return 0;
 }
 
