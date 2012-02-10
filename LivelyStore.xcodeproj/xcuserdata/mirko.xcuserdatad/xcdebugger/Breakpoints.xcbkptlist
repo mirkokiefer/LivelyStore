@@ -9,11 +9,11 @@
          continueAfterRunningActions = "No"
          isPathRelative = "1"
          filePath = "LivelyStore/main.c"
-         timestampString = "350530719.235391"
+         timestampString = "350534713.492497"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "27"
-         endingLineNumber = "27"
+         startingLineNumber = "31"
+         endingLineNumber = "31"
          landmarkName = "main()"
          landmarkType = "7">
       </FileBreakpoint>
@@ -23,11 +23,11 @@
          continueAfterRunningActions = "No"
          isPathRelative = "1"
          filePath = "LivelyStore/main.c"
-         timestampString = "350528704.169742"
+         timestampString = "350534713.492497"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "13"
-         endingLineNumber = "13"
+         startingLineNumber = "17"
+         endingLineNumber = "17"
          landmarkName = "sha1example()"
          landmarkType = "7">
       </FileBreakpoint>
@@ -37,11 +37,11 @@
          continueAfterRunningActions = "No"
          isPathRelative = "1"
          filePath = "LivelyStore/main.c"
-         timestampString = "350528713.900939"
+         timestampString = "350534713.492497"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "18"
-         endingLineNumber = "18"
+         startingLineNumber = "22"
+         endingLineNumber = "22"
          landmarkName = "sha1example()"
          landmarkType = "7">
       </FileBreakpoint>
