@@ -14,7 +14,7 @@ void LCRelease(void* object) {
       (*meta).dealloc(object);      
     }
     free(object);
-    printf("dealloc: %p", object);
+    //printf("dealloc: %p", object);
   }
 }
 
