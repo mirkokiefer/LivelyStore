@@ -23,10 +23,7 @@ void sha1example() {
 }
 
 
-int main (int argc, const char * argv[])
-{
-
-  // insert code here...
+int main (int argc, const char * argv[]) {
   char* aString = "normal string";
   LCStringRef test = LCStringCreate(aString);
   printf("LCStringPrint test: ");
