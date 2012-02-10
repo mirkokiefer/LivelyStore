@@ -9,11 +9,15 @@ void sha1example() {
   LCSHARef sha = LCBlobSHA1(testBlob);
   LCStringPrint(LCSHAHexString(sha));
   
+  LCStringRef testString = LCStringCreate(testData);
+  LCSHARef sha1 = LCBlobSHA1(LCStringBlob(testString));
+  LCStringPrint(LCSHAHexString(sha1));
+  
   unsigned char shaDirect[20];
   SHA1((unsigned char*)testData, strlen(testData)+1, shaDirect);
   int i;
   for (i = 0; i < 20; i++) {
-    printf("%02x ", shaDirect[i]);
+    printf("%02x", shaDirect[i]);
   }
   printf("\n");
 }
