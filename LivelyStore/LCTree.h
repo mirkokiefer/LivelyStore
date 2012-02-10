@@ -5,9 +5,9 @@
 
 #include "LivelyStore.h"
 
-LCTreeRef LCTreeCreate(LCTreeRef childTrees[], LCEntryRef childEntries[]);
+LCTreeRef LCTreeCreate(LCTreeRef childTrees[], LCKeyValueRef childEntries[]);
 
-void LCTreeSHA1(LCTreeRef tree, unsigned char* buffer);
+LCSHARef LCTreeSHA1(LCTreeRef tree);
 
 
 #endif

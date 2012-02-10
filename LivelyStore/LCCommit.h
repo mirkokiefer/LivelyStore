@@ -6,10 +6,10 @@
 #include "LivelyStore.h"
 
 LCCommitRef LCCommitCreate();
-void LCCommitAddEntry(LCCommitRef commit, LCStringRef key, LCBlobRef blob);
+void LCCommitAddEntry(LCCommitRef commit, LCKeyValueRef);
 void LCCommitRemoveEntry(LCCommitRef commit, LCStringRef key);
 
-void LCCommitSHA1(LCCommitRef commit, unsigned char* buffer);
+LCSHARef LCCommitSHA1(LCCommitRef commit);
 
 
 #endif

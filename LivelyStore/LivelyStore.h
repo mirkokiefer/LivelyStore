@@ -20,7 +20,7 @@ typedef LCStringRef LCKeyRef;
 typedef struct LCStore* LCStoreRef;
 typedef struct LCCommit* LCCommitRef;
 typedef struct LCTree* LCTreeRef;
-typedef struct LCEntry* LCEntryRef;
+typedef struct LCKeyValue* LCKeyValueRef;
 typedef struct LCBlob* LCBlobRef;
 typedef struct LCSHA* LCSHARef;
 
@@ -33,6 +33,6 @@ typedef struct LCSHA* LCSHARef;
 #include "LCStore.h"
 #include "LCCommit.h"
 #include "LCTree.h"
-#include "LCEntry.h"
+#include "LCKeyValue.h"
 #include "LCBlob.h"
 #include "LCSHA.h"

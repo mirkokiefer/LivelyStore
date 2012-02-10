@@ -5,7 +5,7 @@
 
 #include "LivelyStore.h"
 
-LCEntryRef LCEntryCreate(LCKeyRef key, LCBlobRef value);
+LCKeyValueRef LCKeyValueCreate(LCStringRef key, LCBlobRef value);
 
 
 #endif
