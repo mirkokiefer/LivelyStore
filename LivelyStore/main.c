@@ -51,11 +51,5 @@ int main (int argc, const char * argv[]) {
   printf("test Blob: %s \n", (char*)blobData);
   sha1example();
   
-  unsigned char test1[3];
-  test1[0] = 12;
-  test1[1] = 250;
-  test1[2] = '\0';
-  
-  char buffer[4+1];
   return 0;
 }
