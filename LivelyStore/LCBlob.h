@@ -13,6 +13,6 @@ size_t LCBlobSize(LCBlobRef blob);
 void LCBlobData(LCBlobRef blob, void *buffer);
 
 // buffer[20]
-LCStringRef LCBlobSHA1(LCBlobRef blob);
+LCSHARef LCBlobSHA1(LCBlobRef blob);
 
 #endif

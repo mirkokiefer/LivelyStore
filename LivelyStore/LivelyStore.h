@@ -21,7 +21,9 @@ typedef struct LCCommit* LCCommitRef;
 typedef struct LCTree* LCTreeRef;
 typedef struct LCEntry* LCEntryRef;
 typedef struct LCBlob* LCBlobRef;
+typedef struct LCSHA* LCSHARef;
 
+#define LC_SHA1_Length 20
 
 #endif
 
@@ -32,3 +34,4 @@ typedef struct LCBlob* LCBlobRef;
 #include "LCTree.h"
 #include "LCEntry.h"
 #include "LCBlob.h"
+#include "LCSHA.h"
