@@ -48,7 +48,33 @@ void LCBlobData(LCBlobRef blob, void* buffer) {
   memcpy(buffer, blob->data, blob->size);
 }
 
-void LCBlobSHA1(LCBlobRef blob, unsigned char* buffer) {
+char hexDigitToCharacter(char hexDigit) {
+  if(hexDigit > 9) {
+    hexDigit = hexDigit - 10 + 97; //97 is A
+  } else {
+    hexDigit = hexDigit + 48; //48 is 0
+  }
+  return hexDigit;
+}
+
+void unsignedCharToHex(unsigned char input, char* buffer) {
+  buffer[0] = hexDigitToCharacter(input/16);
+  buffer[1] = hexDigitToCharacter(input%16);
+}
+
+void unsignedCharsToHex(unsigned char input[], size_t length, char* buffer) {
+  for(LCInteger i=0; i<length; i++) {
+    unsignedCharToHex(input[i], &buffer[i*2]);
+  }
+  buffer[length*2] = '\0';
+}
+
+LCStringRef LCBlobSHA1(LCBlobRef blob) {
   unsigned char* dataChars = (unsigned char*)blob->data;
-  SHA1(dataChars, strlen(dataChars), buffer);
+  unsigned char buffer[20];
+  SHA1(dataChars, strlen((char*)dataChars), buffer);
+  char shaString[41];
+  unsignedCharsToHex(buffer, 20, shaString); 
+  LCStringRef sha = LCStringCreate(shaString);
+  return sha;
 }
