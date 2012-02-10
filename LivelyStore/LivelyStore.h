@@ -14,6 +14,7 @@
 typedef int LCInteger;
 typedef uint8_t LCUInteger8Bit;
 typedef struct LCString* LCStringRef;
+typedef unsigned char LCByte;
 
 typedef LCStringRef LCKeyRef;
 typedef struct LCStore* LCStoreRef;

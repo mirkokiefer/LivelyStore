@@ -4,13 +4,13 @@
 
 void sha1example() {
   char* testData = "compute sha1";
-  LCBlobRef testBlob = LCBlobCreate(testData, strlen(testData)+1);
+  LCBlobRef testBlob = LCBlobCreate((LCByte*)testData, strlen(testData)+1);
   
   LCSHARef sha = LCBlobSHA1(testBlob);
   LCStringPrint(LCSHAHexString(sha));
   
   unsigned char shaDirect[20];
-  SHA1((unsigned char*)testData, strlen(testData), shaDirect);
+  SHA1((unsigned char*)testData, strlen(testData)+1, shaDirect);
   int i;
   for (i = 0; i < 20; i++) {
     printf("%02x ", shaDirect[i]);
@@ -28,10 +28,10 @@ int main (int argc, const char * argv[])
   printf("LCStringPrint test: ");
   LCStringPrint(test);
   
-  LCBlobRef aBlob = LCBlobCreate(aString, strlen(aString)+1);
-  char blobData[LCBlobSize(aBlob)]; 
+  LCBlobRef aBlob = LCBlobCreate((LCByte*)aString, strlen(aString)+1);
+  LCByte blobData[LCBlobLength(aBlob)]; 
   LCBlobData(aBlob, blobData);
-  printf("test Blob: %s \n", blobData);
+  printf("test Blob: %s \n", (char*)blobData);
   sha1example();
   
   unsigned char test1[3];

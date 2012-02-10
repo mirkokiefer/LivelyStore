@@ -3,24 +3,17 @@
 
 struct LCBlob {
   LCInteger rCount;
-  size_t size;
-  void* data;
+  size_t length;
+  LCByte data[];
 };
 
 static inline void LCBlobDealloc(LCBlobRef aStruct);
 
-LCBlobRef LCBlobCreate(void* data, size_t size) {
-  LCBlobRef newBlob = malloc(sizeof(struct LCBlob));
+LCBlobRef LCBlobCreate(LCByte data[], size_t length) {
+  LCBlobRef newBlob = malloc(sizeof(struct LCBlob) + length*sizeof(LCByte));
   if (newBlob != NULL) {
-    void* dataMemory = malloc(size);
-    if(dataMemory != NULL) {
-      newBlob->size = size;
-      memcpy(dataMemory, data, size);
-      newBlob->data = dataMemory;
-    } else {
-      free(newBlob);
-      return NULL;
-    }
+    newBlob->length = length;
+    memcpy(newBlob->data, data, length*sizeof(LCByte));
   }
   return newBlob;
 };
@@ -40,16 +33,19 @@ static inline void LCBlobDealloc(LCBlobRef aStruct) {
   free(aStruct);
 }
 
-size_t LCBlobSize(LCBlobRef blob) {
-  return blob->size;
+size_t LCBlobLength(LCBlobRef blob) {
+  return blob->length;
 }
 
-void LCBlobData(LCBlobRef blob, void* buffer) {
-  memcpy(buffer, blob->data, blob->size);
+void LCBlobData(LCBlobRef blob, LCByte buffer[]) {
+  memcpy(buffer, blob->data, blob->length*sizeof(LCByte));
+}
+
+LCByte* LCBlobDataRef(LCBlobRef blob) {
+  return blob->data;
 }
 
 LCSHARef LCBlobSHA1(LCBlobRef blob) {
-  unsigned char* dataChars = (unsigned char*)blob->data;
-  LCSHARef sha = LCSHACreate(dataChars, blob->size);
+  LCSHARef sha = LCSHACreate(blob);
   return sha;
 }

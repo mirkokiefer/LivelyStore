@@ -4,7 +4,7 @@
 
 #include "LivelyStore.h"
 
-LCSHARef LCSHACreate(unsigned char* data, size_t length);
+LCSHARef LCSHACreate(LCBlobRef blob);
 void LCSHARetain(LCSHARef sha);
 void LCSHARelease(LCSHARef sha);
 LCStringRef LCSHAHexString(LCSHARef sha);
