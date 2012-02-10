@@ -4,7 +4,7 @@
 struct LCCommit {
   LCObjectMeta meta;
   size_t length;
-  LCKeyValueRef keyValues[];
+  LCKeyValueRef* keyValues;
 };
 
 void LCCommitDealloc(void* object);
@@ -18,8 +18,10 @@ LCCommitRef LCCommitCreate() {
 };
 
 void LCCommitAddEntry(LCCommitRef commit, LCKeyValueRef keyValue) {
-  realloc(commit, sizeof(struct LCCommit) + (commit->length+1)*sizeof(keyValue));
-  commit->keyValues[commit->length] = keyValue;
+  LCRetain(keyValue);
+  LCKeyValueRef* keyValues = realloc(commit->keyValues, (commit->length+1)*sizeof(keyValue));
+  keyValues[commit->length] = keyValue;
+  commit->keyValues = keyValues;
   commit->length = commit->length + 1;
 }
 
@@ -32,5 +34,9 @@ void LCCommitEntries(LCCommitRef commit, LCKeyValueRef buffer[]) {
 }
 
 void LCCommitDealloc(void* object) {
-
+  LCCommitRef commit = (LCCommitRef)object;
+  for(LCInteger i=0; i<commit->length; i++) {
+    LCRelease(commit->keyValues[i]);
+  }
+  free(commit->keyValues);
 }
