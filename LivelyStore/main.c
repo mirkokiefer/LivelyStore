@@ -3,23 +3,39 @@
 #include "LivelyStore.h"
 
 void sha1example() {
-  char* testData = "compute sha1";
-  LCBlobRef testBlob = LCBlobCreate((LCByte*)testData, strlen(testData)+1);
-  
-  LCSHARef sha = LCBlobSHA1(testBlob);
-  LCStringPrint(LCSHAHexString(sha));
-  
-  LCStringRef testString = LCStringCreate(testData);
-  LCSHARef sha1 = LCBlobSHA1(LCStringBlob(testString));
-  LCStringPrint(LCSHAHexString(sha1));
+  char* testData1 = "compute sha1";
+  char* testData2 = " abc";
+  char* testData3 = "compute sha1 abc";
   
   unsigned char shaDirect[20];
-  SHA1((unsigned char*)testData, strlen(testData)+1, shaDirect);
+  SHA1((unsigned char*)testData1, strlen(testData1)+1, shaDirect);
   int i;
   for (i = 0; i < 20; i++) {
     printf("%02x", shaDirect[i]);
   }
   printf("\n");
+  
+  LCBlobRef testData1Blob = LCBlobCreate((LCByte*)testData1, strlen(testData1)+1);
+  LCBlobRef testData1BlobNoNull = LCBlobCreate((LCByte*)testData1, strlen(testData1));
+  LCBlobRef testData2Blob = LCStringBlob(LCStringCreate(testData2));
+  LCBlobRef testData3Blob = LCStringBlob(LCStringCreate(testData3));
+  LCBlobRef testData1and2Blobs[2];
+  testData1and2Blobs[0] = testData1BlobNoNull;
+  testData1and2Blobs[1] = testData2Blob;
+
+  LCSHARef sha = LCBlobSHA1(testData1Blob);
+  LCStringPrint(LCSHAHexString(sha));
+  
+  LCStringRef testString = LCStringCreate(testData1);
+  LCSHARef sha1 = LCBlobSHA1(LCStringBlob(testString));
+  LCStringPrint(LCSHAHexString(sha1));
+  
+  LCSHARef testData3SHA = LCSHACreate(&testData3Blob, 1);
+  LCStringPrint(LCSHAHexString(testData3SHA));
+  
+  LCSHARef testData1and2SHA = LCSHACreate(testData1and2Blobs, 2);
+  LCStringPrint(LCSHAHexString(testData1and2SHA));
+
 }
 
 
