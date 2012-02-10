@@ -49,6 +49,10 @@ void LCStringPrint(LCStringRef string) {
   printf("%s\n", content);
 }
 
+LCBool LCStringEqual(LCStringRef string, LCStringRef otherString) {
+  return strcmp(string->content, otherString->content) == 0;
+}
+
 static inline void LCStringDealloc(LCStringRef string) {
   free(string);
 }

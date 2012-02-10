@@ -15,4 +15,5 @@ size_t LCStringLength(LCStringRef string);
 void LCStringString(LCStringRef string, char* buffer);
 LCBlobRef LCStringBlob(LCStringRef string);
 void LCStringPrint(LCStringRef string);
+LCBool LCStringEqual(LCStringRef string, LCStringRef otherString);
 #endif
