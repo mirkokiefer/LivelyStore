@@ -11,10 +11,15 @@ char hexDigitToCharacter(char hexDigit);
 void unsignedCharToHex(unsigned char input, char* buffer);
 void unsignedCharArrayToHexString(unsigned char input[], size_t length, char* buffer);
 
-LCSHARef LCSHACreate(LCBlobRef blob) {
+LCSHARef LCSHACreate(LCBlobRef blobs[], size_t count) {
   LCSHARef newSha = malloc(sizeof(struct LCSHA) + LC_SHA1_Length);
   if (newSha != NULL) {
-    SHA1(LCBlobDataRef(blob), LCBlobLength(blob), newSha->sha);
+    SHA_CTX context;
+    SHA1_Init(&context);
+    for(LCInteger i=0; i<count; i++) {
+      SHA1_Update(&context, LCBlobDataRef(blobs[i]), LCBlobLength(blobs[i]));
+    }
+    SHA1_Final(newSha->sha, &context);
   }
   return newSha;
 };

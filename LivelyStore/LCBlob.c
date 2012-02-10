@@ -46,6 +46,6 @@ LCByte* LCBlobDataRef(LCBlobRef blob) {
 }
 
 LCSHARef LCBlobSHA1(LCBlobRef blob) {
-  LCSHARef sha = LCSHACreate(blob);
+  LCSHARef sha = LCSHACreate(&blob, 1);
   return sha;
 }
