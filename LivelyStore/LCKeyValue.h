@@ -6,6 +6,7 @@
 #include "LivelyStore.h"
 
 LCKeyValueRef LCKeyValueCreate(LCStringRef key, LCBlobRef value);
-
+LCStringRef LCKeyValueKey(LCKeyValueRef keyValue);
+LCBlobRef LCKeyValueValue(LCKeyValueRef keyValue);
 
 #endif
