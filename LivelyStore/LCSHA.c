@@ -55,7 +55,7 @@ void unsignedCharArrayToHexString(unsigned char input[], size_t length, char* bu
   buffer[length*2] = '\0';
 }
 
-LCStringRef LCSHAHexString(LCSHARef sha) {
+LCStringRef LCSHACreateHexString(LCSHARef sha) {
   char shaString[41];
   unsignedCharArrayToHexString(sha->sha, 20, shaString); 
   LCStringRef hexString = LCStringCreate(shaString);

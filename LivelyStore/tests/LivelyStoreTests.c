@@ -32,10 +32,10 @@ static char* test_sha1() {
   LCStringRef testData1RealSHA = LCStringCreate("a0e1e14cb346a01f9fd10e60080b945f995524af");
   LCStringRef testData3RealSHA = LCStringCreate("253f7e747aa2bd4107cc0af2f78fe60fc075d090");
   
-  LCBlobRef testData1Blob = LCStringBlob(LCStringCreate(testData1));
+  LCBlobRef testData1Blob = LCStringCreateBlob(LCStringCreate(testData1));
   LCBlobRef testData1BlobNoNull = LCBlobCreate((LCByte*)testData1, strlen(testData1));
-  LCBlobRef testData2Blob = LCStringBlob(LCStringCreate(testData2));
-  LCBlobRef testData3Blob = LCStringBlob(LCStringCreate(testData3));
+  LCBlobRef testData2Blob = LCStringCreateBlob(LCStringCreate(testData2));
+  LCBlobRef testData3Blob = LCStringCreateBlob(LCStringCreate(testData3));
   LCBlobRef testData1and2Blobs[2];
   testData1and2Blobs[0] = testData1BlobNoNull;
   testData1and2Blobs[1] = testData2Blob;
@@ -44,9 +44,9 @@ static char* test_sha1() {
   LCSHARef testData3SHA = LCBlobSHA1(testData3Blob);
   LCSHARef testData1and2SHA = LCSHACreate(testData1and2Blobs, 2);
   
-  mu_assert("SHA1 from testData1 is correct", LCStringEqual(LCSHAHexString(testData1SHA), testData1RealSHA));
-  mu_assert("SHA1 from testData3 is correct", LCStringEqual(LCSHAHexString(testData3SHA), testData3RealSHA));
-  mu_assert("SHA1 from two LCBlobs is correct", LCStringEqual(LCSHAHexString(testData1and2SHA), testData3RealSHA));
+  mu_assert("SHA1 from testData1 is correct", LCStringEqual(LCSHACreateHexString(testData1SHA), testData1RealSHA));
+  mu_assert("SHA1 from testData3 is correct", LCStringEqual(LCSHACreateHexString(testData3SHA), testData3RealSHA));
+  mu_assert("SHA1 from two LCBlobs is correct", LCStringEqual(LCSHACreateHexString(testData1and2SHA), testData3RealSHA));
   mu_assert("LCSHAEqual is correct", LCSHAEqual(testData3SHA, testData1and2SHA));
   return 0;
 }
