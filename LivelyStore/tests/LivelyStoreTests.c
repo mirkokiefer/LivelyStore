@@ -4,6 +4,17 @@
 
 int tests_run = 0;
 
+static char* test_retain_counting() {
+  LCStringRef test = LCStringCreate("abc");
+  mu_assert("initial retain count=0", LCRetainCount(test)==0);
+  LCRetain(test);
+  mu_assert("retain increases retain count", LCRetainCount(test)==1);
+  LCRelease(test);
+  mu_assert("releasing decreases retain count", LCRetainCount(test)==0);
+  LCRelease(test);
+  return 0;
+}
+
 static char* test_string() {
   char* aCString = "abcd";
   char* anIdenticalCString = "abcd";
@@ -54,6 +65,7 @@ static char* test_blob() {
 }
 
 static char* all_tests() {
+  mu_run_test(test_retain_counting);
   mu_run_test(test_string);
   mu_run_test(test_blob);
   mu_run_test(test_sha1);
