@@ -17,12 +17,15 @@ LCCommitRef LCCommitCreate() {
   return newCommit;
 };
 
+//actually needs to return error
 void LCCommitAddEntry(LCCommitRef commit, LCKeyValueRef keyValue) {
-  LCRetain(keyValue);
   LCKeyValueRef* keyValues = realloc(commit->keyValues, (commit->length+1)*sizeof(keyValue));
-  keyValues[commit->length] = keyValue;
-  commit->keyValues = keyValues;
-  commit->length = commit->length + 1;
+  if(keyValues) {
+    LCRetain(keyValue);
+    keyValues[commit->length] = keyValue;
+    commit->keyValues = keyValues;
+    commit->length = commit->length + 1;
+  }
 }
 
 size_t LCCommitEntryCount(LCCommitRef commit) {
