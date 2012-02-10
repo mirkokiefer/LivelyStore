@@ -1,5 +1,5 @@
 
-#include "LCCommit.h"
+#include "LCCommitStage.h"
 
 struct LCKeyValue {
   LCObjectMeta meta;

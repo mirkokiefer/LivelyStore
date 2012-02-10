@@ -89,15 +89,15 @@ static char* test_commit() {
   LCKeyValueRef entry1 = LCKeyValueCreate(key1, value1);
   LCKeyValueRef entry2 = LCKeyValueCreate(key2, value2);
   
-  LCCommitRef commit = LCCommitCreate();
-  LCCommitAddEntry(commit, entry1);
-  LCCommitAddEntry(commit, entry2);
+  LCCommitStageRef commit = LCCommitStageCreate();
+  LCCommitStageAddEntry(commit, entry1);
+  LCCommitStageAddEntry(commit, entry2);
 
-  mu_assert("LCCommit entry adding works", LCCommitEntryCount(commit)==2);
+  mu_assert("LCCommitStage entry adding works", LCCommitStageEntryCount(commit)==2);
   
-  LCKeyValueRef entries[LCCommitEntryCount(commit)];
-  LCCommitEntries(commit, entries);
-  mu_assert("LCCommit stores entries correctly", (entries[0] == entry1) && (entries[1] == entry2));
+  LCKeyValueRef entries[LCCommitStageEntryCount(commit)];
+  LCCommitStageEntries(commit, entries);
+  mu_assert("LCCommitStage stores entries correctly", (entries[0] == entry1) && (entries[1] == entry2));
   return 0;
 }
 

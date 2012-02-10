@@ -19,7 +19,7 @@ typedef bool LCBool;
 
 typedef LCStringRef LCKeyRef;
 typedef struct LCStore* LCStoreRef;
-typedef struct LCCommit* LCCommitRef;
+typedef struct LCCommitStage* LCCommitStageRef;
 typedef struct LCTree* LCTreeRef;
 typedef struct LCKeyValue* LCKeyValueRef;
 typedef struct LCBlob* LCBlobRef;
@@ -39,7 +39,7 @@ typedef struct LCObjectMeta LCObjectMeta;
 #include "LCString.h"
 
 #include "LCStore.h"
-#include "LCCommit.h"
+#include "LCCommitStage.h"
 #include "LCTree.h"
 #include "LCKeyValue.h"
 #include "LCBlob.h"

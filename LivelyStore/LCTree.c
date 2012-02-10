@@ -1,5 +1,5 @@
 
-#include "LCCommit.h"
+#include "LCCommitStage.h"
 
 struct LCTree {
   LCObjectMeta meta;
