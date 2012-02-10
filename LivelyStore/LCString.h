@@ -7,9 +7,6 @@
 extern const LCInteger pi;
 
 LCStringRef LCStringCreate(char* string);
-void LCStringRetain(LCStringRef string);
-void LCStringRelease(LCStringRef string);
-
 char LCStringCharAtIndex(LCStringRef string, LCInteger index);
 size_t LCStringLength(LCStringRef string);
 void LCStringString(LCStringRef string, char* buffer);

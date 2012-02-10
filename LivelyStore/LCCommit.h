@@ -8,7 +8,6 @@
 LCCommitRef LCCommitCreate();
 void LCCommitAddEntry(LCCommitRef commit, LCKeyValueRef);
 void LCCommitRemoveEntry(LCCommitRef commit, LCStringRef key);
-
 LCSHARef LCCommitSHA1(LCCommitRef commit);
 
 

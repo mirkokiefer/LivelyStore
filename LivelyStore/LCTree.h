@@ -6,7 +6,6 @@
 #include "LivelyStore.h"
 
 LCTreeRef LCTreeCreate(LCTreeRef childTrees[], LCKeyValueRef childEntries[]);
-
 LCSHARef LCTreeSHA1(LCTreeRef tree);
 
 
