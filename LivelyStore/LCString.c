@@ -45,7 +45,7 @@ void LCStringString(LCStringRef string, char* buffer) {
 void LCStringPrint(LCStringRef string) {
   char content[LCStringSize(string)];
   LCStringString(string, content);
-  printf("%s", content);
+  printf("%s\n", content);
 }
 
 static inline void LCStringDealloc(LCStringRef string) {
