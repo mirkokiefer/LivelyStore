@@ -47,20 +47,37 @@ static char* test_sha1() {
   mu_assert("SHA1 from testData1 is correct", LCStringEqual(LCSHAHexString(testData1SHA), testData1RealSHA));
   mu_assert("SHA1 from testData3 is correct", LCStringEqual(LCSHAHexString(testData3SHA), testData3RealSHA));
   mu_assert("SHA1 from two LCBlobs is correct", LCStringEqual(LCSHAHexString(testData1and2SHA), testData3RealSHA));
-
+  mu_assert("LCSHAEqual is correct", LCSHAEqual(testData3SHA, testData1and2SHA));
   return 0;
 }
 
 
 static char* test_blob() {
   char* aCString = "normal string";
+  char* sameCString = "normal string";
+  char* differentCString = "different string";
+
   LCBlobRef aBlob = LCBlobCreate((LCByte*)aCString, strlen(aCString)+1);
+  LCBlobRef sameBlob = LCBlobCreate((LCByte*)sameCString, strlen(sameCString)+1);
+  LCBlobRef differentBlob = LCBlobCreate((LCByte*)differentCString, strlen(differentCString)+1);
+
   
   LCByte blobData[LCBlobLength(aBlob)];
   LCBlobData(aBlob, blobData);
   
   mu_assert("LCBlob stores data correctly", strcmp(aCString, (char*)blobData)==0);
-  
+  mu_assert("LCBlobEqual works with same blob data", LCBlobEqual(aBlob, sameBlob));
+  mu_assert("LCBlobEqual works with differing blob data", LCBlobEqual(aBlob, differentBlob)==false);
+
+  return 0;
+}
+
+static char* test_keyValue() {
+  LCStringRef someKey = LCStringCreate("somekey");
+  LCBlobRef someValue = LCBlobCreate((LCByte*)"12345", 6);
+  LCKeyValueRef keyValue = LCKeyValueCreate(someKey, someValue);
+  mu_assert("LCKeyValue stores key correctly", LCStringEqual(LCKeyValueKey(keyValue), someKey));
+  mu_assert("LCKeyValue stores value correctly", LCStringEqual(LCKeyValueKey(keyValue), someKey));
   return 0;
 }
 
@@ -69,6 +86,7 @@ static char* all_tests() {
   mu_run_test(test_string);
   mu_run_test(test_blob);
   mu_run_test(test_sha1);
+  mu_run_test(test_keyValue);
   return 0;
 }
 

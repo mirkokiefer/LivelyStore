@@ -61,3 +61,12 @@ LCStringRef LCSHAHexString(LCSHARef sha) {
   LCStringRef hexString = LCStringCreate(shaString);
   return hexString;
 }
+
+LCBool LCSHAEqual(LCSHARef sha, LCSHARef anotherSHA) {
+  for(LCInteger i=0; i<LC_SHA1_Length; i++) {
+    if(sha->sha[i] != anotherSHA->sha[i]) {
+      return false;
+    }
+  }
+  return true;
+}

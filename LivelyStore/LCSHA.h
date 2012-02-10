@@ -6,5 +6,5 @@
 
 LCSHARef LCSHACreate(LCBlobRef blobs[], size_t count);
 LCStringRef LCSHAHexString(LCSHARef sha);
-
+LCBool LCSHAEqual(LCSHARef sha, LCSHARef anotherSHA);
 #endif
