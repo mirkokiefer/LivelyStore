@@ -25,6 +25,13 @@ typedef struct LCKeyValue* LCKeyValueRef;
 typedef struct LCBlob* LCBlobRef;
 typedef struct LCSHA* LCSHARef;
 
+struct LCObjectMeta {
+  LCInteger rCount;
+  void (*dealloc)(void* object);;
+};
+
+typedef struct LCObjectMeta LCObjectMeta;
+
 #define LC_SHA1_Length 20
 
 #endif
@@ -37,3 +44,4 @@ typedef struct LCSHA* LCSHARef;
 #include "LCKeyValue.h"
 #include "LCBlob.h"
 #include "LCSHA.h"
+#include "LCUtils.h"

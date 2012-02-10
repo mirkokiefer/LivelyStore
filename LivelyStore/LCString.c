@@ -2,27 +2,28 @@
 #include "LCString.h"
 
 struct LCString {
-  LCInteger rCount;
+  LCObjectMeta meta;
   char content[];
 };
 
-static inline void LCStringDealloc(LCStringRef string);
+static inline void LCStringDealloc(void* string);
 
 LCStringRef LCStringCreate(char* string) {
   LCStringRef newString = malloc(sizeof(struct LCString) + strlen(string)+1);
   if (newString != NULL) {
+    newString->meta.dealloc = LCStringDealloc;
     memcpy(newString->content, string, strlen(string)+1);
   }
   return newString;
 };
 
 void LCStringRetain(LCStringRef string) {
-  string->rCount = string->rCount + 1;
+  string->meta.rCount = string->meta.rCount + 1;
 }
 
 void LCStringRelease(LCStringRef string) {
-  string->rCount = string->rCount - 1;
-  if(string->rCount == 0) {
+  string->meta.rCount = string->meta.rCount - 1;
+  if(string->meta.rCount == 0) {
     LCStringDealloc(string);
   }
 }
@@ -53,6 +54,4 @@ LCBool LCStringEqual(LCStringRef string, LCStringRef otherString) {
   return strcmp(string->content, otherString->content) == 0;
 }
 
-static inline void LCStringDealloc(LCStringRef string) {
-  free(string);
-}
+static inline void LCStringDealloc(void* string) {}
