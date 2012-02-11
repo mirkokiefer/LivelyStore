@@ -26,6 +26,10 @@ void LCStringString(LCStringRef string, char* buffer) {
   memcpy(buffer, string->content, strlen(string->content)+1);
 }
 
+char* LCStringStringRef(LCStringRef string) {
+  return string->content;
+}
+
 LCBlobRef LCStringCreateBlob(LCStringRef string) {
   return LCBlobCreate((LCByte*)string->content, strlen(string->content)+1);
 }
