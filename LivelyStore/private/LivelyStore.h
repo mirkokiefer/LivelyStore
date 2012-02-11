@@ -20,10 +20,13 @@ typedef bool LCBool;
 typedef LCStringRef LCKeyRef;
 typedef struct LCStore* LCStoreRef;
 typedef struct LCCommitStage* LCCommitStageRef;
-typedef struct LCTree* LCTreeRef;
 typedef struct LCKeyValue* LCKeyValueRef;
 typedef struct LCBlob* LCBlobRef;
 typedef struct LCSHA* LCSHARef;
+
+typedef struct LCTree* LCTreeRef;
+typedef struct LCBlobStore* LCBlobStoreRef;
+typedef struct LCKeyValueSHA LCKeyValueSHARef;
 
 struct LCObjectMeta {
   LCInteger rCount;
@@ -45,3 +48,5 @@ typedef struct LCObjectMeta LCObjectMeta;
 #include "LCBlob.h"
 #include "LCSHA.h"
 #include "LCUtils.h"
+#include "LCBlobStore.h"
+#include "LCKeyValueSHA.h"
