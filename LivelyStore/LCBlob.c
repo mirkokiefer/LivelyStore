@@ -2,7 +2,7 @@
 #include "LCBlob.h"
 
 struct LCBlob {
-  LCObjectMeta meta;
+  LCObjectInfo info;
   size_t length;
   LCSHARef sha;
   LCByte data[];
@@ -10,9 +10,14 @@ struct LCBlob {
 
 void LCBlobDealloc(void* object);
 
+LCType typeBlob = {
+  .dealloc = LCBlobDealloc
+};
+
 LCBlobRef LCBlobCreate(LCByte data[], size_t length) {
   LCBlobRef newBlob = malloc(sizeof(struct LCBlob) + length*sizeof(LCByte));
   if (newBlob != NULL) {
+    newBlob->info.type = &typeBlob;
     newBlob->length = length;
     memcpy(newBlob->data, data, length*sizeof(LCByte));
   }

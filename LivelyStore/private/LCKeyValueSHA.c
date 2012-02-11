@@ -2,17 +2,21 @@
 #include "LCKeyValueSHA.h"
 
 struct LCKeyValueSHA {
-  LCObjectMeta meta;
+  LCObjectInfo info;
   LCStringRef key;
   LCSHARef value;
 };
 
 void LCKeyValueSHADealloc(void* object);
 
+LCType typeKeyValueSHA = {
+  .dealloc = LCKeyValueSHADealloc
+};
+
 LCKeyValueSHARef LCKeyValueSHACreate(LCStringRef key, LCSHARef value) {
   LCKeyValueSHARef newKeyValue = malloc(sizeof(struct LCKeyValueSHA));
   if (newKeyValue != NULL) {
-    newKeyValue->meta.dealloc = LCKeyValueSHADealloc;
+    newKeyValue->info.type = &typeKeyValueSHA;
     LCRetain(key);
     LCRetain(value);
     newKeyValue->key=key;

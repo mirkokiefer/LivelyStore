@@ -2,17 +2,21 @@
 #include "LCCommitStage.h"
 
 struct LCKeyValue {
-  LCObjectMeta meta;
+  LCObjectInfo info;
   LCStringRef key;
   LCBlobRef value;
 };
 
 void LCKeyValueDealloc(void* object);
 
+LCType typeKeyValue = {
+  .dealloc = LCKeyValueDealloc
+};
+
 LCKeyValueRef LCKeyValueCreate(LCStringRef key, LCBlobRef value) {
   LCKeyValueRef newKeyValue = malloc(sizeof(struct LCKeyValue));
   if (newKeyValue != NULL) {
-    newKeyValue->meta.dealloc = LCKeyValueDealloc;
+    newKeyValue->info.type = &typeKeyValue;
     LCRetain(key);
     LCRetain(value);
     newKeyValue->key=key;

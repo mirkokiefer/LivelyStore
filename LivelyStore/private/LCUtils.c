@@ -2,16 +2,17 @@
 #include "LivelyStoreTests.h"
 
 void LCRetain(void* object) {
-  LCObjectMeta* meta = (LCObjectMeta*)object;
-  (*meta).rCount++;
+  LCObjectInfo* info = (LCObjectInfo*)object;
+  info->rCount++;
 }
 
 void LCRelease(void* object) {
-  LCObjectMeta* meta = (LCObjectMeta*)object;
-  (*meta).rCount--;
-  if((*meta).rCount == -1) {
-    if((*meta).dealloc) {
-      (*meta).dealloc(object);      
+  LCObjectInfo* info = (LCObjectInfo*)object;
+  info->rCount--;
+  if(info->rCount == -1) {
+    LCTypeRef type = (*info).type;
+    if(type->dealloc) {
+      type->dealloc(object);      
     }
     free(object);
     //printf("dealloc: %p", object);
@@ -19,6 +20,6 @@ void LCRelease(void* object) {
 }
 
 LCInteger LCRetainCount(void* object) {
-  LCObjectMeta* meta = (LCObjectMeta*)object;
-  return (*meta).rCount;
+  LCObjectInfo* info = (LCObjectInfo*)object;
+  return info->rCount;
 }

@@ -2,7 +2,7 @@
 #include "LCCommitStage.h"
 
 struct LCTree {
-  LCObjectMeta meta;
+  LCObjectInfo info;
   LCSHARef sha;
   size_t childTreesLength;
   size_t childBlobsLength;
@@ -11,11 +11,15 @@ struct LCTree {
 
 void LCTreeDealloc(void* object);
 
+LCType typeTree = {
+  .dealloc = LCTreeDealloc
+};
+
 LCTreeRef LCTreeCreate(LCKeyValueSHARef childTrees[], size_t childTreesLength,
                        LCKeyValueSHARef childBlobs[], size_t childBlobsLength) {
   LCTreeRef newTree = malloc(sizeof(struct LCTree)+sizeof(LCKeyValueSHARef)*(childBlobsLength+childTreesLength));
   if (newTree != NULL) {
-    newTree->meta.dealloc = LCTreeDealloc;
+    newTree->info.type = &typeTree;
     for (LCInteger i=0; i<childTreesLength; i++) {
       LCRetain(childTrees[i]);
     }

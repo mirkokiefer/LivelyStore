@@ -28,12 +28,21 @@ typedef struct LCTree* LCTreeRef;
 typedef struct LCBlobStore* LCBlobStoreRef;
 typedef struct LCKeyValueSHA* LCKeyValueSHARef;
 
-struct LCObjectMeta {
-  LCInteger rCount;
-  void (*dealloc)(void* object);;
+// internal types
+typedef struct LCType LCType;
+typedef struct LCType* LCTypeRef;
+typedef struct LCObjectInfo LCObjectInfo;
+
+struct LCType {
+  void (*dealloc)(void* object);
+  void* meta;
 };
 
-typedef struct LCObjectMeta LCObjectMeta;
+struct LCObjectInfo {
+  LCInteger rCount;
+  LCTypeRef type;
+};
+
 
 #define LC_SHA1_Length 20
 

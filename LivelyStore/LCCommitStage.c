@@ -2,17 +2,21 @@
 #include "LCCommitStage.h"
 
 struct LCCommitStage {
-  LCObjectMeta meta;
+  LCObjectInfo info;
   size_t length;
   LCKeyValueRef* keyValues;
 };
 
 void LCCommitStageDealloc(void* object);
 
+LCType typeCommitStage = {
+  .dealloc = LCCommitStageDealloc
+};
+
 LCCommitStageRef LCCommitStageCreate() {
   LCCommitStageRef newCommit = malloc(sizeof(struct LCCommitStage));
   if (newCommit != NULL) {
-    newCommit->meta.dealloc = LCCommitStageDealloc;
+    newCommit->info.type = &typeCommitStage;
   }
   return newCommit;
 };

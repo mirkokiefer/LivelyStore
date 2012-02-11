@@ -2,13 +2,18 @@
 #include "LCString.h"
 
 struct LCString {
-  LCObjectMeta meta;
+  LCObjectInfo info;
   char content[];
+};
+
+LCType typeString = {
+  .dealloc = NULL,
 };
 
 LCStringRef LCStringCreate(char* string) {
   LCStringRef newString = malloc(sizeof(struct LCString) + strlen(string)+1);
   if (newString != NULL) {
+    newString->info.type = &typeString;
     memcpy(newString->content, string, strlen(string)+1);
   }
   return newString;

@@ -9,4 +9,7 @@ LCSHARef LCSHACreateFromHexString(LCStringRef hexString);
 LCBlobRef LCSHABlob(LCSHARef sha);
 LCStringRef LCSHACreateHexString(LCSHARef sha);
 LCBool LCSHAEqual(LCSHARef sha, LCSHARef anotherSHA);
+
+//private
+void* LCSHAStoreLookup(LCSHARef sha, LCBlobStoreRef blobStore);
 #endif

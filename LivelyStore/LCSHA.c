@@ -2,12 +2,18 @@
 #include "LivelyStore.h"
 
 struct LCSHA {
-  LCObjectMeta meta;
+  LCObjectInfo info;
   LCBlobRef sha;
+  void* cachedValue;
+};
+
+void LCSHADealloc(void* object);
+
+LCType typeSHA = {
+  .dealloc = LCSHADealloc
 };
 
 void computeSHA1(LCBlobRef blobs[], size_t count, LCByte buffer[]);
-void LCSHADealloc(void* object);
 char hexDigitToASCIChar(char hexDigit);
 char asciCharToHexDigit(char hexDigit);
 void byteToHexDigits(LCByte input, char* buffer);
@@ -18,7 +24,7 @@ LCBlobRef createBlobFromHexString(LCStringRef hexString);
 LCSHARef LCSHACreate(LCBlobRef blobs[], size_t count) {
   LCSHARef newSha = malloc(sizeof(struct LCSHA) + LC_SHA1_Length);
   if (newSha != NULL) {
-    newSha->meta.dealloc = LCSHADealloc;
+    newSha->info.type = &typeSHA;
     LCByte sha[LC_SHA1_Length];
     computeSHA1(blobs, count, sha);
     newSha->sha = LCBlobCreate(sha, LC_SHA1_Length);
@@ -40,7 +46,7 @@ void computeSHA1(LCBlobRef blobs[], size_t count, LCByte buffer[]) {
 LCSHARef LCSHACreateFromHexString(LCStringRef hexString) {
   LCSHARef newSha = malloc(sizeof(struct LCSHA) + LC_SHA1_Length);
   if (newSha != NULL) {
-    newSha->meta.dealloc = LCSHADealloc;
+    newSha->info.type = &typeSHA;
     newSha->sha = createBlobFromHexString(hexString);
   }
   return newSha;
@@ -69,6 +75,14 @@ void LCSHADealloc(void* object) {
   LCRelease(((LCSHARef)object)->sha);
 }
 
+void* LCSHAStoreLookup(LCSHARef sha, LCBlobStoreRef blobStore) {
+  if(sha->cachedValue == NULL) {
+    sha->cachedValue = LCBlobStoreGet(blobStore, sha);    
+  }
+  return sha->cachedValue;
+}
+
+// utility functions
 char hexDigitToASCIChar(char hexDigit) {
   if(hexDigit > 9) {
     hexDigit = hexDigit - 10 + 97; //97 is A
