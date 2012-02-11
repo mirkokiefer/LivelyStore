@@ -44,6 +44,10 @@ LCBool LCBlobEqual(LCBlobRef blob, LCBlobRef anotherBlob) {
   return LCSHAEqual(blob1SHA, blob2SHA);
 }
 
+LCStringRef LCBLobCreateString(LCBlobRef blob) {
+  return LCStringCreate((char*)(blob->data));
+}
+
 void LCBlobDealloc(void* object) {
   LCBlobRef blob = (LCBlobRef)object;
   LCRelease(blob->sha);

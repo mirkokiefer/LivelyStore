@@ -12,5 +12,5 @@ void LCBlobData(LCBlobRef blob, LCByte buffer[]);
 LCByte* LCBlobDataRef(LCBlobRef blob);
 LCBool LCBlobEqual(LCBlobRef blob, LCBlobRef anotherBlob);
 LCSHARef LCBlobSHA1(LCBlobRef blob);
-
+LCStringRef LCBLobCreateString(LCBlobRef blob);
 #endif

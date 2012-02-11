@@ -77,7 +77,9 @@ static char* test_blob() {
   mu_assert("LCBlob stores data correctly", strcmp(aCString, (char*)blobData)==0);
   mu_assert("LCBlobEqual works with same blob data", LCBlobEqual(aBlob, sameBlob));
   mu_assert("LCBlobEqual works with differing blob data", LCBlobEqual(aBlob, differentBlob)==false);
-
+  LCStringRef aLCString = LCStringCreate(aCString);
+  LCStringRef stringFromBlob = LCBLobCreateString(aBlob);
+  mu_assert("LCBlob returns correct string", LCStringEqual(stringFromBlob, aLCString));
   return 0;
 }
 
