@@ -14,6 +14,23 @@ LCStringRef LCStringCreate(char* string) {
   return newString;
 };
 
+LCStringRef LCStringCreateFromStrings(LCStringRef strings[], size_t count) {
+  size_t totalLength = 1;
+  for (LCInteger i=0; i<count; i++) {
+    totalLength = totalLength + LCStringLength(strings[i])-1;
+  }
+  char buffer[totalLength];
+  size_t bufferPosition = 0;
+  size_t currentStringLength;
+  for (LCInteger i=0; i<count; i++) {
+    currentStringLength = LCStringLength(strings[i])-1;
+    memcpy(&buffer[bufferPosition], LCStringStringRef(strings[i]), currentStringLength);
+    bufferPosition = bufferPosition + currentStringLength;
+  }
+  buffer[totalLength-1]='\0';
+  return LCStringCreate(buffer);
+}
+
 char LCStringCharAtIndex(LCStringRef string, LCInteger index) {
   return string->content[index];
 }

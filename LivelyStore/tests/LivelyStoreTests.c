@@ -21,7 +21,12 @@ static char* test_string() {
   LCStringRef aLCString = LCStringCreate(aCString);
   LCStringRef anIdenticalLCString = LCStringCreate(anIdenticalCString);
   
-  mu_assert("LCStringEqual", LCStringEqual(aLCString, anIdenticalLCString));
+  mu_assert("LCStringEqual is correct", LCStringEqual(aLCString, anIdenticalLCString));
+  
+  LCStringRef bothStrings = LCStringCreate("abcdabcd");
+  LCStringRef stringArray[] = {aLCString, anIdenticalLCString};
+  LCStringRef mergedString = LCStringCreateFromStrings(stringArray, 2);
+  mu_assert("LCStringCreateFromStrings is correct", LCStringEqual(mergedString, bothStrings));
   return 0;
 }
 
