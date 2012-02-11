@@ -9,11 +9,16 @@
 /* Begin PBXBuildFile section */
 		AC54F88A14E4013D00F36F59 /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC54F88914E4013D00F36F59 /* libssl.dylib */; };
 		AC54F88C14E4131800F36F59 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC54F88B14E4131800F36F59 /* libcrypto.dylib */; };
-		AC54F8CE14E53B9800F36F59 /* LCBlob.c in Sources */ = {isa = PBXBuildFile; fileRef = AC54F8BE14E53B9800F36F59 /* LCBlob.c */; };
-		AC54F8CF14E53B9800F36F59 /* LCSHA.c in Sources */ = {isa = PBXBuildFile; fileRef = AC54F8C314E53B9800F36F59 /* LCSHA.c */; };
-		AC54F8D014E53B9800F36F59 /* LCString.c in Sources */ = {isa = PBXBuildFile; fileRef = AC54F8C614E53B9800F36F59 /* LCString.c */; };
-		AC54F8D114E53B9800F36F59 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = AC54F8CA14E53B9800F36F59 /* main.c */; };
-		AC54F8D214E53B9800F36F59 /* LivelyStoreTests.c in Sources */ = {isa = PBXBuildFile; fileRef = AC54F8CC14E53B9800F36F59 /* LivelyStoreTests.c */; };
+		AC56F80C14E6B85900F7F882 /* LCBlob.c in Sources */ = {isa = PBXBuildFile; fileRef = AC56F7F314E6B85900F7F882 /* LCBlob.c */; };
+		AC56F80D14E6B85900F7F882 /* LCCommitStage.c in Sources */ = {isa = PBXBuildFile; fileRef = AC56F7F514E6B85900F7F882 /* LCCommitStage.c */; };
+		AC56F80E14E6B85900F7F882 /* LCKeyValue.c in Sources */ = {isa = PBXBuildFile; fileRef = AC56F7F714E6B85900F7F882 /* LCKeyValue.c */; };
+		AC56F80F14E6B85900F7F882 /* LCSHA.c in Sources */ = {isa = PBXBuildFile; fileRef = AC56F7FA14E6B85900F7F882 /* LCSHA.c */; };
+		AC56F81014E6B85900F7F882 /* LCString.c in Sources */ = {isa = PBXBuildFile; fileRef = AC56F7FD14E6B85900F7F882 /* LCString.c */; };
+		AC56F81114E6B85900F7F882 /* LCTree.c in Sources */ = {isa = PBXBuildFile; fileRef = AC56F80214E6B85900F7F882 /* LCTree.c */; };
+		AC56F81214E6B85900F7F882 /* LCUtils.c in Sources */ = {isa = PBXBuildFile; fileRef = AC56F80414E6B85900F7F882 /* LCUtils.c */; };
+		AC56F81314E6B85900F7F882 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = AC56F80714E6B85900F7F882 /* main.c */; };
+		AC56F81414E6B85900F7F882 /* LivelyStoreTests.c in Sources */ = {isa = PBXBuildFile; fileRef = AC56F80914E6B85900F7F882 /* LivelyStoreTests.c */; };
+		AC56F81614E6B94B00F7F882 /* LCKeyValueSHA.c in Sources */ = {isa = PBXBuildFile; fileRef = AC56F81514E6B94B00F7F882 /* LCKeyValueSHA.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,22 +36,30 @@
 /* Begin PBXFileReference section */
 		AC54F88914E4013D00F36F59 /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = usr/lib/libssl.dylib; sourceTree = SDKROOT; };
 		AC54F88B14E4131800F36F59 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
-		AC54F8BE14E53B9800F36F59 /* LCBlob.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LCBlob.c; sourceTree = "<group>"; };
-		AC54F8BF14E53B9800F36F59 /* LCBlob.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCBlob.h; sourceTree = "<group>"; };
-		AC54F8C014E53B9800F36F59 /* LCCommit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCCommit.h; sourceTree = "<group>"; };
-		AC54F8C114E53B9800F36F59 /* LCKeyValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCKeyValue.h; sourceTree = "<group>"; };
-		AC54F8C214E53B9800F36F59 /* LCRemoteStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCRemoteStore.h; sourceTree = "<group>"; };
-		AC54F8C314E53B9800F36F59 /* LCSHA.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LCSHA.c; sourceTree = "<group>"; };
-		AC54F8C414E53B9800F36F59 /* LCSHA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCSHA.h; sourceTree = "<group>"; };
-		AC54F8C514E53B9800F36F59 /* LCStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCStore.h; sourceTree = "<group>"; };
-		AC54F8C614E53B9800F36F59 /* LCString.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LCString.c; sourceTree = "<group>"; };
-		AC54F8C714E53B9800F36F59 /* LCString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCString.h; sourceTree = "<group>"; };
-		AC54F8C814E53B9800F36F59 /* LCTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCTree.h; sourceTree = "<group>"; };
-		AC54F8C914E53B9800F36F59 /* LivelyStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LivelyStore.h; sourceTree = "<group>"; };
-		AC54F8CA14E53B9800F36F59 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		AC54F8CC14E53B9800F36F59 /* LivelyStoreTests.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LivelyStoreTests.c; sourceTree = "<group>"; };
-		AC54F8CD14E53B9800F36F59 /* LivelyStoreTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LivelyStoreTests.h; sourceTree = "<group>"; };
-		AC54F8D314E53E2900F36F59 /* minuit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = minuit.h; sourceTree = "<group>"; };
+		AC56F7F314E6B85900F7F882 /* LCBlob.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LCBlob.c; sourceTree = "<group>"; };
+		AC56F7F414E6B85900F7F882 /* LCBlob.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCBlob.h; sourceTree = "<group>"; };
+		AC56F7F514E6B85900F7F882 /* LCCommitStage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LCCommitStage.c; sourceTree = "<group>"; };
+		AC56F7F614E6B85900F7F882 /* LCCommitStage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCCommitStage.h; sourceTree = "<group>"; };
+		AC56F7F714E6B85900F7F882 /* LCKeyValue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LCKeyValue.c; sourceTree = "<group>"; };
+		AC56F7F814E6B85900F7F882 /* LCKeyValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCKeyValue.h; sourceTree = "<group>"; };
+		AC56F7F914E6B85900F7F882 /* LCRemoteStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCRemoteStore.h; sourceTree = "<group>"; };
+		AC56F7FA14E6B85900F7F882 /* LCSHA.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LCSHA.c; sourceTree = "<group>"; };
+		AC56F7FB14E6B85900F7F882 /* LCSHA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCSHA.h; sourceTree = "<group>"; };
+		AC56F7FC14E6B85900F7F882 /* LCStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCStore.h; sourceTree = "<group>"; };
+		AC56F7FD14E6B85900F7F882 /* LCString.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LCString.c; sourceTree = "<group>"; };
+		AC56F7FE14E6B85900F7F882 /* LCString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCString.h; sourceTree = "<group>"; };
+		AC56F80014E6B85900F7F882 /* LCBlobStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCBlobStore.h; sourceTree = "<group>"; };
+		AC56F80114E6B85900F7F882 /* LCKeyValueSHA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCKeyValueSHA.h; sourceTree = "<group>"; };
+		AC56F80214E6B85900F7F882 /* LCTree.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LCTree.c; sourceTree = "<group>"; };
+		AC56F80314E6B85900F7F882 /* LCTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCTree.h; sourceTree = "<group>"; };
+		AC56F80414E6B85900F7F882 /* LCUtils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LCUtils.c; sourceTree = "<group>"; };
+		AC56F80514E6B85900F7F882 /* LCUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCUtils.h; sourceTree = "<group>"; };
+		AC56F80614E6B85900F7F882 /* LivelyStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LivelyStore.h; sourceTree = "<group>"; };
+		AC56F80714E6B85900F7F882 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		AC56F80914E6B85900F7F882 /* LivelyStoreTests.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LivelyStoreTests.c; sourceTree = "<group>"; };
+		AC56F80A14E6B85900F7F882 /* LivelyStoreTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LivelyStoreTests.h; sourceTree = "<group>"; };
+		AC56F80B14E6B85900F7F882 /* minuit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = minuit.h; sourceTree = "<group>"; };
+		AC56F81514E6B94B00F7F882 /* LCKeyValueSHA.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LCKeyValueSHA.c; sourceTree = "<group>"; };
 		ACC5367F14DC81E500DC693F /* LivelyStore */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LivelyStore; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -63,33 +76,49 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		AC54F8BD14E53B9800F36F59 /* LivelyStore */ = {
+		AC56F7F214E6B85900F7F882 /* LivelyStore */ = {
 			isa = PBXGroup;
 			children = (
-				AC54F8BF14E53B9800F36F59 /* LCBlob.h */,
-				AC54F8BE14E53B9800F36F59 /* LCBlob.c */,
-				AC54F8C014E53B9800F36F59 /* LCCommit.h */,
-				AC54F8C114E53B9800F36F59 /* LCKeyValue.h */,
-				AC54F8C214E53B9800F36F59 /* LCRemoteStore.h */,
-				AC54F8C414E53B9800F36F59 /* LCSHA.h */,
-				AC54F8C314E53B9800F36F59 /* LCSHA.c */,
-				AC54F8C514E53B9800F36F59 /* LCStore.h */,
-				AC54F8C714E53B9800F36F59 /* LCString.h */,
-				AC54F8C614E53B9800F36F59 /* LCString.c */,
-				AC54F8C814E53B9800F36F59 /* LCTree.h */,
-				AC54F8C914E53B9800F36F59 /* LivelyStore.h */,
-				AC54F8CA14E53B9800F36F59 /* main.c */,
-				AC54F8CB14E53B9800F36F59 /* tests */,
+				AC56F7F314E6B85900F7F882 /* LCBlob.c */,
+				AC56F7F414E6B85900F7F882 /* LCBlob.h */,
+				AC56F7F514E6B85900F7F882 /* LCCommitStage.c */,
+				AC56F7F614E6B85900F7F882 /* LCCommitStage.h */,
+				AC56F7F714E6B85900F7F882 /* LCKeyValue.c */,
+				AC56F7F814E6B85900F7F882 /* LCKeyValue.h */,
+				AC56F7F914E6B85900F7F882 /* LCRemoteStore.h */,
+				AC56F7FA14E6B85900F7F882 /* LCSHA.c */,
+				AC56F7FB14E6B85900F7F882 /* LCSHA.h */,
+				AC56F7FC14E6B85900F7F882 /* LCStore.h */,
+				AC56F7FD14E6B85900F7F882 /* LCString.c */,
+				AC56F7FE14E6B85900F7F882 /* LCString.h */,
+				AC56F7FF14E6B85900F7F882 /* private */,
+				AC56F80814E6B85900F7F882 /* tests */,
 			);
 			path = LivelyStore;
 			sourceTree = "<group>";
 		};
-		AC54F8CB14E53B9800F36F59 /* tests */ = {
+		AC56F7FF14E6B85900F7F882 /* private */ = {
 			isa = PBXGroup;
 			children = (
-				AC54F8CD14E53B9800F36F59 /* LivelyStoreTests.h */,
-				AC54F8D314E53E2900F36F59 /* minuit.h */,
-				AC54F8CC14E53B9800F36F59 /* LivelyStoreTests.c */,
+				AC56F80014E6B85900F7F882 /* LCBlobStore.h */,
+				AC56F80114E6B85900F7F882 /* LCKeyValueSHA.h */,
+				AC56F81514E6B94B00F7F882 /* LCKeyValueSHA.c */,
+				AC56F80214E6B85900F7F882 /* LCTree.c */,
+				AC56F80314E6B85900F7F882 /* LCTree.h */,
+				AC56F80414E6B85900F7F882 /* LCUtils.c */,
+				AC56F80514E6B85900F7F882 /* LCUtils.h */,
+				AC56F80614E6B85900F7F882 /* LivelyStore.h */,
+				AC56F80714E6B85900F7F882 /* main.c */,
+			);
+			path = private;
+			sourceTree = "<group>";
+		};
+		AC56F80814E6B85900F7F882 /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				AC56F80914E6B85900F7F882 /* LivelyStoreTests.c */,
+				AC56F80A14E6B85900F7F882 /* LivelyStoreTests.h */,
+				AC56F80B14E6B85900F7F882 /* minuit.h */,
 			);
 			path = tests;
 			sourceTree = "<group>";
@@ -97,7 +126,7 @@
 		ACC5367414DC81E400DC693F = {
 			isa = PBXGroup;
 			children = (
-				AC54F8BD14E53B9800F36F59 /* LivelyStore */,
+				AC56F7F214E6B85900F7F882 /* LivelyStore */,
 				AC54F88B14E4131800F36F59 /* libcrypto.dylib */,
 				AC54F88914E4013D00F36F59 /* libssl.dylib */,
 				ACC5368014DC81E500DC693F /* Products */,
@@ -162,11 +191,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC54F8CE14E53B9800F36F59 /* LCBlob.c in Sources */,
-				AC54F8CF14E53B9800F36F59 /* LCSHA.c in Sources */,
-				AC54F8D014E53B9800F36F59 /* LCString.c in Sources */,
-				AC54F8D114E53B9800F36F59 /* main.c in Sources */,
-				AC54F8D214E53B9800F36F59 /* LivelyStoreTests.c in Sources */,
+				AC56F80C14E6B85900F7F882 /* LCBlob.c in Sources */,
+				AC56F80D14E6B85900F7F882 /* LCCommitStage.c in Sources */,
+				AC56F80E14E6B85900F7F882 /* LCKeyValue.c in Sources */,
+				AC56F80F14E6B85900F7F882 /* LCSHA.c in Sources */,
+				AC56F81014E6B85900F7F882 /* LCString.c in Sources */,
+				AC56F81114E6B85900F7F882 /* LCTree.c in Sources */,
+				AC56F81214E6B85900F7F882 /* LCUtils.c in Sources */,
+				AC56F81314E6B85900F7F882 /* main.c in Sources */,
+				AC56F81414E6B85900F7F882 /* LivelyStoreTests.c in Sources */,
+				AC56F81614E6B94B00F7F882 /* LCKeyValueSHA.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
