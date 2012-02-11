@@ -48,8 +48,7 @@ struct LCObjectInfo {
 };
 
 struct LCHashableObject {
-  void (*blobs)(void* object, LCBlobRef buffer[]);
-  size_t (*blobCount)(void* object);
+  LCBlobArrayRef (*blobArrayCopy)(void* object);
 };
 
 

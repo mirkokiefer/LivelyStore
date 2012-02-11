@@ -2,7 +2,7 @@
 #include "LCBlob.h"
 
 void LCBlobDealloc(void* object);
-void LCBlobBlobs(void* blob, LCBlobRef* buffer);
+LCBlobArrayRef LCBlobBlobsArrayCopy(void* blob);
 size_t LCBlobBlobCount(void* blob);
 
 struct LCBlob {
@@ -13,8 +13,7 @@ struct LCBlob {
 };
 
 LCHashableObject hashableBlob = {
-  .blobs = LCBlobBlobs,
-  .blobCount = LCBlobBlobCount
+  .blobArrayCopy = LCBlobBlobsArrayCopy,
 };
 
 LCType typeBlob = {
@@ -44,14 +43,9 @@ LCByte* LCBlobDataRef(LCBlobRef blob) {
   return blob->data;
 }
 
-void LCBlobBlobs(void* object, LCBlobRef* buffer) {
+LCBlobArrayRef LCBlobBlobsArrayCopy(void* object) {
   LCBlobRef blob = (LCBlobRef)object;
-  LCBlobRef blobs[] = {blob};
-  memcpy(buffer, blobs, sizeof(LCBlobRef));
-}
-
-size_t LCBlobBlobCount(void* blob) {
-  return 1;
+  return LCBlobArrayCreate(&blob, 1);
 }
 
 LCSHARef LCBlobSHA1(LCBlobRef blob) {
@@ -73,5 +67,7 @@ LCStringRef LCBLobCreateString(LCBlobRef blob) {
 
 void LCBlobDealloc(void* object) {
   LCBlobRef blob = (LCBlobRef)object;
-  LCRelease(blob->sha);
+  if(blob->sha) {
+    LCRelease(blob->sha);    
+  }
 }

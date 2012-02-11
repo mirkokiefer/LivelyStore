@@ -1,8 +1,7 @@
 
 #include "LCCommitStage.h"
 
-void LCTreeBlobs(void* blob, LCBlobRef* buffer);
-size_t LCTreeBlobCount(void* blob);
+LCBlobArrayRef LCTreeBlobArrayCopy(void* blob);
 void LCTreeDealloc(void* object);
 
 struct LCTree {
@@ -14,8 +13,7 @@ struct LCTree {
 };
 
 LCHashableObject hashableTree = {
-  .blobs = LCTreeBlobs,
-  .blobCount = LCTreeBlobCount
+  .blobArrayCopy = LCTreeBlobArrayCopy,
 };
 
 LCType typeTree = {
@@ -58,14 +56,10 @@ LCKeyValueSHARef* LCTreeChildBlobs(LCTreeRef tree) {
   return &(tree->children[tree->childTreesLength]);
 }
 
-size_t LCTreeBlobCount(void* blob) {
+LCBlobArrayRef LCTreeBlobArrayCopy(void* blob) {
   LCTreeRef tree = (LCTreeRef)blob;
-  return tree->childTreesLength*2 + tree->childBlobsLength*2;
-}
-
-void LCTreeBlobs(void* blob, LCBlobRef* buffer) {
-  LCTreeRef tree = (LCTreeRef)blob;
-  size_t blobCount = LCTreeBlobCount(blob);
+  size_t blobCount = tree->childTreesLength*2 + tree->childBlobsLength*2;
+  LCBlobRef buffer[blobCount];
   LCInteger bufferIndex = 0;
   for (LCInteger i=0; i<blobCount/2; i++) {
     LCBlobRef key = LCStringCreateBlob(LCKeyValueSHAKey(tree->children[i]));
@@ -74,6 +68,7 @@ void LCTreeBlobs(void* blob, LCBlobRef* buffer) {
     buffer[bufferIndex+1] = value;
     bufferIndex = bufferIndex+2;
   }
+  return LCBlobArrayCreate(buffer, blobCount);
 }
 
 LCSHARef LCTreeSHA(LCTreeRef tree) {

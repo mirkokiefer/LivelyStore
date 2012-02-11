@@ -2,7 +2,7 @@
 #include "LCBlobArray.h"
 
 void LCBlobArrayDealloc(void* object);
-void LCBlobArrayBlobRef(void* blob, LCBlobRef* buffer);
+LCBlobArrayRef LCBlobArrayCopy(void* blob);
 size_t LCBlobArrayBlobCount(void* blob);
 
 struct LCBlobArray {
@@ -12,8 +12,7 @@ struct LCBlobArray {
 };
 
 LCHashableObject hashableBlobArray = {
-  .blobs = LCBlobArrayBlobRef,
-  .blobCount = LCBlobArrayBlobCount
+  .blobArrayCopy = LCBlobArrayCopy,
 };
 
 LCType typeBlobArray = {
@@ -47,9 +46,13 @@ LCBlobRef LCBlobBlobAtIndex(LCBlobArrayRef blob, LCInteger index) {
   }
 }
 
-void LCBlobArrayBlobRef(void* object, LCBlobRef* buffer) {
-  LCBlobArrayRef array = (LCBlobArrayRef)object;
-  memcpy(buffer, array->blobs, array->length*sizeof(LCBlobRef));
+LCBlobRef* LCBlobArrayBlobs(LCBlobArrayRef array) {
+  return array->blobs;
+}
+
+LCBlobArrayRef LCBlobArrayCopy(void* object) {
+  LCRetain(object);
+  return object;
 }
 
 size_t LCBlobArrayBlobCount(void* blob) {

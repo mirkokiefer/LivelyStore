@@ -25,10 +25,10 @@ LCBlobRef createBlobFromHexString(LCStringRef hexString);
 LCSHARef LCSHACreateFromHashableObject(void* object) {
   LCObjectInfoRef info = (LCObjectInfoRef)object;
   LCHashableObjectRef hashableObject = info->type->meta;
-  size_t blobCount = hashableObject->blobCount(object);
-  LCBlobRef buffer[blobCount];
-  hashableObject->blobs(object, buffer);
-  return LCSHACreate(buffer, blobCount);
+  LCBlobArrayRef blobArray = hashableObject->blobArrayCopy(object);
+  LCSHARef sha = LCSHACreate(LCBlobArrayBlobs(blobArray), LCBlobArrayLength(blobArray));
+  LCRelease(blobArray);
+  return sha;
 }
 
 LCSHARef LCSHACreateFromHexString(LCStringRef hexString, LCBlobStoreRef store) {
