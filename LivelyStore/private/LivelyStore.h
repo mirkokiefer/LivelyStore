@@ -28,6 +28,7 @@ typedef struct LCSHA* LCSHARef;
 typedef struct LCTree* LCTreeRef;
 typedef struct LCBlobStore* LCBlobStoreRef;
 typedef struct LCKeyValueSHA* LCKeyValueSHARef;
+typedef struct LCCommit* LCCommitRef;
 
 // internal types
 typedef struct LCType LCType;
@@ -68,3 +69,4 @@ struct LCHashableObject {
 #include "LCUtils.h"
 #include "LCBlobStore.h"
 #include "LCKeyValueSHA.h"
+#include "LCCommit.h"

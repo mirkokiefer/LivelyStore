@@ -1,12 +1,13 @@
 
 #include "LivelyStoreTests.h"
 
-void LCRetain(void* object) {
+void* LCRetain(void* object) {
   LCObjectInfo* info = (LCObjectInfo*)object;
   info->rCount++;
+  return object;
 }
 
-void LCRelease(void* object) {
+void* LCRelease(void* object) {
   LCObjectInfo* info = (LCObjectInfo*)object;
   info->rCount--;
   if(info->rCount == -1) {
@@ -17,6 +18,7 @@ void LCRelease(void* object) {
     free(object);
     //printf("dealloc: %p", object);
   }
+  return object;
 }
 
 LCInteger LCRetainCount(void* object) {
