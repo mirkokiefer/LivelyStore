@@ -62,6 +62,10 @@ LCStringRef LCSHACreateHexString(LCSHARef sha) {
   return hexString;
 }
 
+LCBlobRef LCSHABlob(LCSHARef sha) {
+  return sha->sha;
+}
+
 LCBool LCSHAEqual(LCSHARef sha, LCSHARef anotherSHA) {
   LCByte* sha1Bytes = LCBlobDataRef(sha->sha);
   LCByte* sha2Bytes = LCBlobDataRef(anotherSHA->sha);
