@@ -5,6 +5,7 @@
 #include "LivelyStore.h"
 
 LCSHARef LCSHACreate(LCBlobRef blobs[], size_t count);
+LCSHARef LCSHACreateFromHexString(LCStringRef hexString);
 LCBlobRef LCSHABlob(LCSHARef sha);
 LCStringRef LCSHACreateHexString(LCSHARef sha);
 LCBool LCSHAEqual(LCSHARef sha, LCSHARef anotherSHA);

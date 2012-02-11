@@ -48,6 +48,10 @@ static char* test_sha1() {
   mu_assert("SHA1 from testData3 is correct", LCStringEqual(LCSHACreateHexString(testData3SHA), testData3RealSHA));
   mu_assert("SHA1 from two LCBlobs is correct", LCStringEqual(LCSHACreateHexString(testData1and2SHA), testData3RealSHA));
   mu_assert("LCSHAEqual is correct", LCSHAEqual(testData3SHA, testData1and2SHA));
+  
+  LCSHARef fromHexString = LCSHACreateFromHexString(testData1RealSHA);
+  LCStringRef hexStringAgain = LCSHACreateHexString(fromHexString);
+  mu_assert("LCSHA can be created from hex string", LCStringEqual(hexStringAgain, testData1RealSHA));
   return 0;
 }
 
