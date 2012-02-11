@@ -6,11 +6,11 @@ struct LCSHA {
   LCBlobRef sha;
 };
 
-void computeSHA1(LCBlobRef blobs[], size_t count, unsigned char buffer[]);
+void computeSHA1(LCBlobRef blobs[], size_t count, LCByte buffer[]);
 void LCSHADealloc(void* object);
 char hexDigitToCharacter(char hexDigit);
-void unsignedCharToHex(unsigned char input, char* buffer);
-void unsignedCharArrayToHexString(unsigned char input[], size_t length, char* buffer);
+void unsignedCharToHex(LCByte input, char* buffer);
+void unsignedCharArrayToHexString(LCByte input[], size_t length, char* buffer);
 
 LCSHARef LCSHACreate(LCBlobRef blobs[], size_t count) {
   LCSHARef newSha = malloc(sizeof(struct LCSHA) + LC_SHA1_Length);
@@ -24,7 +24,7 @@ LCSHARef LCSHACreate(LCBlobRef blobs[], size_t count) {
 };
 
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-void computeSHA1(LCBlobRef blobs[], size_t count, unsigned char buffer[]) {
+void computeSHA1(LCBlobRef blobs[], size_t count, LCByte buffer[]) {
   SHA_CTX context;
   SHA1_Init(&context);
   for(LCInteger i=0; i<count; i++) {
@@ -33,8 +33,6 @@ void computeSHA1(LCBlobRef blobs[], size_t count, unsigned char buffer[]) {
   SHA1_Final(buffer, &context);
 }
 #pragma GCC diagnostic warning "-Wdeprecated-declarations"
-
-void LCSHADealloc(void* object) {}
 
 char hexDigitToCharacter(char hexDigit) {
   if(hexDigit > 9) {
@@ -45,12 +43,12 @@ char hexDigitToCharacter(char hexDigit) {
   return hexDigit;
 }
 
-void unsignedCharToHex(unsigned char input, char* buffer) {
+void unsignedCharToHex(LCByte input, char* buffer) {
   buffer[0] = hexDigitToCharacter(input/16);
   buffer[1] = hexDigitToCharacter(input%16);
 }
 
-void unsignedCharArrayToHexString(unsigned char input[], size_t length, char* buffer) {
+void unsignedCharArrayToHexString(LCByte input[], size_t length, char* buffer) {
   for(LCInteger i=0; i<length; i++) {
     unsignedCharToHex(input[i], &buffer[i*2]);
   }
@@ -73,4 +71,8 @@ LCBool LCSHAEqual(LCSHARef sha, LCSHARef anotherSHA) {
     }
   }
   return true;
+}
+
+void LCSHADealloc(void* object) {
+  LCRelease(((LCSHARef)object)->sha);
 }
