@@ -1,6 +1,10 @@
 
 #include "LCCommitStage.h"
 
+void LCTreeBlobs(void* blob, LCBlobRef* buffer);
+size_t LCTreeBlobCount(void* blob);
+void LCTreeDealloc(void* object);
+
 struct LCTree {
   LCObjectInfo info;
   LCSHARef sha;
@@ -9,10 +13,14 @@ struct LCTree {
   LCKeyValueSHARef children[];
 };
 
-void LCTreeDealloc(void* object);
+LCHashableObject hashableTree = {
+  .blobs = LCTreeBlobs,
+  .blobCount = LCTreeBlobCount
+};
 
 LCType typeTree = {
-  .dealloc = LCTreeDealloc
+  .dealloc = LCTreeDealloc,
+  .meta = &hashableTree
 };
 
 LCTreeRef LCTreeCreate(LCKeyValueSHARef childTrees[], size_t childTreesLength,
@@ -50,20 +58,28 @@ LCKeyValueSHARef* LCTreeChildBlobs(LCTreeRef tree) {
   return &(tree->children[tree->childTreesLength]);
 }
 
-LCSHARef LCTreeSHA1(LCTreeRef tree) {
+size_t LCTreeBlobCount(void* blob) {
+  LCTreeRef tree = (LCTreeRef)blob;
+  return tree->childTreesLength*2 + tree->childBlobsLength*2;
+}
+
+void LCTreeBlobs(void* blob, LCBlobRef* buffer) {
+  LCTreeRef tree = (LCTreeRef)blob;
+  size_t blobCount = LCTreeBlobCount(blob);
+  LCInteger bufferIndex = 0;
+  for (LCInteger i=0; i<blobCount/2; i++) {
+    LCBlobRef key = LCStringCreateBlob(LCKeyValueSHAKey(tree->children[i]));
+    LCBlobRef value = LCSHASHABlob(LCKeyValueSHAValue(tree->children[i]));
+    buffer[bufferIndex] = key;
+    buffer[bufferIndex+1] = value;
+    bufferIndex = bufferIndex+2;
+  }
+}
+
+LCSHARef LCTreeSHA(LCTreeRef tree) {
   if(tree->sha == NULL) {
-    size_t blobCount = tree->childTreesLength*2 + tree->childBlobsLength*2;
-    LCBlobRef blobs[blobCount];
-    LCInteger blobIndex = 0;
-    for (LCInteger i=0; i<blobCount/2; i++) {
-      LCBlobRef key = LCStringCreateBlob(LCKeyValueSHAKey(tree->children[i]));
-      LCBlobRef value = LCSHABlob(LCKeyValueSHAValue(tree->children[i]));
-      blobs[blobIndex] = key;
-      blobs[blobIndex+1] = value;
-      blobIndex = blobIndex+2;
-    }
-    tree->sha = LCSHACreate(blobs, blobCount);
-  };
+    tree->sha = LCSHACreateFromHashableObject(tree);
+  }
   return tree->sha;
 }
 

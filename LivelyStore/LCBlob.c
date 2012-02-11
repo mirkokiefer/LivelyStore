@@ -1,6 +1,10 @@
 
 #include "LCBlob.h"
 
+void LCBlobDealloc(void* object);
+void LCBlobBlobs(void* blob, LCBlobRef* buffer);
+size_t LCBlobBlobCount(void* blob);
+
 struct LCBlob {
   LCObjectInfo info;
   size_t length;
@@ -8,10 +12,14 @@ struct LCBlob {
   LCByte data[];
 };
 
-void LCBlobDealloc(void* object);
+LCHashableObject hashableBlob = {
+  .blobs = LCBlobBlobs,
+  .blobCount = LCBlobBlobCount
+};
 
 LCType typeBlob = {
-  .dealloc = LCBlobDealloc
+  .dealloc = LCBlobDealloc,
+  .meta = &hashableBlob
 };
 
 LCBlobRef LCBlobCreate(LCByte data[], size_t length) {
@@ -36,9 +44,19 @@ LCByte* LCBlobDataRef(LCBlobRef blob) {
   return blob->data;
 }
 
+void LCBlobBlobs(void* object, LCBlobRef* buffer) {
+  LCBlobRef blob = (LCBlobRef)object;
+  LCBlobRef blobs[] = {blob};
+  memcpy(buffer, blobs, sizeof(LCBlobRef));
+}
+
+size_t LCBlobBlobCount(void* blob) {
+  return 1;
+}
+
 LCSHARef LCBlobSHA1(LCBlobRef blob) {
   if(blob->sha == NULL) {
-    blob->sha = LCSHACreate(&blob, 1);    
+    blob->sha = LCSHACreateFromHashableObject(blob);
   }
   return blob->sha;
 }

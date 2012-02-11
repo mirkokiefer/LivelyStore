@@ -4,7 +4,7 @@
 struct LCSHA {
   LCObjectInfo info;
   LCBlobRef sha;
-  void* cachedValue;
+  void* object;
 };
 
 void LCSHADealloc(void* object);
@@ -13,6 +13,7 @@ LCType typeSHA = {
   .dealloc = LCSHADealloc
 };
 
+LCSHARef LCSHACreate(LCBlobRef blobs[], size_t count);
 void computeSHA1(LCBlobRef blobs[], size_t count, LCByte buffer[]);
 char hexDigitToASCIChar(char hexDigit);
 char asciCharToHexDigit(char hexDigit);
@@ -20,6 +21,24 @@ void byteToHexDigits(LCByte input, char* buffer);
 LCByte hexDigitsToByte(char* hexDigits);
 LCStringRef createHexStringFromBlob(LCBlobRef blob);
 LCBlobRef createBlobFromHexString(LCStringRef hexString);
+
+LCSHARef LCSHACreateFromHashableObject(void* object) {
+  LCObjectInfoRef info = (LCObjectInfoRef)object;
+  LCHashableObjectRef hashableObject = info->type->meta;
+  size_t blobCount = hashableObject->blobCount(object);
+  LCBlobRef buffer[blobCount];
+  hashableObject->blobs(object, buffer);
+  return LCSHACreate(buffer, blobCount);
+}
+
+LCSHARef LCSHACreateFromHexString(LCStringRef hexString, LCBlobStoreRef store) {
+  LCSHARef newSha = malloc(sizeof(struct LCSHA) + LC_SHA1_Length);
+  if (newSha != NULL) {
+    newSha->info.type = &typeSHA;
+    newSha->sha = createBlobFromHexString(hexString);
+  }
+  return newSha;
+}
 
 LCSHARef LCSHACreate(LCBlobRef blobs[], size_t count) {
   LCSHARef newSha = malloc(sizeof(struct LCSHA) + LC_SHA1_Length);
@@ -32,6 +51,10 @@ LCSHARef LCSHACreate(LCBlobRef blobs[], size_t count) {
   return newSha;
 };
 
+LCBlobRef LCSHASHABlob(LCSHARef sha) {
+  return sha->sha;
+}
+
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 void computeSHA1(LCBlobRef blobs[], size_t count, LCByte buffer[]) {
   SHA_CTX context;
@@ -43,21 +66,12 @@ void computeSHA1(LCBlobRef blobs[], size_t count, LCByte buffer[]) {
 }
 #pragma GCC diagnostic warning "-Wdeprecated-declarations"
 
-LCSHARef LCSHACreateFromHexString(LCStringRef hexString) {
-  LCSHARef newSha = malloc(sizeof(struct LCSHA) + LC_SHA1_Length);
-  if (newSha != NULL) {
-    newSha->info.type = &typeSHA;
-    newSha->sha = createBlobFromHexString(hexString);
-  }
-  return newSha;
-}
-
 LCStringRef LCSHACreateHexString(LCSHARef sha) {
   return createHexStringFromBlob(sha->sha);
 }
 
-LCBlobRef LCSHABlob(LCSHARef sha) {
-  return sha->sha;
+void* LCSHAObject(LCSHARef sha) {
+  return sha->object;
 }
 
 LCBool LCSHAEqual(LCSHARef sha, LCSHARef anotherSHA) {
@@ -73,13 +87,6 @@ LCBool LCSHAEqual(LCSHARef sha, LCSHARef anotherSHA) {
 
 void LCSHADealloc(void* object) {
   LCRelease(((LCSHARef)object)->sha);
-}
-
-void* LCSHAStoreLookup(LCSHARef sha, LCBlobStoreRef blobStore) {
-  if(sha->cachedValue == NULL) {
-    sha->cachedValue = LCBlobStoreGet(blobStore, sha);    
-  }
-  return sha->cachedValue;
 }
 
 // utility functions

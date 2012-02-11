@@ -4,12 +4,11 @@
 
 #include "LivelyStore.h"
 
-LCSHARef LCSHACreate(LCBlobRef blobs[], size_t count);
-LCSHARef LCSHACreateFromHexString(LCStringRef hexString);
-LCBlobRef LCSHABlob(LCSHARef sha);
+LCSHARef LCSHACreateFromHashableObject(void* object);
+LCSHARef LCSHACreateFromHexString(LCStringRef hexString, LCBlobStoreRef blobStore);
+void* LCSHAObject(LCSHARef sha);
 LCStringRef LCSHACreateHexString(LCSHARef sha);
 LCBool LCSHAEqual(LCSHARef sha, LCSHARef anotherSHA);
+LCBlobRef LCSHASHABlob(LCSHARef sha);
 
-//private
-void* LCSHAStoreLookup(LCSHARef sha, LCBlobStoreRef blobStore);
 #endif

@@ -1,7 +1,7 @@
 
 
-#ifndef LivelyStore_LCKey_h
-#define LivelyStore_LCKey_h
+#ifndef LivelyStore_LCKeyValue_h
+#define LivelyStore_LCKeyValue_h
 
 #include "LivelyStore.h"
 

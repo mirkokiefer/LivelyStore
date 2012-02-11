@@ -22,6 +22,7 @@ typedef struct LCStore* LCStoreRef;
 typedef struct LCCommitStage* LCCommitStageRef;
 typedef struct LCKeyValue* LCKeyValueRef;
 typedef struct LCBlob* LCBlobRef;
+typedef struct LCBlobArray* LCBlobArrayRef;
 typedef struct LCSHA* LCSHARef;
 
 typedef struct LCTree* LCTreeRef;
@@ -32,6 +33,9 @@ typedef struct LCKeyValueSHA* LCKeyValueSHARef;
 typedef struct LCType LCType;
 typedef struct LCType* LCTypeRef;
 typedef struct LCObjectInfo LCObjectInfo;
+typedef struct LCObjectInfo* LCObjectInfoRef;
+typedef struct LCHashableObject LCHashableObject;
+typedef struct LCHashableObject* LCHashableObjectRef;
 
 struct LCType {
   void (*dealloc)(void* object);
@@ -41,6 +45,11 @@ struct LCType {
 struct LCObjectInfo {
   LCInteger rCount;
   LCTypeRef type;
+};
+
+struct LCHashableObject {
+  void (*blobs)(void* object, LCBlobRef buffer[]);
+  size_t (*blobCount)(void* object);
 };
 
 
@@ -55,6 +64,7 @@ struct LCObjectInfo {
 #include "LCTree.h"
 #include "LCKeyValue.h"
 #include "LCBlob.h"
+#include "LCBlobArray.h"
 #include "LCSHA.h"
 #include "LCUtils.h"
 #include "LCBlobStore.h"

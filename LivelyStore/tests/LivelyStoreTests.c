@@ -30,31 +30,41 @@ static char* test_string() {
   return 0;
 }
 
+static char* test_blobArray() {
+  char* data1 = "abc";
+  char* data2 = "def";
+  
+  LCBlobRef blob1 = LCBlobCreate((LCByte*)data1, strlen(data1)+1);
+  LCBlobRef blob2 = LCBlobCreate((LCByte*)data2, strlen(data1)+1);
+  LCBlobRef blobs[] = {blob1, blob2};
+  LCBlobArrayRef array = LCBlobArrayCreate(blobs, 2);
+  LCBool correct = (LCBlobBlobAtIndex(array, 0) == blob1) && (LCBlobBlobAtIndex(array, 1) == blob2);
+  mu_assert("LCBlobArray stores elements correctly", correct);
+  return 0;
+}
+
 static char* test_sha1() {
   char* testData1 = "compute sha1";
   char* testData2 = " abc";
-  char* testData3 = "compute sha1 abc";
+  //char* testData3 = "compute sha1 abc";
   LCStringRef testData1RealSHA = LCStringCreate("a0e1e14cb346a01f9fd10e60080b945f995524af");
   LCStringRef testData3RealSHA = LCStringCreate("253f7e747aa2bd4107cc0af2f78fe60fc075d090");
   
   LCBlobRef testData1Blob = LCStringCreateBlob(LCStringCreate(testData1));
   LCBlobRef testData1BlobNoNull = LCBlobCreate((LCByte*)testData1, strlen(testData1));
   LCBlobRef testData2Blob = LCStringCreateBlob(LCStringCreate(testData2));
-  LCBlobRef testData3Blob = LCStringCreateBlob(LCStringCreate(testData3));
-  LCBlobRef testData1and2Blobs[2];
-  testData1and2Blobs[0] = testData1BlobNoNull;
-  testData1and2Blobs[1] = testData2Blob;
+  LCBlobRef testData1and2Blobs[] = {testData1BlobNoNull, testData2Blob};
+  LCBlobArrayRef testData1and2BlobArray = LCBlobArrayCreate(testData1and2Blobs, 2);
   
-  LCSHARef testData1SHA = LCBlobSHA1(testData1Blob);
-  LCSHARef testData3SHA = LCBlobSHA1(testData3Blob);
-  LCSHARef testData1and2SHA = LCSHACreate(testData1and2Blobs, 2);
+  LCSHARef testData1SHA = LCSHACreateFromHashableObject(testData1Blob);
+  LCSHARef testData1SHAClone = LCBlobSHA1(testData1Blob);
+  LCSHARef testData1and2SHA = LCSHACreateFromHashableObject(testData1and2BlobArray);
   
   mu_assert("SHA1 from testData1 is correct", LCStringEqual(LCSHACreateHexString(testData1SHA), testData1RealSHA));
-  mu_assert("SHA1 from testData3 is correct", LCStringEqual(LCSHACreateHexString(testData3SHA), testData3RealSHA));
   mu_assert("SHA1 from two LCBlobs is correct", LCStringEqual(LCSHACreateHexString(testData1and2SHA), testData3RealSHA));
-  mu_assert("LCSHAEqual is correct", LCSHAEqual(testData3SHA, testData1and2SHA));
+  mu_assert("LCSHAEqual is correct", LCSHAEqual(testData1SHA, testData1SHAClone));
   
-  LCSHARef fromHexString = LCSHACreateFromHexString(testData1RealSHA);
+  LCSHARef fromHexString = LCSHACreateFromHexString(testData1RealSHA, NULL);
   LCStringRef hexStringAgain = LCSHACreateHexString(fromHexString);
   mu_assert("LCSHA can be created from hex string", LCStringEqual(hexStringAgain, testData1RealSHA));
   return 0;
@@ -127,7 +137,7 @@ static char* test_tree() {
   
   LCStringRef tree1Name = LCStringCreate("");
   LCTreeRef tree1 = LCTreeCreate(NULL, 0, blobs1, 1);
-  LCKeyValueSHARef childTree1 = LCKeyValueSHACreate(tree1Name, LCTreeSHA1(tree1));
+  LCKeyValueSHARef childTree1 = LCKeyValueSHACreate(tree1Name, LCTreeSHA(tree1));
   LCKeyValueSHARef childTrees1[] = {childTree1};
   LCTreeRef tree2 = LCTreeCreate(childTrees1, 1, blobs2, 2);
   
@@ -140,9 +150,9 @@ static char* test_tree() {
   mu_assert("LCTree stores child trees correctly", tree2ChildTrees[0] == childTree1);
   
   LCTreeRef tree2Clone = LCTreeCreate(childTrees1, 1, blobs2, 2);
-  LCSHARef tree1SHA = LCTreeSHA1(tree1);
-  LCSHARef tree2SHA = LCTreeSHA1(tree2);
-  LCSHARef tree2CloneSHA = LCTreeSHA1(tree2Clone);
+  LCSHARef tree1SHA = LCTreeSHA(tree1);
+  LCSHARef tree2SHA = LCTreeSHA(tree2);
+  LCSHARef tree2CloneSHA = LCTreeSHA(tree2Clone);
   mu_assert("LCTree SHA differs on differing trees", LCSHAEqual(tree1SHA, tree2SHA)==false);
   mu_assert("LCTree SHA is identical on identical trees", LCSHAEqual(tree2SHA, tree2CloneSHA));
   return 0;
@@ -152,6 +162,7 @@ static char* all_tests() {
   mu_run_test(test_retain_counting);
   mu_run_test(test_string);
   mu_run_test(test_blob);
+  mu_run_test(test_blobArray);
   mu_run_test(test_sha1);
   mu_run_test(test_keyValue);
   mu_run_test(test_commit);

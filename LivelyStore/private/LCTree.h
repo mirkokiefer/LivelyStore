@@ -12,7 +12,7 @@ size_t LCTreeChildTreesLength(LCTreeRef tree);
 size_t LCTreeChildBlobsLength(LCTreeRef tree);
 LCKeyValueSHARef* LCTreeChildTrees(LCTreeRef tree);
 LCKeyValueSHARef* LCTreeChildBlobs(LCTreeRef tree);
-LCSHARef LCTreeSHA1(LCTreeRef tree);
+LCSHARef LCTreeSHA(LCTreeRef tree);
 LCStringRef LCTreeSerialize(LCTreeRef);
 
 #endif
