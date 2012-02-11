@@ -3,7 +3,7 @@
 
 struct LCSHA {
   LCObjectMeta meta;
-  unsigned char sha[];
+  LCBlobRef sha;
 };
 
 void computeSHA1(LCBlobRef blobs[], size_t count, unsigned char buffer[]);
@@ -16,7 +16,9 @@ LCSHARef LCSHACreate(LCBlobRef blobs[], size_t count) {
   LCSHARef newSha = malloc(sizeof(struct LCSHA) + LC_SHA1_Length);
   if (newSha != NULL) {
     newSha->meta.dealloc = LCSHADealloc;
-    computeSHA1(blobs, count, newSha->sha);
+    LCByte sha[LC_SHA1_Length];
+    computeSHA1(blobs, count, sha);
+    newSha->sha = LCBlobCreate(sha, LC_SHA1_Length);
   }
   return newSha;
 };
@@ -56,15 +58,17 @@ void unsignedCharArrayToHexString(unsigned char input[], size_t length, char* bu
 }
 
 LCStringRef LCSHACreateHexString(LCSHARef sha) {
-  char shaString[41];
-  unsignedCharArrayToHexString(sha->sha, 20, shaString); 
+  char shaString[LC_SHA1_Length*2+1];
+  unsignedCharArrayToHexString(LCBlobDataRef(sha->sha), LC_SHA1_Length, shaString); 
   LCStringRef hexString = LCStringCreate(shaString);
   return hexString;
 }
 
 LCBool LCSHAEqual(LCSHARef sha, LCSHARef anotherSHA) {
+  LCByte* sha1Bytes = LCBlobDataRef(sha->sha);
+  LCByte* sha2Bytes = LCBlobDataRef(anotherSHA->sha);
   for(LCInteger i=0; i<LC_SHA1_Length; i++) {
-    if(sha->sha[i] != anotherSHA->sha[i]) {
+    if(sha1Bytes[i] != sha2Bytes[i]) {
       return false;
     }
   }
