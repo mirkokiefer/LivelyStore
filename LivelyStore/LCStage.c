@@ -1,27 +1,27 @@
 
-#include "LCCommitStage.h"
+#include "LCStage.h"
 
-struct LCCommitStage {
+struct LCStage {
   LCObjectInfo info;
   size_t length;
   LCKeyValueRef* keyValues;
 };
 
-void LCCommitStageDealloc(void* object);
+void LCStageDealloc(void* object);
 
-LCType typeCommitStage = {
-  .dealloc = LCCommitStageDealloc
+LCType typeStage = {
+  .dealloc = LCStageDealloc
 };
 
-LCCommitStageRef LCCommitStageCreate() {
-  LCCommitStageRef newCommit = malloc(sizeof(struct LCCommitStage));
+LCStageRef LCStageCreate() {
+  LCStageRef newCommit = malloc(sizeof(struct LCStage));
   if (newCommit != NULL) {
-    newCommit->info.type = &typeCommitStage;
+    newCommit->info.type = &typeStage;
   }
   return newCommit;
 };
 
-LCBool LCCommitStageAddEntry(LCCommitStageRef commit, LCKeyValueRef keyValue) {
+LCBool LCStageAddEntry(LCStageRef commit, LCKeyValueRef keyValue) {
   LCKeyValueRef* keyValues = realloc(commit->keyValues, (commit->length+1)*sizeof(keyValue));
   if(keyValues) {
     LCRetain(keyValue);
@@ -34,16 +34,16 @@ LCBool LCCommitStageAddEntry(LCCommitStageRef commit, LCKeyValueRef keyValue) {
   return true;
 }
 
-size_t LCCommitStageEntryCount(LCCommitStageRef commit) {
+size_t LCStageEntryCount(LCStageRef commit) {
   return commit->length;
 }
 
-void LCCommitStageEntries(LCCommitStageRef commit, LCKeyValueRef buffer[]) {
+void LCStageEntries(LCStageRef commit, LCKeyValueRef buffer[]) {
   memcpy(buffer, commit->keyValues, commit->length*sizeof(LCKeyValueRef));
 }
 
-void LCCommitStageDealloc(void* object) {
-  LCCommitStageRef commit = (LCCommitStageRef)object;
+void LCStageDealloc(void* object) {
+  LCStageRef commit = (LCStageRef)object;
   for(LCInteger i=0; i<commit->length; i++) {
     LCRelease(commit->keyValues[i]);
   }

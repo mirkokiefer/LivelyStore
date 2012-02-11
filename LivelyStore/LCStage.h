@@ -1,15 +1,15 @@
 
 
-#ifndef LivelyStore_LCCommitStage_h
-#define LivelyStore_LCCommitStage_h
+#ifndef LivelyStore_LCStage_h
+#define LivelyStore_LCStage_h
 
 #include "LivelyStore.h"
 
-LCCommitStageRef LCCommitStageCreate();
-LCBool LCCommitStageAddEntry(LCCommitStageRef commit, LCKeyValueRef keyValue);
-size_t LCCommitStageEntryCount(LCCommitStageRef commit);
-void LCCommitStageEntries(LCCommitStageRef commit, LCKeyValueRef buffer[]);
-LCSHARef LCCommitStageSHA1(LCCommitStageRef commit);
+LCStageRef LCStageCreate();
+LCBool LCStageAddEntry(LCStageRef commit, LCKeyValueRef keyValue);
+size_t LCStageEntryCount(LCStageRef commit);
+void LCStageEntries(LCStageRef commit, LCKeyValueRef buffer[]);
+LCSHARef LCStageSHA1(LCStageRef commit);
 
 void LCCommitToStore(LCStoreRef store);
 

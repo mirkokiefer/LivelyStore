@@ -1,5 +1,5 @@
 
-#include "LCCommitStage.h"
+#include "LCStage.h"
 
 LCBlobArrayRef LCTreeBlobArrayCopy(void* blob);
 void LCTreeDealloc(void* object);

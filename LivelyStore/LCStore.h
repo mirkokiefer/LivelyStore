@@ -8,6 +8,6 @@
 LCStoreRef LCStoreCreate(LCStringRef location);
 void LCStorePull(LCStoreRef target, LCStoreRef source);
 void LCStorePush(LCStoreRef source, LCStoreRef target);
-void LCStoreAddCommit(LCStoreRef store, LCCommitStageRef commit);
+void LCStoreAddCommit(LCStoreRef store, LCStageRef commit);
 
 #endif

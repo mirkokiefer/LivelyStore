@@ -19,7 +19,7 @@ typedef bool LCBool;
 
 typedef LCStringRef LCKeyRef;
 typedef struct LCStore* LCStoreRef;
-typedef struct LCCommitStage* LCCommitStageRef;
+typedef struct LCStage* LCStageRef;
 typedef struct LCKeyValue* LCKeyValueRef;
 typedef struct LCBlob* LCBlobRef;
 typedef struct LCBlobArray* LCBlobArrayRef;

@@ -1,5 +1,5 @@
 
-#include "LCCommitStage.h"
+#include "LCStage.h"
 
 struct LCKeyValue {
   LCObjectInfo info;

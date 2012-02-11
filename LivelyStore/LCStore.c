@@ -21,7 +21,7 @@ LCStoreRef LCStoreCreate(LCStringRef location) {
   return newStore;
 };
 
-void LCStoreAddCommit(LCStoreRef store, LCCommitStageRef commit) {
+void LCStoreAddCommit(LCStoreRef store, LCStageRef commit) {
   
 }
 
