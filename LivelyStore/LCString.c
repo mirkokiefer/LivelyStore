@@ -20,14 +20,10 @@ LCStringRef LCStringCreateFromStrings(LCStringRef strings[], size_t count) {
     totalLength = totalLength + LCStringLength(strings[i])-1;
   }
   char buffer[totalLength];
-  size_t bufferPosition = 0;
-  size_t currentStringLength;
+  buffer[0]='\0';
   for (LCInteger i=0; i<count; i++) {
-    currentStringLength = LCStringLength(strings[i])-1;
-    memcpy(&buffer[bufferPosition], LCStringStringRef(strings[i]), currentStringLength);
-    bufferPosition = bufferPosition + currentStringLength;
+    strcat(buffer, LCStringStringRef(strings[i]));
   }
-  buffer[totalLength-1]='\0';
   return LCStringCreate(buffer);
 }
 
