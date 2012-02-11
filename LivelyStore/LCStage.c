@@ -21,25 +21,26 @@ LCStageRef LCStageCreate() {
   return newCommit;
 };
 
-LCBool LCStageAddEntry(LCStageRef commit, LCKeyValueRef keyValue) {
-  LCKeyValueRef* keyValues = realloc(commit->keyValues, (commit->length+1)*sizeof(keyValue));
+LCBool LCStageAddEntry(LCStageRef stage, char* key, unsigned char data[], size_t length) {  
+  LCKeyValueRef* keyValues = realloc(stage->keyValues, (stage->length+1)*sizeof(LCKeyValueRef));
   if(keyValues) {
-    LCRetain(keyValue);
-    keyValues[commit->length] = keyValue;
-    commit->keyValues = keyValues;
-    commit->length = commit->length + 1;
+    LCStringRef lcKey = LCStringCreate(key);
+    LCDataRef lcData = LCDataCreate(data, length);
+    LCKeyValueRef keyValue = LCKeyValueCreate(lcKey, lcData);
+    LCRelease(lcKey);
+    LCRelease(lcData);
+
+    keyValues[stage->length] = keyValue;
+    stage->keyValues = keyValues;
+    stage->length ++;
   } else {
     return false;
   }
   return true;
 }
 
-size_t LCStageEntryCount(LCStageRef commit) {
-  return commit->length;
-}
-
-void LCStageEntries(LCStageRef commit, LCKeyValueRef buffer[]) {
-  memcpy(buffer, commit->keyValues, commit->length*sizeof(LCKeyValueRef));
+LCKeyValueRef* LCStageEntries(LCStageRef stage) {
+  return stage->keyValues;
 }
 
 void LCStageDealloc(void* object) {

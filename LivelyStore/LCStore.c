@@ -13,11 +13,13 @@ LCType typeStore = {
   .dealloc = LCStoreDealloc
 };
 
-LCStoreRef LCStoreCreate(LCStringRef location) {
+LCStoreRef LCStoreCreate(char* location) {
   LCStoreRef newStore = malloc(sizeof(struct LCStore));
   if (newStore != NULL) {
     newStore->info.type = &typeStore;
-    newStore->dataStore = LCDataStoreCreate(location);
+    LCStringRef lcLocation = LCStringCreate(location);
+    newStore->dataStore = LCDataStoreCreate(lcLocation);
+    LCRelease(lcLocation);
   }
   return newStore;
 };

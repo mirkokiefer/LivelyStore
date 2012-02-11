@@ -6,11 +6,9 @@
 #include "LivelyStore.h"
 
 LCStageRef LCStageCreate();
-LCBool LCStageAddEntry(LCStageRef commit, LCKeyValueRef keyValue);
-size_t LCStageEntryCount(LCStageRef commit);
-void LCStageEntries(LCStageRef commit, LCKeyValueRef buffer[]);
-LCSHARef LCStageSHA1(LCStageRef commit);
+bool LCStageAddEntry(LCStageRef stage, char* key, unsigned char data[], size_t length);
+void LCStageCommitToStore(LCStoreRef store);
 
-void LCCommitToStore(LCStoreRef store);
-
+// private
+LCKeyValueRef* LCStageEntries(LCStageRef stage);
 #endif

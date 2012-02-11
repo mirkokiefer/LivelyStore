@@ -103,22 +103,17 @@ static char* test_keyValue() {
 }
 
 static char* test_commit() {
-  LCStringRef key1 = LCStringCreate("key1");
-  LCStringRef key2 = LCStringCreate("key2");
-  LCDataRef value1 = LCDataCreate((LCByte*)"12345", 6);
-  LCDataRef value2 = LCDataCreate((LCByte*)"67890", 6);
-  LCKeyValueRef entry1 = LCKeyValueCreate(key1, value1);
-  LCKeyValueRef entry2 = LCKeyValueCreate(key2, value2);
+  char* key1 = "key1";
+  char* key2 = "key2";
+  LCByte value1[] = "12345";
+  LCByte value2[] = "67890";
   
-  LCStageRef commit = LCStageCreate();
-  LCStageAddEntry(commit, entry1);
-  LCStageAddEntry(commit, entry2);
-
-  mu_assert("LCStage entry adding works", LCStageEntryCount(commit)==2);
+  LCStageRef stage = LCStageCreate();
+  LCStageAddEntry(stage, key1, value1, 5);
+  LCStageAddEntry(stage, key2, value2, 5);
   
-  LCKeyValueRef entries[LCStageEntryCount(commit)];
-  LCStageEntries(commit, entries);
-  mu_assert("LCStage stores entries correctly", (entries[0] == entry1) && (entries[1] == entry2));
+  LCKeyValueRef* entries = LCStageEntries(stage);
+  mu_assert("LCStage stores entries correctly", (LCStringEqual(LCKeyValueKey(entries[0]), LCStringCreate(key1))));
   return 0;
 }
 
