@@ -14,15 +14,22 @@ LCType typeSHA = {
 };
 
 LCSHARef LCSHACreate(LCBlobRef blobs[], size_t count);
-void computeSHA1(LCBlobRef blobs[], size_t count, LCByte buffer[]);
+void computeSHA1(LCBlobArrayRef blobs, LCByte buffer[]);
 
 LCSHARef LCSHACreateFromHashableObject(void* object) {
-  LCObjectInfoRef info = (LCObjectInfoRef)object;
-  LCHashableObjectRef hashableObject = info->type->meta;
-  LCBlobArrayRef blobArray = hashableObject->blobArrayCopy(object);
-  LCSHARef sha = LCSHACreate(LCBlobArrayBlobs(blobArray), LCBlobArrayLength(blobArray));
-  LCRelease(blobArray);
-  return sha;
+  LCSHARef newSha = malloc(sizeof(struct LCSHA) + LC_SHA1_Length);
+  if (newSha != NULL) {
+    LCObjectInfoRef info = (LCObjectInfoRef)object;
+    LCHashableObjectRef hashableObject = info->type->meta;
+    LCBlobArrayRef blobArray = hashableObject->blobArrayCopy(object);
+    
+    newSha->info.type = &typeSHA;
+    LCByte sha[LC_SHA1_Length];
+    computeSHA1(blobArray, sha);
+    newSha->sha = LCBlobCreate(sha, LC_SHA1_Length);
+    LCRelease(blobArray);
+  }
+  return newSha;
 }
 
 LCSHARef LCSHACreateFromHexString(LCStringRef hexString, LCBlobStoreRef store) {
@@ -34,26 +41,16 @@ LCSHARef LCSHACreateFromHexString(LCStringRef hexString, LCBlobStoreRef store) {
   return newSha;
 }
 
-LCSHARef LCSHACreate(LCBlobRef blobs[], size_t count) {
-  LCSHARef newSha = malloc(sizeof(struct LCSHA) + LC_SHA1_Length);
-  if (newSha != NULL) {
-    newSha->info.type = &typeSHA;
-    LCByte sha[LC_SHA1_Length];
-    computeSHA1(blobs, count, sha);
-    newSha->sha = LCBlobCreate(sha, LC_SHA1_Length);
-  }
-  return newSha;
-};
-
 LCBlobRef LCSHASHABlob(LCSHARef sha) {
   return sha->sha;
 }
 
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-void computeSHA1(LCBlobRef blobs[], size_t count, LCByte buffer[]) {
+void computeSHA1(LCBlobArrayRef array, LCByte buffer[]) {
   SHA_CTX context;
   SHA1_Init(&context);
-  for(LCInteger i=0; i<count; i++) {
+  LCBlobRef* blobs = LCBlobArrayBlobs(array);
+  for(LCInteger i=0; i<LCBlobArrayLength(array); i++) {
     SHA1_Update(&context, LCBlobDataRef(blobs[i]), LCBlobLength(blobs[i]));
   }
   SHA1_Final(buffer, &context);
