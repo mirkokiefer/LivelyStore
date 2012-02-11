@@ -26,7 +26,7 @@ typedef struct LCSHA* LCSHARef;
 
 typedef struct LCTree* LCTreeRef;
 typedef struct LCBlobStore* LCBlobStoreRef;
-typedef struct LCKeyValueSHA LCKeyValueSHARef;
+typedef struct LCKeyValueSHA* LCKeyValueSHARef;
 
 struct LCObjectMeta {
   LCInteger rCount;

@@ -4,80 +4,58 @@
 struct LCTree {
   LCObjectMeta meta;
   LCSHARef sha;
-  LCStringRef name;
   size_t childTreesLength;
-  size_t childEntriesLength;
-  LCTreeRef* childTrees;
-  LCKeyValueRef childEntries[];
+  size_t childBlobsLength;
+  LCKeyValueSHARef children[];
 };
 
 void LCTreeDealloc(void* object);
 
-LCTreeRef LCTreeCreate(LCStringRef name, LCTreeRef childTrees[], size_t childTreesLength,
-                       LCKeyValueRef childEntries[], size_t childEntriesLength) {
-  LCTreeRef newTree = malloc(sizeof(struct LCTree)+sizeof(LCKeyValueRef)*childEntriesLength);
+LCTreeRef LCTreeCreate(LCKeyValueSHARef childTrees[], size_t childTreesLength,
+                       LCKeyValueSHARef childBlobs[], size_t childBlobsLength) {
+  LCTreeRef newTree = malloc(sizeof(struct LCTree)+sizeof(LCKeyValueSHARef)*(childBlobsLength+childTreesLength));
   if (newTree != NULL) {
     newTree->meta.dealloc = LCTreeDealloc;
-    LCTreeRef* childTreesMemory = malloc(sizeof(LCTreeRef)*childTreesLength);
-    if(childTreesMemory) {
-      LCRetain(name);
-      newTree->name = name;
-      for (LCInteger i=0; i<childTreesLength; i++) {
-        LCRetain(childTrees[i]);
-      }
-      for (LCInteger i=0; i<childEntriesLength; i++) {
-        LCRetain(childEntries[i]);
-      }
-      memcpy(childTreesMemory, childTrees, childTreesLength*sizeof(LCTreeRef));
-      newTree->childTrees = childTreesMemory;
-      memcpy(newTree->childEntries, childEntries, childEntriesLength*sizeof(LCKeyValueRef));
-      newTree->childTreesLength = childTreesLength;
-      newTree->childEntriesLength = childEntriesLength;
-    } else {
-      free(newTree);
+    for (LCInteger i=0; i<childTreesLength; i++) {
+      LCRetain(childTrees[i]);
     }
+    for (LCInteger i=0; i<childBlobsLength; i++) {
+      LCRetain(childBlobs[i]);
+    }
+    memcpy(newTree->children, childTrees, childTreesLength*sizeof(LCKeyValueSHARef));
+    memcpy(&(newTree->children[childTreesLength]), childBlobs, childBlobsLength*sizeof(LCKeyValueSHARef));
+    newTree->childTreesLength = childTreesLength;
+    newTree->childBlobsLength = childBlobsLength;
   }
   return newTree;
 };
-
-LCStringRef LCTreeName(LCTreeRef tree) {
-  return tree->name;
-}
 
 size_t LCTreeChildTreesLength(LCTreeRef tree) {
   return tree->childTreesLength;
 }
 
-size_t LCTreeChildEntriesLength(LCTreeRef tree) {
-  return tree->childEntriesLength;
+size_t LCTreeChildBlobsLength(LCTreeRef tree) {
+  return tree->childBlobsLength;
 }
 
-LCTreeRef* LCTreeChildTrees(LCTreeRef tree) {
-  return tree->childTrees;
+LCKeyValueSHARef* LCTreeChildTrees(LCTreeRef tree) {
+  return tree->children;
 }
 
-LCKeyValueRef* LCTreeChildEntries(LCTreeRef tree) {
-  return tree->childEntries;
+LCKeyValueSHARef* LCTreeChildBlobs(LCTreeRef tree) {
+  return &(tree->children[tree->childTreesLength]);
 }
 
 LCSHARef LCTreeSHA1(LCTreeRef tree) {
   if(tree->sha == NULL) {
-    size_t blobCount = tree->childTreesLength*2+tree->childEntriesLength*2;
+    size_t blobCount = tree->childTreesLength*2 + tree->childBlobsLength*2;
     LCBlobRef blobs[blobCount];
     LCInteger blobIndex = 0;
-    for (LCInteger i=0; i<tree->childTreesLength; i++) {
-      LCBlobRef treeName = LCStringCreateBlob(LCTreeName(tree->childTrees[i]));
-      LCBlobRef treeSHA = LCSHABlob(LCTreeSHA1(tree->childTrees[i]));
-      blobs[blobIndex] = treeName;
-      blobs[blobIndex+1] = treeSHA;
-      blobIndex = blobIndex+2;
-    }
-    for (LCInteger i=0; i<tree->childEntriesLength; i++) {
-      LCBlobRef key = LCStringCreateBlob(LCKeyValueKey(tree->childEntries[i]));
-      LCBlobRef value = LCKeyValueValue((tree->childEntries[i]));
-      LCBlobRef valueSHA = LCSHABlob(LCBlobSHA1(value));
+    for (LCInteger i=0; i<blobCount/2; i++) {
+      LCBlobRef key = LCStringCreateBlob(LCKeyValueSHAKey(tree->children[i]));
+      LCBlobRef value = LCSHABlob(LCKeyValueSHAValue(tree->children[i]));
       blobs[blobIndex] = key;
-      blobs[blobIndex+1] = valueSHA;
+      blobs[blobIndex+1] = value;
       blobIndex = blobIndex+2;
     }
     tree->sha = LCSHACreate(blobs, blobCount);
@@ -87,11 +65,7 @@ LCSHARef LCTreeSHA1(LCTreeRef tree) {
 
 void LCTreeDealloc(void* object) {
   LCTreeRef tree = (LCTreeRef)object;
-  for (LCInteger i=0; i<tree->childTreesLength; i++) {
-    LCRelease(tree->childTrees[i]);
+  for (LCInteger i=0; i<(tree->childTreesLength+tree->childBlobsLength); i++) {
+    LCRelease(tree->children[i]);
   }
-  for (LCInteger i=0; i<tree->childEntriesLength; i++) {
-    LCRelease(tree->childEntries[i]);
-  }
-  free(tree->childTrees);
 }

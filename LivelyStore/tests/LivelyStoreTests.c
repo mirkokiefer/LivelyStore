@@ -105,29 +105,30 @@ static char* test_tree() {
   LCStringRef key1 = LCStringCreate("key1");
   LCStringRef key2 = LCStringCreate("key2");
   LCStringRef key3 = LCStringCreate("key3");
-  LCBlobRef value1 = LCBlobCreate((LCByte*)"12345", 6);
-  LCBlobRef value2 = LCBlobCreate((LCByte*)"67890", 6);
-  LCKeyValueRef entry1 = LCKeyValueCreate(key1, value1);
-  LCKeyValueRef entry2 = LCKeyValueCreate(key2, value2);
-  LCKeyValueRef entry3 = LCKeyValueCreate(key3, value2);
+  LCSHARef value1SHA = LCBlobSHA1(LCBlobCreate((LCByte*)"12345", 6));
+  LCSHARef value2SHA = LCBlobSHA1(LCBlobCreate((LCByte*)"67890", 6));
+  LCKeyValueSHARef entry1 = LCKeyValueSHACreate(key1, value1SHA);
+  LCKeyValueSHARef entry2 = LCKeyValueSHACreate(key2, value2SHA);
+  LCKeyValueSHARef entry3 = LCKeyValueSHACreate(key3, value2SHA);
   
-  LCKeyValueRef entries1[] = {entry1};
-  LCKeyValueRef entries2[] = {entry2, entry3};
+  LCKeyValueSHARef blobs1[] = {entry1};
+  LCKeyValueSHARef blobs2[] = {entry2, entry3};
+  
   LCStringRef tree1Name = LCStringCreate("");
-  LCStringRef tree2Name = LCStringCreate("dir");
-
-  LCTreeRef tree1 = LCTreeCreate(tree1Name, NULL, 0, entries1, 1);
-  LCTreeRef tree2 = LCTreeCreate(tree2Name, &tree1, 1, entries2, 2);
+  LCTreeRef tree1 = LCTreeCreate(NULL, 0, blobs1, 1);
+  LCKeyValueSHARef childTree1 = LCKeyValueSHACreate(tree1Name, LCTreeSHA1(tree1));
+  LCKeyValueSHARef childTrees1[] = {childTree1};
+  LCTreeRef tree2 = LCTreeCreate(childTrees1, 1, blobs2, 2);
   
-  LCKeyValueRef* tree1Entries = LCTreeChildEntries(tree1);
-  LCKeyValueRef* tree2Entries = LCTreeChildEntries(tree2);
-  LCTreeRef* tree2ChildTrees = LCTreeChildTrees(tree2);
+  LCKeyValueSHARef* tree1Blobs = LCTreeChildBlobs(tree1);
+  LCKeyValueSHARef* tree2Blobs = LCTreeChildBlobs(tree2);
+  LCKeyValueSHARef* tree2ChildTrees = LCTreeChildTrees(tree2);
   
-  LCBool correct = (tree1Entries[0]==entry1) && (tree2Entries[0]==entry2) && (tree2Entries[1]==entry3);
+  LCBool correct = (tree1Blobs[0]==entry1) && (tree2Blobs[0]==entry2) && (tree2Blobs[1]==entry3);
   mu_assert("LCTree stores entries correctly", correct);
-  mu_assert("LCTree stores child trees correctly", tree2ChildTrees[0] == tree1);
+  mu_assert("LCTree stores child trees correctly", tree2ChildTrees[0] == childTree1);
   
-  LCTreeRef tree2Clone = LCTreeCreate(tree2Name, &tree1, 1, entries2, 2);
+  LCTreeRef tree2Clone = LCTreeCreate(childTrees1, 1, blobs2, 2);
   LCSHARef tree1SHA = LCTreeSHA1(tree1);
   LCSHARef tree2SHA = LCTreeSHA1(tree2);
   LCSHARef tree2CloneSHA = LCTreeSHA1(tree2Clone);
