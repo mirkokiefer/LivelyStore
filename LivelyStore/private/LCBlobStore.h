@@ -1,12 +1,12 @@
 
-#ifndef LivelyStore_LCBlobStore_h
-#define LivelyStore_LCBlobStore_h
+#ifndef LivelyStore_LCDataStore_h
+#define LivelyStore_LCDataStore_h
 
 #include "LivelyStore.h"
 
-LCBlobStoreRef LCBlobStoreCreate(LCStringRef location);
-LCSHARef LCBlobStorePut(LCBlobStoreRef store, LCBlobRef blob);
-LCBlobRef LCBlobStoreGet(LCBlobStoreRef store, LCSHARef key);
-void LCBlobStoreDelete(LCBlobStoreRef store, LCSHARef key);
+LCDataStoreRef LCDataStoreCreate(LCStringRef location);
+LCSHARef LCDataStorePut(LCDataStoreRef store, LCDataRef data);
+LCDataRef LCDataStoreGet(LCDataStoreRef store, LCSHARef key);
+void LCDataStoreDelete(LCDataStoreRef store, LCSHARef key);
 
 #endif

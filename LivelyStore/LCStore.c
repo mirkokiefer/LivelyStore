@@ -3,7 +3,7 @@
 
 struct LCStore {
   LCObjectInfo info;
-  LCBlobStoreRef blobStore;
+  LCDataStoreRef dataStore;
   LCCommitRef head;
 };
 
@@ -17,7 +17,7 @@ LCStoreRef LCStoreCreate(LCStringRef location) {
   LCStoreRef newStore = malloc(sizeof(struct LCStore));
   if (newStore != NULL) {
     newStore->info.type = &typeStore;
-    newStore->blobStore = LCBlobStoreCreate(location);
+    newStore->dataStore = LCDataStoreCreate(location);
   }
   return newStore;
 };
@@ -28,5 +28,5 @@ void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
 
 void LCStoreDealloc(void* object) {
   LCStoreRef store = (LCStoreRef)object;
-  LCRelease(store->blobStore);
+  LCRelease(store->dataStore);
 }

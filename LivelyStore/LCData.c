@@ -1,73 +1,73 @@
 
-#include "LCBlob.h"
+#include "LCData.h"
 
-void LCBlobDealloc(void* object);
-LCBlobArrayRef LCBlobBlobsArrayCopy(void* blob);
-size_t LCBlobBlobCount(void* blob);
+void LCDataDealloc(void* object);
+LCDataArrayRef LCDataDatasArrayCopy(void* data);
+size_t LCDataDataCount(void* data);
 
-struct LCBlob {
+struct LCData {
   LCObjectInfo info;
   size_t length;
   LCSHARef sha;
   LCByte data[];
 };
 
-LCHashableObject hashableBlob = {
-  .blobArrayCopy = LCBlobBlobsArrayCopy,
+LCHashableObject hashableData = {
+  .dataArrayCopy = LCDataDatasArrayCopy,
 };
 
-LCType typeBlob = {
-  .dealloc = LCBlobDealloc,
-  .meta = &hashableBlob
+LCType typeData = {
+  .dealloc = LCDataDealloc,
+  .meta = &hashableData
 };
 
-LCBlobRef LCBlobCreate(LCByte data[], size_t length) {
-  LCBlobRef newBlob = malloc(sizeof(struct LCBlob) + length*sizeof(LCByte));
-  if (newBlob != NULL) {
-    newBlob->info.type = &typeBlob;
-    newBlob->length = length;
-    memcpy(newBlob->data, data, length*sizeof(LCByte));
+LCDataRef LCDataCreate(LCByte data[], size_t length) {
+  LCDataRef newData = malloc(sizeof(struct LCData) + length*sizeof(LCByte));
+  if (newData != NULL) {
+    newData->info.type = &typeData;
+    newData->length = length;
+    memcpy(newData->data, data, length*sizeof(LCByte));
   }
-  return newBlob;
+  return newData;
 };
 
-size_t LCBlobLength(LCBlobRef blob) {
-  return blob->length;
+size_t LCDataLength(LCDataRef data) {
+  return data->length;
 }
 
-void LCBlobData(LCBlobRef blob, LCByte buffer[]) {
-  memcpy(buffer, blob->data, blob->length*sizeof(LCByte));
+void LCDataData(LCDataRef data, LCByte buffer[]) {
+  memcpy(buffer, data->data, data->length*sizeof(LCByte));
 }
 
-LCByte* LCBlobDataRef(LCBlobRef blob) {
-  return blob->data;
+LCByte* LCDataDataRef(LCDataRef data) {
+  return data->data;
 }
 
-LCBlobArrayRef LCBlobBlobsArrayCopy(void* object) {
-  LCBlobRef blob = (LCBlobRef)object;
-  return LCBlobArrayCreate(&blob, 1);
+LCDataArrayRef LCDataDatasArrayCopy(void* object) {
+  LCDataRef data = (LCDataRef)object;
+  return LCDataArrayCreate(&data, 1);
 }
 
-LCSHARef LCBlobSHA1(LCBlobRef blob) {
-  if(blob->sha == NULL) {
-    blob->sha = LCSHACreateFromHashableObject(blob);
+LCSHARef LCDataSHA1(LCDataRef data) {
+  if(data->sha == NULL) {
+    data->sha = LCSHACreateFromHashableObject(data);
   }
-  return blob->sha;
+  return data->sha;
 }
 
-LCBool LCBlobEqual(LCBlobRef blob, LCBlobRef anotherBlob) {
-  LCSHARef blob1SHA = LCBlobSHA1(blob);
-  LCSHARef blob2SHA = LCBlobSHA1(anotherBlob);
-  return LCSHAEqual(blob1SHA, blob2SHA);
+LCBool LCDataEqual(LCDataRef data, LCDataRef anotherData) {
+  LCSHARef data1SHA = LCDataSHA1(data);
+  LCSHARef data2SHA = LCDataSHA1(anotherData);
+  return LCSHAEqual(data1SHA, data2SHA);
 }
 
-LCStringRef LCBLobCreateString(LCBlobRef blob) {
-  return LCStringCreate((char*)(blob->data));
+LCStringRef LCBLobCreateString(LCDataRef data) {
+  return LCStringCreate((char*)(data->data));
 }
 
-void LCBlobDealloc(void* object) {
-  LCBlobRef blob = (LCBlobRef)object;
-  if(blob->sha) {
-    LCRelease(blob->sha);    
+void LCDataDealloc(void* object) {
+  LCDataRef data = (LCDataRef)object;
+  if(data->sha) {
+    LCRelease(data->sha);    
   }
 }

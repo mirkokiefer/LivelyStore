@@ -53,9 +53,9 @@ LCByte hexDigitsToByte(char* hexDigits) {
   return hexDigits[0]*16 + hexDigits[1];
 }
 
-LCStringRef createHexStringFromBlob(LCBlobRef blob) {
-  LCByte* input = LCBlobDataRef(blob);
-  size_t length = LCBlobLength(blob);
+LCStringRef createHexStringFromData(LCDataRef data) {
+  LCByte* input = LCDataDataRef(data);
+  size_t length = LCDataLength(data);
   char buffer[length*2];
   for(LCInteger i=0; i<length; i++) {
     byteToHexDigits(input[i], &buffer[i*2]);
@@ -64,7 +64,7 @@ LCStringRef createHexStringFromBlob(LCBlobRef blob) {
   return LCStringCreate(buffer);
 }
 
-LCBlobRef createBlobFromHexString(LCStringRef hexString) {
+LCDataRef createDataFromHexString(LCStringRef hexString) {
   LCByte buffer[LC_SHA1_Length];
   for (LCInteger i=0; i<LC_SHA1_Length; i++) {
     char digit1 = LCStringCharAtIndex(hexString, i*2);
@@ -72,5 +72,5 @@ LCBlobRef createBlobFromHexString(LCStringRef hexString) {
     char hexDigits[] = {asciCharToHexDigit(digit1), asciCharToHexDigit(digit2)};
     buffer[i] = hexDigitsToByte(hexDigits);
   }
-  return LCBlobCreate(buffer, LC_SHA1_Length);
+  return LCDataCreate(buffer, LC_SHA1_Length);
 }

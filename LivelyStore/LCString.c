@@ -48,8 +48,8 @@ char* LCStringStringRef(LCStringRef string) {
   return string->content;
 }
 
-LCBlobRef LCStringCreateBlob(LCStringRef string) {
-  return LCBlobCreate((LCByte*)string->content, strlen(string->content)+1);
+LCDataRef LCStringCreateData(LCStringRef string) {
+  return LCDataCreate((LCByte*)string->content, strlen(string->content)+1);
 }
 
 void LCStringPrint(LCStringRef string) {

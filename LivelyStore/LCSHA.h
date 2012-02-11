@@ -5,10 +5,10 @@
 #include "LivelyStore.h"
 
 LCSHARef LCSHACreateFromHashableObject(void* object);
-LCSHARef LCSHACreateFromHexString(LCStringRef hexString, LCBlobStoreRef blobStore);
+LCSHARef LCSHACreateFromHexString(LCStringRef hexString, LCDataStoreRef dataStore);
 void* LCSHAObject(LCSHARef sha);
 LCStringRef LCSHACreateHexString(LCSHARef sha);
 LCBool LCSHAEqual(LCSHARef sha, LCSHARef anotherSHA);
-LCBlobRef LCSHASHABlob(LCSHARef sha);
+LCDataRef LCSHASHAData(LCSHARef sha);
 
 #endif

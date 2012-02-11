@@ -1,33 +1,33 @@
 
-#include "LCBlobStore.h"
+#include "LCDataStore.h"
 
-struct LCBlobStore {
+struct LCDataStore {
   LCObjectInfo info;
   LCStringRef location;
 };
 
-void LCBlobStoreDealloc(void* object);
+void LCDataStoreDealloc(void* object);
 
-LCType typeBlobStore = {
-  .dealloc = LCBlobStoreDealloc
+LCType typeDataStore = {
+  .dealloc = LCDataStoreDealloc
 };
 
-LCBlobStoreRef LCBlobStoreCreate(LCStringRef location) {
-  LCBlobStoreRef newStore = malloc(sizeof(struct LCBlobStore));
+LCDataStoreRef LCDataStoreCreate(LCStringRef location) {
+  LCDataStoreRef newStore = malloc(sizeof(struct LCDataStore));
   if (newStore != NULL) {
-    newStore->info.type = &typeBlobStore;
+    newStore->info.type = &typeDataStore;
     LCRetain(location);
     newStore->location = location;
   }
   return newStore;
 };
 
-LCBlobRef LCBlobStoreGet(LCBlobStoreRef store, LCSHARef key) {
-  return LCBlobCreate(NULL, 0);
+LCDataRef LCDataStoreGet(LCDataStoreRef store, LCSHARef key) {
+  return LCDataCreate(NULL, 0);
 }
 
 
-void LCBlobStoreDealloc(void* object) {
-  LCBlobStoreRef store = (LCBlobStoreRef)object;
+void LCDataStoreDealloc(void* object) {
+  LCDataStoreRef store = (LCDataStoreRef)object;
   LCRelease(store->location);
 }

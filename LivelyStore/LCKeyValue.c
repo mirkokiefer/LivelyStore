@@ -4,7 +4,7 @@
 struct LCKeyValue {
   LCObjectInfo info;
   LCStringRef key;
-  LCBlobRef value;
+  LCDataRef value;
 };
 
 void LCKeyValueDealloc(void* object);
@@ -13,7 +13,7 @@ LCType typeKeyValue = {
   .dealloc = LCKeyValueDealloc
 };
 
-LCKeyValueRef LCKeyValueCreate(LCStringRef key, LCBlobRef value) {
+LCKeyValueRef LCKeyValueCreate(LCStringRef key, LCDataRef value) {
   LCKeyValueRef newKeyValue = malloc(sizeof(struct LCKeyValue));
   if (newKeyValue != NULL) {
     newKeyValue->info.type = &typeKeyValue;
@@ -29,7 +29,7 @@ LCStringRef LCKeyValueKey(LCKeyValueRef keyValue) {
   return keyValue->key;
 }
 
-LCBlobRef LCKeyValueValue(LCKeyValueRef keyValue) {
+LCDataRef LCKeyValueValue(LCKeyValueRef keyValue) {
   return keyValue->value;
 }
 

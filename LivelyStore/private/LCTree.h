@@ -6,12 +6,12 @@
 #include "LivelyStore.h"
 
 LCTreeRef LCTreeCreate(LCKeyValueSHARef childTrees[], size_t childTreesLength,
-                       LCKeyValueSHARef childBlobs[], size_t childBlobsLength);
+                       LCKeyValueSHARef childDatas[], size_t childDatasLength);
 LCTreeRef LCTreeCreateFromSerialized(LCStringRef serializedTree);
 size_t LCTreeChildTreesLength(LCTreeRef tree);
-size_t LCTreeChildBlobsLength(LCTreeRef tree);
+size_t LCTreeChildDatasLength(LCTreeRef tree);
 LCKeyValueSHARef* LCTreeChildTrees(LCTreeRef tree);
-LCKeyValueSHARef* LCTreeChildBlobs(LCTreeRef tree);
+LCKeyValueSHARef* LCTreeChildDatas(LCTreeRef tree);
 LCSHARef LCTreeSHA(LCTreeRef tree);
 LCStringRef LCTreeSerialize(LCTreeRef);
 

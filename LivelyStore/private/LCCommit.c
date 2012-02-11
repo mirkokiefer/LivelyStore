@@ -8,11 +8,11 @@ struct LCCommit {
   LCSHARef sha;
 };
 
-LCBlobArrayRef LCCommitBlobArray(void* object);
+LCDataArrayRef LCCommitDataArray(void* object);
 void LCCommitDealloc(void* object);
 
 LCHashableObject hashableCommit = {
-  .blobArrayCopy = LCCommitBlobArray
+  .dataArrayCopy = LCCommitDataArray
 };
 
 LCType typeCommit = {
@@ -38,10 +38,10 @@ LCSHARef LCCommitSHA(LCCommitRef commit) {
   return commit->sha;
 }
 
-LCBlobArrayRef LCCommitBlobArray(void* object) {
+LCDataArrayRef LCCommitDataArray(void* object) {
   LCCommitRef commit = (LCCommitRef)object;
-  LCBlobRef blobs[2] = {LCSHASHABlob(commit->parentSHA), LCSHASHABlob(commit->treeSHA)};
-  return LCBlobArrayCreate(blobs, 2);
+  LCDataRef datas[2] = {LCSHASHAData(commit->parentSHA), LCSHASHAData(commit->treeSHA)};
+  return LCDataArrayCreate(datas, 2);
 }
 
 void LCCommitDealloc(void* object) {

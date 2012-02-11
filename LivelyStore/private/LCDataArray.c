@@ -1,67 +1,67 @@
 
-#include "LCBlobArray.h"
+#include "LCDataArray.h"
 
-void LCBlobArrayDealloc(void* object);
-LCBlobArrayRef LCBlobArrayCopy(void* blob);
-size_t LCBlobArrayBlobCount(void* blob);
+void LCDataArrayDealloc(void* object);
+LCDataArrayRef LCDataArrayCopy(void* data);
+size_t LCDataArrayDataCount(void* data);
 
-struct LCBlobArray {
+struct LCDataArray {
   LCObjectInfo info;
   size_t length;
-  LCBlobRef blobs[];
+  LCDataRef datas[];
 };
 
-LCHashableObject hashableBlobArray = {
-  .blobArrayCopy = LCBlobArrayCopy,
+LCHashableObject hashableDataArray = {
+  .dataArrayCopy = LCDataArrayCopy,
 };
 
-LCType typeBlobArray = {
-  .dealloc = LCBlobArrayDealloc,
-  .meta = &hashableBlobArray
+LCType typeDataArray = {
+  .dealloc = LCDataArrayDealloc,
+  .meta = &hashableDataArray
 };
 
-LCBlobArrayRef LCBlobArrayCreate(LCBlobRef* blobs, size_t length) {
-  LCBlobArrayRef newArray = malloc(sizeof(struct LCBlobArray) + length*sizeof(LCBlobRef));
+LCDataArrayRef LCDataArrayCreate(LCDataRef* datas, size_t length) {
+  LCDataArrayRef newArray = malloc(sizeof(struct LCDataArray) + length*sizeof(LCDataRef));
   if (newArray != NULL) {
-    newArray->info.type = &typeBlobArray;
+    newArray->info.type = &typeDataArray;
     
     for (LCInteger i=0; i<length; i++) {
-      LCRetain(blobs[i]);
+      LCRetain(datas[i]);
     }
     newArray->length = length;
-    memcpy(newArray->blobs, blobs, length*sizeof(LCBlobRef));
+    memcpy(newArray->datas, datas, length*sizeof(LCDataRef));
   }
   return newArray;
 };
 
-size_t LCBlobArrayLength(LCBlobArrayRef array) {
+size_t LCDataArrayLength(LCDataArrayRef array) {
   return array->length;
 }
 
-LCBlobRef LCBlobBlobAtIndex(LCBlobArrayRef blob, LCInteger index) {
-  if(index < blob->length) {
-    return blob->blobs[index];    
+LCDataRef LCDataDataAtIndex(LCDataArrayRef data, LCInteger index) {
+  if(index < data->length) {
+    return data->datas[index];    
   } else {
     return NULL;
   }
 }
 
-LCBlobRef* LCBlobArrayBlobs(LCBlobArrayRef array) {
-  return array->blobs;
+LCDataRef* LCDataArrayDatas(LCDataArrayRef array) {
+  return array->datas;
 }
 
-LCBlobArrayRef LCBlobArrayCopy(void* object) {
+LCDataArrayRef LCDataArrayCopy(void* object) {
   LCRetain(object);
   return object;
 }
 
-size_t LCBlobArrayBlobCount(void* blob) {
-  return ((LCBlobArrayRef)blob)->length;
+size_t LCDataArrayDataCount(void* data) {
+  return ((LCDataArrayRef)data)->length;
 }
 
-void LCBlobArrayDealloc(void* object) {
-  LCBlobArrayRef array = (LCBlobArrayRef)object;
+void LCDataArrayDealloc(void* object) {
+  LCDataArrayRef array = (LCDataArrayRef)object;
   for (LCInteger i=0; i<array->length; i++) {
-    LCRelease(array->blobs[i]);
+    LCRelease(array->datas[i]);
   }
 }

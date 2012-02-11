@@ -5,7 +5,7 @@
 
 #include "LivelyStore.h"
 
-LCBlobArrayRef LCBlobArrayCreate(LCBlobRef* blobs, size_t length);
+LCBlobArrayRef LCBlobArrayCreate(LCBlobRef* datas, size_t length);
 size_t LCBlobArrayLength(LCBlobArrayRef array);
 LCBlobRef LCBlobBlobAtIndex(LCBlobArrayRef array, LCInteger index);
 LCBlobRef* LCBlobArrayBlobs(LCBlobArrayRef array);

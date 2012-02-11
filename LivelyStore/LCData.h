@@ -1,16 +1,16 @@
 
 
-#ifndef LivelyStore_LCBlob_h
-#define LivelyStore_LCBlob_h
+#ifndef LivelyStore_LCData_h
+#define LivelyStore_LCData_h
 
 #include "LivelyStore.h"
 
-LCBlobRef LCBlobCreate(LCByte data[], size_t length);
+LCDataRef LCDataCreate(LCByte data[], size_t length);
 
-size_t LCBlobLength(LCBlobRef blob);
-void LCBlobData(LCBlobRef blob, LCByte buffer[]);
-LCByte* LCBlobDataRef(LCBlobRef blob);
-LCBool LCBlobEqual(LCBlobRef blob, LCBlobRef anotherBlob);
-LCSHARef LCBlobSHA1(LCBlobRef blob);
-LCStringRef LCBLobCreateString(LCBlobRef blob);
+size_t LCDataLength(LCDataRef data);
+void LCDataData(LCDataRef data, LCByte buffer[]);
+LCByte* LCDataDataRef(LCDataRef data);
+LCBool LCDataEqual(LCDataRef data, LCDataRef anotherData);
+LCSHARef LCDataSHA1(LCDataRef data);
+LCStringRef LCBLobCreateString(LCDataRef data);
 #endif
