@@ -23,7 +23,7 @@ LCStoreRef LCStoreCreate(LCStringRef location) {
 };
 
 void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
-  store->head = LCStageCreateCommit(stage, store->head);
+  //store->head = LCStageCreateCommit(stage, store->head);
 }
 
 void LCStoreDealloc(void* object) {

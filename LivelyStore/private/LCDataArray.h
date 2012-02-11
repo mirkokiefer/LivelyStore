@@ -1,12 +1,12 @@
 
 
-#ifndef LivelyStore_LCBlobArray_h
-#define LivelyStore_LCBlobArray_h
+#ifndef LivelyStore_LCDataArray_h
+#define LivelyStore_LCDataArray_h
 
 #include "LivelyStore.h"
 
-LCBlobArrayRef LCBlobArrayCreate(LCBlobRef* datas, size_t length);
-size_t LCBlobArrayLength(LCBlobArrayRef array);
-LCBlobRef LCBlobBlobAtIndex(LCBlobArrayRef array, LCInteger index);
-LCBlobRef* LCBlobArrayBlobs(LCBlobArrayRef array);
+LCDataArrayRef LCDataArrayCreate(LCDataRef* datas, size_t length);
+size_t LCDataArrayLength(LCDataArrayRef array);
+LCDataRef LCDataDataAtIndex(LCDataArrayRef array, LCInteger index);
+LCDataRef* LCDataArrayDatas(LCDataArrayRef array);
 #endif

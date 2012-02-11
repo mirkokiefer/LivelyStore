@@ -31,11 +31,11 @@ static char* test_string() {
 }
 
 static char* test_dataArray() {
-  char* data1 = "abc";
-  char* data2 = "def";
+  char* string1 = "abc";
+  char* string2 = "def";
   
-  LCDataRef data1 = LCDataCreate((LCByte*)data1, strlen(data1)+1);
-  LCDataRef data2 = LCDataCreate((LCByte*)data2, strlen(data1)+1);
+  LCDataRef data1 = LCDataCreate((LCByte*)string1, strlen(string1)+1);
+  LCDataRef data2 = LCDataCreate((LCByte*)string2, strlen(string2)+1);
   LCDataRef datas[] = {data1, data2};
   LCDataArrayRef array = LCDataArrayCreate(datas, 2);
   LCBool correct = (LCDataDataAtIndex(array, 0) == data1) && (LCDataDataAtIndex(array, 1) == data2);
