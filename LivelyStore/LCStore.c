@@ -4,6 +4,7 @@
 struct LCStore {
   LCObjectInfo info;
   LCBlobStoreRef blobStore;
+  LCCommitRef head;
 };
 
 void LCStoreDealloc(void* object);
@@ -21,8 +22,8 @@ LCStoreRef LCStoreCreate(LCStringRef location) {
   return newStore;
 };
 
-void LCStoreAddCommit(LCStoreRef store, LCStageRef commit) {
-  
+void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
+  store->head = LCStageCreateCommit(stage, store->head);
 }
 
 void LCStoreDealloc(void* object) {
