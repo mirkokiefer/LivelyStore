@@ -5,7 +5,9 @@
 
 #include "LivelyStore.h"
 
-LCTreeRef LCTreeCreate(LCTreeRef childTrees[], size_t childTreesLength, LCKeyValueRef childEntries[], size_t childEntriesLength);
+LCTreeRef LCTreeCreate(LCStringRef name, LCTreeRef childTrees[], size_t childTreesLength,
+                       LCKeyValueRef childEntries[], size_t childEntriesLength);
+LCStringRef LCTreeName(LCTreeRef tree);
 size_t LCTreeChildTreesLength(LCTreeRef tree);
 size_t LCTreeChildEntriesLength(LCTreeRef tree);
 LCTreeRef* LCTreeChildTrees(LCTreeRef tree);

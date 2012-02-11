@@ -113,9 +113,11 @@ static char* test_tree() {
   
   LCKeyValueRef entries1[] = {entry1};
   LCKeyValueRef entries2[] = {entry2, entry3};
-  
-  LCTreeRef tree1 = LCTreeCreate(NULL, 0, entries1, 1);
-  LCTreeRef tree2 = LCTreeCreate(&tree1, 1, entries2, 2);
+  LCStringRef tree1Name = LCStringCreate("");
+  LCStringRef tree2Name = LCStringCreate("dir");
+
+  LCTreeRef tree1 = LCTreeCreate(tree1Name, NULL, 0, entries1, 1);
+  LCTreeRef tree2 = LCTreeCreate(tree2Name, &tree1, 1, entries2, 2);
   
   LCKeyValueRef* tree1Entries = LCTreeChildEntries(tree1);
   LCKeyValueRef* tree2Entries = LCTreeChildEntries(tree2);
@@ -124,6 +126,13 @@ static char* test_tree() {
   LCBool correct = (tree1Entries[0]==entry1) && (tree2Entries[0]==entry2) && (tree2Entries[1]==entry3);
   mu_assert("LCTree stores entries correctly", correct);
   mu_assert("LCTree stores child trees correctly", tree2ChildTrees[0] == tree1);
+  
+  LCTreeRef tree2Clone = LCTreeCreate(tree2Name, &tree1, 1, entries2, 2);
+  LCSHARef tree1SHA = LCTreeSHA1(tree1);
+  LCSHARef tree2SHA = LCTreeSHA1(tree2);
+  LCSHARef tree2CloneSHA = LCTreeSHA1(tree2Clone);
+  mu_assert("LCTree SHA differs on differing trees", LCSHAEqual(tree1SHA, tree2SHA)==false);
+  mu_assert("LCTree SHA is identical on identical trees", LCSHAEqual(tree2SHA, tree2CloneSHA));
   return 0;
 }
 
