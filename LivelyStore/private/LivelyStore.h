@@ -60,7 +60,7 @@ struct LCHashableObject {
 #include "LCString.h"
 
 #include "LCStore.h"
-#include "LCCommitStage.h"
+#include "LCStage.h"
 #include "LCTree.h"
 #include "LCKeyValue.h"
 #include "LCBlob.h"
