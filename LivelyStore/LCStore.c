@@ -5,6 +5,8 @@ struct LCStore {
   LCObjectInfo info;
   LCDataStoreRef dataStore;
   LCCommitRef head;
+  void (*newDataCallback)(char* sha, unsigned char* data, size_t length);
+  void(*deletedDataCallback)(char* sha);
 };
 
 void LCStoreDealloc(void* object);
@@ -24,11 +26,12 @@ LCStoreRef LCStoreCreate(char* location) {
   return newStore;
 };
 
-void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
-  //store->head = LCStageCreateCommit(stage, store->head);
+void LCStoreSetHead(LCStoreRef store, LCCommitRef commit) {
+   LCCommitTree(commit);
 }
 
 void LCStoreDealloc(void* object) {
   LCStoreRef store = (LCStoreRef)object;
   LCRelease(store->dataStore);
+  LCRelease(store->head);
 }
