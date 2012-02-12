@@ -3,8 +3,8 @@
 
 struct LCCommit {
   LCObjectInfo info;
-  LCSHARef parentSHA;
-  LCSHARef treeSHA;
+  LCCommitRef parent;
+  LCTreeRef tree;
   LCSHARef sha;
 };
 
@@ -23,13 +23,19 @@ LCCommitRef LCCommitCreate(LCCommitRef parent, LCTreeRef tree) {
   LCCommitRef newCommit = malloc(sizeof(struct LCCommit));
   if (newCommit != NULL) {
     newCommit->info.type = &typeCommit;
-    LCSHARef parentSHA = LCCommitSHA(parent);
-    LCSHARef treeSHA = LCTreeSHA(tree);
-    newCommit->parentSHA = LCRetain(parentSHA);
-    newCommit->treeSHA = LCRetain(treeSHA);
+    newCommit->parent = LCRetain(parent);
+    newCommit->tree = LCRetain(tree);
   }
   return newCommit;
 };
+
+LCTreeRef LCCommitTree(LCCommitRef commit) {
+  return commit->tree;
+}
+
+LCCommitRef LCCommitParent(LCCommitRef commit) {
+  return commit->parent;
+}
 
 LCSHARef LCCommitSHA(LCCommitRef commit) {
   if(commit->sha == NULL) {
@@ -40,12 +46,14 @@ LCSHARef LCCommitSHA(LCCommitRef commit) {
 
 LCDataArrayRef LCCommitDataArray(void* object) {
   LCCommitRef commit = (LCCommitRef)object;
-  LCDataRef datas[2] = {LCSHASHAData(commit->parentSHA), LCSHASHAData(commit->treeSHA)};
+  LCSHARef parentSHA = LCCommitSHA(commit->parent);
+  LCSHARef treeSHA = LCTreeSHA(commit->tree);
+  LCDataRef datas[2] = {LCSHASHAData(parentSHA), LCSHASHAData(treeSHA)};
   return LCDataArrayCreate(datas, 2);
 }
 
 void LCCommitDealloc(void* object) {
   LCCommitRef commit = (LCCommitRef)object;
-  LCRelease(commit->parentSHA);
-  LCRelease(commit->treeSHA);
+  LCRelease(commit->parent);
+  LCRelease(commit->tree);
 }

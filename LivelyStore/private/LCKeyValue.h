@@ -8,5 +8,6 @@
 LCKeyValueRef LCKeyValueCreate(LCStringRef key, LCDataRef value);
 LCStringRef LCKeyValueKey(LCKeyValueRef keyValue);
 LCDataRef LCKeyValueValue(LCKeyValueRef keyValue);
+LCKeyValueSHARef LCKeyValueCreateKeyValueSHA(LCKeyValueRef keyValue);
 
 #endif

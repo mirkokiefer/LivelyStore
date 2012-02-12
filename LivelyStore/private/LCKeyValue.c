@@ -33,6 +33,10 @@ LCDataRef LCKeyValueValue(LCKeyValueRef keyValue) {
   return keyValue->value;
 }
 
+LCKeyValueSHARef LCKeyValueCreateKeyValueSHA(LCKeyValueRef keyValue) {
+  return LCKeyValueSHACreate(keyValue->key, LCDataSHA1(keyValue->value));
+}
+
 void LCKeyValueDealloc(void* object) {
   LCKeyValueRef keyValue = (LCKeyValueRef)object;
   LCRelease(keyValue->key);

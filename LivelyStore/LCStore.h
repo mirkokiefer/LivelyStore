@@ -11,8 +11,4 @@ void LCStoreSetDeletedDataCallback(void(*callback)(char* sha));
 void LCStorePull(LCStoreRef target, LCStoreRef source);
 void LCStorePush(LCStoreRef source, LCStoreRef target);
 void LCStoreCommit(LCStoreRef store, LCStageRef stage);
-
-
-// private
-void LCStoreSetHead(LCStoreRef store, LCCommitRef commit);
 #endif

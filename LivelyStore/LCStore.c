@@ -10,6 +10,10 @@ struct LCStore {
 };
 
 void LCStoreDealloc(void* object);
+void invokeNewDataCallback(LCStoreRef store, LCSHARef sha, LCDataRef data);
+void createSHAsAndInvokeCallback(LCStoreRef store, LCKeyValueRef addKeys[], size_t length, LCKeyValueSHARef buffer[]);
+LCTreeRef buildTree(LCTreeRef current, LCKeyValueSHARef* add, size_t newLength, LCStringRef* delete, size_t deleteLength);
+void setStoreHead(LCStoreRef store, LCCommitRef newHead);
 
 LCType typeStore = {
   .dealloc = LCStoreDealloc
@@ -26,8 +30,43 @@ LCStoreRef LCStoreCreate(char* location) {
   return newStore;
 };
 
-void LCStoreSetHead(LCStoreRef store, LCCommitRef commit) {
-   LCCommitTree(commit);
+void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
+  LCKeyValueRef* addKeys = LCStageKeysToAdd(stage);
+  size_t addKeysLength = LCStageAddKeysCount(stage);
+  LCStringRef* deleteKeys = LCStageKeysToDelete(stage);
+  size_t deleteKeysLength = LCStageDeleteKeysCount(stage);
+
+  LCKeyValueSHARef keyValueSHAs[addKeysLength];
+  createSHAsAndInvokeCallback(store, addKeys, addKeysLength, keyValueSHAs);
+  
+  LCTreeRef newTree = buildTree(LCCommitTree(store->head), keyValueSHAs, addKeysLength, deleteKeys, deleteKeysLength);
+  
+  LCCommitRef newHead = LCCommitCreate(store->head, newTree);
+  setStoreHead(store, newHead);
+}
+
+void invokeNewDataCallback(LCStoreRef store, LCSHARef sha, LCDataRef data) {
+  LCStringRef shaString = LCSHACreateHexString(sha);
+  store->newDataCallback(LCStringStringRef(shaString), LCDataDataRef(data), LCDataLength(data));
+  LCRelease(shaString);
+}
+
+void createSHAsAndInvokeCallback(LCStoreRef store, LCKeyValueRef addKeys[], size_t length, LCKeyValueSHARef buffer[]) {
+  LCDataRef value;
+  for (LCInteger i=0; i<length; i++) {
+    value = LCKeyValueValue(addKeys[i]);
+    invokeNewDataCallback(store, LCDataSHA1(value), value);
+    buffer[i] = LCKeyValueCreateKeyValueSHA(addKeys[i]);
+  }
+}
+
+LCTreeRef buildTree(LCTreeRef current, LCKeyValueSHARef* add, size_t newLength, LCStringRef* delete, size_t deleteLength) {
+  
+}
+
+void setStoreHead(LCStoreRef store, LCCommitRef newHead) {
+  free(store->head);
+  store->head = newHead;
 }
 
 void LCStoreDealloc(void* object) {

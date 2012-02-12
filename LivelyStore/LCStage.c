@@ -3,8 +3,10 @@
 
 struct LCStage {
   LCObjectInfo info;
-  size_t length;
-  LCKeyValueRef* keyValues;
+  size_t addKeysLength;
+  size_t deleteKeysLength;
+  LCStringRef* deleteKeys;
+  LCKeyValueRef* addKeys;
 };
 
 void LCStageDealloc(void* object);
@@ -22,7 +24,7 @@ LCStageRef LCStageCreate() {
 };
 
 LCBool LCStageAddEntry(LCStageRef stage, char* key, unsigned char data[], size_t length) {  
-  LCKeyValueRef* keyValues = realloc(stage->keyValues, (stage->length+1)*sizeof(LCKeyValueRef));
+  LCKeyValueRef* keyValues = realloc(stage->addKeys, (stage->addKeysLength+1)*sizeof(LCKeyValueRef));
   if(keyValues) {
     LCStringRef lcKey = LCStringCreate(key);
     LCDataRef lcData = LCDataCreate(data, length);
@@ -30,23 +32,49 @@ LCBool LCStageAddEntry(LCStageRef stage, char* key, unsigned char data[], size_t
     LCRelease(lcKey);
     LCRelease(lcData);
 
-    keyValues[stage->length] = keyValue;
-    stage->keyValues = keyValues;
-    stage->length ++;
+    keyValues[stage->addKeysLength] = keyValue;
+    stage->addKeys = keyValues;
+    stage->addKeysLength ++;
   } else {
     return false;
   }
   return true;
 }
 
-LCKeyValueRef* LCStageEntries(LCStageRef stage) {
-  return stage->keyValues;
+bool LCStageDeleteKey(LCStageRef stage, char* key) {
+  LCStringRef* deleteKeys = realloc(stage->deleteKeys, (stage->deleteKeysLength+1)*sizeof(LCStringRef));
+  if(deleteKeys) {
+    
+  } else {
+    return false;
+  }
+  return true;
+}
+
+LCKeyValueRef* LCStageKeysToAdd(LCStageRef stage) {
+  return stage->addKeys;
+}
+
+LCStringRef* LCStageKeysToDelete(LCStageRef stage) {
+  return stage->deleteKeys;
+}
+
+size_t LCStageAddKeysCount(LCStageRef stage) {
+  return stage->addKeysLength;
+}
+
+size_t LCStageDeleteKeysCount(LCStageRef stage) {
+  return stage->deleteKeysLength;
 }
 
 void LCStageDealloc(void* object) {
-  LCStageRef commit = (LCStageRef)object;
-  for(LCInteger i=0; i<commit->length; i++) {
-    LCRelease(commit->keyValues[i]);
+  LCStageRef stage = (LCStageRef)object;
+  for(LCInteger i=0; i<stage->addKeysLength; i++) {
+    LCRelease(stage->addKeys[i]);
   }
-  free(commit->keyValues);
+  for(LCInteger i=0; i<stage->deleteKeysLength; i++) {
+    LCRelease(stage->deleteKeys[i]);
+  }
+  free(stage->addKeys);
+  free(stage->deleteKeys);
 }

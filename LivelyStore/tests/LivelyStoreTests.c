@@ -112,7 +112,7 @@ static char* test_commit() {
   LCStageAddEntry(stage, key1, value1, 5);
   LCStageAddEntry(stage, key2, value2, 5);
   
-  LCKeyValueRef* entries = LCStageEntries(stage);
+  LCKeyValueRef* entries = LCStageKeysToAdd(stage);
   mu_assert("LCStage stores entries correctly", (LCStringEqual(LCKeyValueKey(entries[0]), LCStringCreate(key1))));
   return 0;
 }
