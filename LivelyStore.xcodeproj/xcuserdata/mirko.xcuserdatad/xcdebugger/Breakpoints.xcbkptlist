@@ -35,26 +35,12 @@
          continueAfterRunningActions = "No"
          isPathRelative = "1"
          filePath = "LivelyStore/tests/LivelyStoreTests.c"
-         timestampString = "350680316.11869"
+         timestampString = "351210157.715578"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "151"
-         endingLineNumber = "151"
+         startingLineNumber = "104"
+         endingLineNumber = "104"
          landmarkName = "test_tree()"
-         landmarkType = "7">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         isPathRelative = "1"
-         filePath = "LivelyStore/tests/LivelyStoreTests.c"
-         timestampString = "350680316.11869"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "67"
-         endingLineNumber = "67"
-         landmarkName = "test_sha1()"
          landmarkType = "7">
       </FileBreakpoint>
       <FileBreakpoint
@@ -69,6 +55,59 @@
          startingLineNumber = "31"
          endingLineNumber = "31"
          landmarkName = "LCStringCreateFromStrings()"
+         landmarkType = "7">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         isPathRelative = "1"
+         filePath = "LivelyStore/LCStage.c"
+         timestampString = "350698955.429292"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "80"
+         endingLineNumber = "80"
+         landmarkName = "LCStageDealloc()"
+         landmarkType = "7">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "LivelyStore/private/LCTree.c"
+         timestampString = "351212317.496492"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "88"
+         endingLineNumber = "88"
+         landmarkName = "LCTreeCreateSerializedString()"
+         landmarkType = "7">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "LivelyStore/private/LCTree.c"
+         timestampString = "351212317.496492"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "72"
+         endingLineNumber = "72"
+         landmarkName = "serializeChildren()"
+         landmarkType = "7">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "LivelyStore/private/LCTree.c"
+         timestampString = "351212317.496492"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "73"
+         endingLineNumber = "73"
+         landmarkName = "serializeChildren()"
          landmarkType = "7">
       </FileBreakpoint>
    </FileBreakpoints>
