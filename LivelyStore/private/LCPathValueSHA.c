@@ -3,8 +3,7 @@
 
 struct LCPathValueSHA {
   LCObjectInfo info;
-  LCStringRef key;
-  LCSHARef value;
+  LCKeyValueRef keyValue;
 };
 
 void LCPathValueSHADealloc(void* object);
@@ -17,24 +16,20 @@ LCPathValueSHARef LCPathValueSHACreate(LCStringRef key, LCSHARef value) {
   LCPathValueSHARef newPathValue = malloc(sizeof(struct LCPathValueSHA));
   if (newPathValue != NULL) {
     newPathValue->info.type = &typePathValueSHA;
-    LCRetain(key);
-    LCRetain(value);
-    newPathValue->key=key;
-    newPathValue->value=value;
+    newPathValue->keyValue = LCKeyValueCreate(key, value);
   }
   return newPathValue;
 };
 
-LCStringRef LCPathValueSHAPath(LCPathValueSHARef keyValue) {
-  return keyValue->key;
+LCStringRef LCPathValueSHAPath(LCPathValueSHARef pathValueSHA) {
+  return LCKeyValueKey(pathValueSHA->keyValue);
 }
 
-LCSHARef LCPathValueSHAValue(LCPathValueSHARef keyValue) {
-  return keyValue->value;
+LCSHARef LCPathValueSHAValue(LCPathValueSHARef pathValueSHA) {
+  return LCKeyValueValue(pathValueSHA->keyValue);
 }
 
 void LCPathValueSHADealloc(void* object) {
-  LCPathValueSHARef keyValue = (LCPathValueSHARef)object;
-  LCRelease(keyValue->key);
-  LCRelease(keyValue->value);
+  LCPathValueSHARef pathValueSHA = (LCPathValueSHARef)object;
+  LCRelease(pathValueSHA->keyValue);
 }

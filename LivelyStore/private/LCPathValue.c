@@ -3,8 +3,7 @@
 
 struct LCPathValue {
   LCObjectInfo info;
-  LCStringRef key;
-  LCDataRef value;
+  LCKeyValueRef keyValue;
 };
 
 void LCPathValueDealloc(void* object);
@@ -17,28 +16,24 @@ LCPathValueRef LCPathValueCreate(LCStringRef key, LCDataRef value) {
   LCPathValueRef newPathValue = malloc(sizeof(struct LCPathValue));
   if (newPathValue != NULL) {
     newPathValue->info.type = &typePathValue;
-    LCRetain(key);
-    LCRetain(value);
-    newPathValue->key=key;
-    newPathValue->value=value;
+    newPathValue->keyValue = LCKeyValueCreate(key, value);
   }
   return newPathValue;
 };
 
-LCStringRef LCPathValuePath(LCPathValueRef keyValue) {
-  return keyValue->key;
+LCStringRef LCPathValuePath(LCPathValueRef pathValue) {
+  return LCKeyValueKey(pathValue->keyValue);
 }
 
-LCDataRef LCPathValueValue(LCPathValueRef keyValue) {
-  return keyValue->value;
+LCDataRef LCPathValueValue(LCPathValueRef pathValue) {
+  return LCKeyValueValue(pathValue->keyValue);
 }
 
-LCPathValueSHARef LCPathValueCreatePathValueSHA(LCPathValueRef keyValue) {
-  return LCPathValueSHACreate(keyValue->key, LCDataSHA1(keyValue->value));
+LCPathValueSHARef LCPathValueCreatePathValueSHA(LCPathValueRef pathValue) {
+  return LCPathValueSHACreate(LCPathValuePath(pathValue), LCDataSHA1(LCPathValueValue(pathValue)));
 }
 
 void LCPathValueDealloc(void* object) {
-  LCPathValueRef keyValue = (LCPathValueRef)object;
-  LCRelease(keyValue->key);
-  LCRelease(keyValue->value);
+  LCPathValueRef pathValue = (LCPathValueRef)object;
+  LCRelease(pathValue->keyValue);
 }
