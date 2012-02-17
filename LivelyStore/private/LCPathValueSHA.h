@@ -1,11 +1,11 @@
 
-#ifndef LivelyStore_LCPathValueSHA_h
-#define LivelyStore_LCPathValueSHA_h
+#ifndef LivelyStore_LCPathDataSHA_h
+#define LivelyStore_LCPathDataSHA_h
 
 #include "LivelyStore.h"
 
-LCPathValueSHARef LCPathValueSHACreate(LCStringRef key, LCSHARef value);
-LCStringRef LCPathValueSHAPath(LCPathValueSHARef keyValue);
-LCSHARef LCPathValueSHAValue(LCPathValueSHARef keyValue);
+LCPathDataSHARef LCPathDataSHACreate(LCStringRef key, LCSHARef value);
+LCStringRef LCPathDataSHAPath(LCPathDataSHARef keyValue);
+LCSHARef LCPathDataSHAValue(LCPathDataSHARef keyValue);
 
 #endif

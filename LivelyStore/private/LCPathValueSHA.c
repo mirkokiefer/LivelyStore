@@ -1,35 +1,35 @@
 
-#include "LCPathValueSHA.h"
+#include "LCPathDataSHA.h"
 
-struct LCPathValueSHA {
+struct LCPathDataSHA {
   LCObjectInfo info;
   LCKeyValueRef keyValue;
 };
 
-void LCPathValueSHADealloc(void* object);
+void LCPathDataSHADealloc(void* object);
 
-LCType typePathValueSHA = {
-  .dealloc = LCPathValueSHADealloc
+LCType typePathDataSHA = {
+  .dealloc = LCPathDataSHADealloc
 };
 
-LCPathValueSHARef LCPathValueSHACreate(LCStringRef key, LCSHARef value) {
-  LCPathValueSHARef newPathValue = malloc(sizeof(struct LCPathValueSHA));
-  if (newPathValue != NULL) {
-    newPathValue->info.type = &typePathValueSHA;
-    newPathValue->keyValue = LCKeyValueCreate(key, value);
+LCPathDataSHARef LCPathDataSHACreate(LCStringRef key, LCSHARef value) {
+  LCPathDataSHARef newPathData = malloc(sizeof(struct LCPathDataSHA));
+  if (newPathData != NULL) {
+    newPathData->info.type = &typePathDataSHA;
+    newPathData->keyValue = LCKeyValueCreate(key, value);
   }
-  return newPathValue;
+  return newPathData;
 };
 
-LCStringRef LCPathValueSHAPath(LCPathValueSHARef pathValueSHA) {
-  return LCKeyValueKey(pathValueSHA->keyValue);
+LCStringRef LCPathDataSHAPath(LCPathDataSHARef pathDataSHA) {
+  return LCKeyValueKey(pathDataSHA->keyValue);
 }
 
-LCSHARef LCPathValueSHAValue(LCPathValueSHARef pathValueSHA) {
-  return LCKeyValueValue(pathValueSHA->keyValue);
+LCSHARef LCPathDataSHAValue(LCPathDataSHARef pathDataSHA) {
+  return LCKeyValueValue(pathDataSHA->keyValue);
 }
 
-void LCPathValueSHADealloc(void* object) {
-  LCPathValueSHARef pathValueSHA = (LCPathValueSHARef)object;
-  LCRelease(pathValueSHA->keyValue);
+void LCPathDataSHADealloc(void* object) {
+  LCPathDataSHARef pathDataSHA = (LCPathDataSHARef)object;
+  LCRelease(pathDataSHA->keyValue);
 }

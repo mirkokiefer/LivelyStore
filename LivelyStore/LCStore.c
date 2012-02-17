@@ -11,8 +11,8 @@ struct LCStore {
 
 void LCStoreDealloc(void* object);
 void invokeNewDataCallback(LCStoreRef store, LCSHARef sha, LCDataRef data);
-void createSHAsAndInvokeCallback(LCStoreRef store, LCPathValueRef addPaths[], size_t length, LCPathValueSHARef buffer[]);
-LCTreeRef buildTree(LCTreeRef current, LCPathValueSHARef* add, size_t newLength, LCStringRef* delete, size_t deleteLength);
+void createSHAsAndInvokeCallback(LCStoreRef store, LCPathDataRef addPaths[], size_t length, LCPathDataSHARef buffer[]);
+LCTreeRef buildTree(LCTreeRef current, LCPathDataSHARef* add, size_t newLength, LCStringRef* delete, size_t deleteLength);
 void setStoreHead(LCStoreRef store, LCCommitRef newHead);
 
 LCType typeStore = {
@@ -31,12 +31,12 @@ LCStoreRef LCStoreCreate(char* location) {
 };
 
 void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
-  LCPathValueRef* addPaths = LCStagePathsToAdd(stage);
+  LCPathDataRef* addPaths = LCStagePathsToAdd(stage);
   size_t addPathsLength = LCStageAddPathsCount(stage);
   LCStringRef* deletePaths = LCStagePathsToDelete(stage);
   size_t deletePathsLength = LCStageDeletePathsCount(stage);
 
-  LCPathValueSHARef keyValueSHAs[addPathsLength];
+  LCPathDataSHARef keyValueSHAs[addPathsLength];
   createSHAsAndInvokeCallback(store, addPaths, addPathsLength, keyValueSHAs);
   
   LCTreeRef newTree = buildTree(LCCommitTree(store->head), keyValueSHAs, addPathsLength, deletePaths, deletePathsLength);
@@ -51,16 +51,16 @@ void invokeNewDataCallback(LCStoreRef store, LCSHARef sha, LCDataRef data) {
   LCRelease(shaString);
 }
 
-void createSHAsAndInvokeCallback(LCStoreRef store, LCPathValueRef addPaths[], size_t length, LCPathValueSHARef buffer[]) {
+void createSHAsAndInvokeCallback(LCStoreRef store, LCPathDataRef addPaths[], size_t length, LCPathDataSHARef buffer[]) {
   LCDataRef value;
   for (LCInteger i=0; i<length; i++) {
-    value = LCPathValueValue(addPaths[i]);
+    value = LCPathDataValue(addPaths[i]);
     invokeNewDataCallback(store, LCDataSHA1(value), value);
-    buffer[i] = LCPathValueCreatePathValueSHA(addPaths[i]);
+    buffer[i] = LCPathDataCreatePathDataSHA(addPaths[i]);
   }
 }
 
-LCTreeRef buildTree(LCTreeRef current, LCPathValueSHARef* add, size_t newLength, LCStringRef* delete, size_t deleteLength) {
+LCTreeRef buildTree(LCTreeRef current, LCPathDataSHARef* add, size_t newLength, LCStringRef* delete, size_t deleteLength) {
   /*
    Ich gehe gezielt runter zu den geänderten pfaden/trees - und erstelle dann rekursiv nach oben die bäume neu
    Ich sollte die keys mit einem Pfad objekt ersetzen...
@@ -68,7 +68,7 @@ LCTreeRef buildTree(LCTreeRef current, LCPathValueSHARef* add, size_t newLength,
    da alle diese Objekte den SHA cachen, wird das auch nur einmal vorkommen.
    wenn ich also den baum neu aufbau und am ende ganz oben SHA aufrufe, werden alle bäume automatisch gespeichert.
    voll geil!
-   LCData wird gespeichtert sobald LCPathValueSHA erstellt wird.
+   LCData wird gespeichtert sobald LCPathDataSHA erstellt wird.
    LCTree wird gespeichter sobald, LCCommit den SHA vom top-tree will.
    LCCommit wird gespeichert sobald LCStore den SHA will um den head neu zu setzen.
    

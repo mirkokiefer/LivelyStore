@@ -20,7 +20,7 @@ typedef bool LCBool;
 typedef LCStringRef LCPathRef;
 typedef struct LCStore* LCStoreRef;
 typedef struct LCStage* LCStageRef;
-typedef struct LCPathValue* LCPathValueRef;
+typedef struct LCPathData* LCPathDataRef;
 typedef struct LCData* LCDataRef;
 typedef struct LCDataArray* LCDataArrayRef;
 typedef struct LCSHA* LCSHARef;
@@ -28,7 +28,7 @@ typedef struct LCKeyValue* LCKeyValueRef;
 
 typedef struct LCTree* LCTreeRef;
 typedef struct LCDataStore* LCDataStoreRef;
-typedef struct LCPathValueSHA* LCPathValueSHARef;
+typedef struct LCPathDataSHA* LCPathDataSHARef;
 typedef struct LCCommit* LCCommitRef;
 
 // internal types
@@ -64,11 +64,11 @@ struct LCHashableObject {
 #include "LCStore.h"
 #include "LCStage.h"
 #include "LCTree.h"
-#include "LCPathValue.h"
+#include "LCPathData.h"
 #include "LCData.h"
 #include "LCDataArray.h"
 #include "LCSHA.h"
 #include "LCUtils.h"
 #include "LCDataStore.h"
-#include "LCPathValueSHA.h"
+#include "LCPathDataSHA.h"
 #include "LCCommit.h"

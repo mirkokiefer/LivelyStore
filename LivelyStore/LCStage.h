@@ -11,7 +11,7 @@ bool LCStageDeletePath(LCStageRef stage, char* path);
 void LCStageCommitToStore(LCStoreRef store);
 
 // private
-LCPathValueRef* LCStagePathsToAdd(LCStageRef stage);
+LCPathDataRef* LCStagePathsToAdd(LCStageRef stage);
 LCStringRef* LCStagePathsToDelete(LCStageRef stage);
 size_t LCStageAddPathsCount(LCStageRef stage);
 size_t LCStageDeletePathsCount(LCStageRef stage);

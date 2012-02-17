@@ -5,13 +5,13 @@
 
 #include "LivelyStore.h"
 
-LCTreeRef LCTreeCreate(LCPathValueSHARef childTrees[], size_t childTreesLength,
-                       LCPathValueSHARef childDatas[], size_t childDatasLength);
+LCTreeRef LCTreeCreate(LCPathDataSHARef childTrees[], size_t childTreesLength,
+                       LCPathDataSHARef childDatas[], size_t childDatasLength);
 LCTreeRef LCTreeCreateFromSerialized(LCStringRef serializedTree);
 size_t LCTreeChildTreesLength(LCTreeRef tree);
 size_t LCTreeChildDatasLength(LCTreeRef tree);
-LCPathValueSHARef* LCTreeChildTrees(LCTreeRef tree);
-LCPathValueSHARef* LCTreeChildDatas(LCTreeRef tree);
+LCPathDataSHARef* LCTreeChildTrees(LCTreeRef tree);
+LCPathDataSHARef* LCTreeChildDatas(LCTreeRef tree);
 LCSHARef LCTreeSHA(LCTreeRef tree);
 LCStringRef LCTreeSerialize(LCTreeRef);
 

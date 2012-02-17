@@ -6,7 +6,7 @@ struct LCStage {
   size_t addPathsLength;
   size_t deletePathsLength;
   LCStringRef* deletePaths;
-  LCPathValueRef* addPaths;
+  LCPathDataRef* addPaths;
 };
 
 void LCStageDealloc(void* object);
@@ -24,11 +24,11 @@ LCStageRef LCStageCreate() {
 };
 
 LCBool LCStageAddEntry(LCStageRef stage, char* path, unsigned char data[], size_t length) {  
-  LCPathValueRef* keyValues = realloc(stage->addPaths, (stage->addPathsLength+1)*sizeof(LCPathValueRef));
+  LCPathDataRef* keyValues = realloc(stage->addPaths, (stage->addPathsLength+1)*sizeof(LCPathDataRef));
   if(keyValues) {
     LCStringRef lcPath = LCStringCreate(path);
     LCDataRef lcData = LCDataCreate(data, length);
-    LCPathValueRef keyValue = LCPathValueCreate(lcPath, lcData);
+    LCPathDataRef keyValue = LCPathDataCreate(lcPath, lcData);
     LCRelease(lcPath);
     LCRelease(lcData);
 
@@ -51,7 +51,7 @@ bool LCStageDeletePath(LCStageRef stage, char* key) {
   return true;
 }
 
-LCPathValueRef* LCStagePathsToAdd(LCStageRef stage) {
+LCPathDataRef* LCStagePathsToAdd(LCStageRef stage) {
   return stage->addPaths;
 }
 
