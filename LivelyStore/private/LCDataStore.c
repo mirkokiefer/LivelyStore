@@ -4,6 +4,8 @@
 struct LCDataStore {
   LCObjectInfo info;
   LCStringRef location;
+  void (*newDataCallback)(char* sha, unsigned char* data, size_t length);
+  void(*deletedDataCallback)(char* sha);
 };
 
 void LCDataStoreDealloc(void* object);
@@ -22,10 +24,21 @@ LCDataStoreRef LCDataStoreCreate(LCStringRef location) {
   return newStore;
 };
 
-LCDataRef LCDataStoreGet(LCDataStoreRef store, LCSHARef key) {
-  return LCDataCreate(NULL, 0);
+void LCDataStoreSetNewDataCallback(LCDataStoreRef store, void(*callback)(char* sha, unsigned char* data, size_t length)) {
+  store->newDataCallback = callback;
 }
 
+void LCDataStoreSetDeletedDataCallback(LCDataStoreRef store, void(*callback)(char* sha)) {
+  store->deletedDataCallback = callback;
+}
+
+void LCDataStorePutData(LCDataStoreRef store, char* sha, unsigned char* data, size_t length) {
+  store->newDataCallback(sha, data, length);
+}
+
+void LCDataStoreDeleteData(LCDataStoreRef store, char* sha) {
+  store->deletedDataCallback(sha);
+}
 
 void LCDataStoreDealloc(void* object) {
   LCDataStoreRef store = (LCDataStoreRef)object;

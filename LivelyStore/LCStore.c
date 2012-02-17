@@ -5,12 +5,10 @@ struct LCStore {
   LCObjectInfo info;
   LCDataStoreRef dataStore;
   LCCommitRef head;
-  void (*newDataCallback)(char* sha, unsigned char* data, size_t length);
-  void(*deletedDataCallback)(char* sha);
 };
 
 void LCStoreDealloc(void* object);
-void invokeNewDataCallback(LCStoreRef store, LCSHARef sha, LCDataRef data);
+void putData(LCStoreRef store, LCSHARef sha, LCDataRef data);
 void createSHAsAndInvokeCallback(LCStoreRef store, LCPathDataRef addPaths[], size_t length, LCPathDataSHARef buffer[]);
 LCTreeRef buildTree(LCTreeRef current, LCPathDataSHARef* add, size_t newLength, LCStringRef* delete, size_t deleteLength);
 void setStoreHead(LCStoreRef store, LCCommitRef newHead);
@@ -30,6 +28,15 @@ LCStoreRef LCStoreCreate(char* location) {
   return newStore;
 };
 
+void LCStoreSetNewDataCallback(LCStoreRef store, void(*callback)(char* sha, unsigned char* data, size_t length)) {
+  LCDataStoreSetNewDataCallback(store->dataStore, callback);
+}
+
+void LCStoreSetDeletedDataCallback(LCStoreRef store, void(*callback)(char* sha)) {
+  LCDataStoreSetDeletedDataCallback(store->dataStore, callback);
+}
+
+
 void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
   LCPathDataRef* addPaths = LCStagePathsToAdd(stage);
   size_t addPathsLength = LCStageAddPathsCount(stage);
@@ -45,9 +52,9 @@ void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
   setStoreHead(store, newHead);
 }
 
-void invokeNewDataCallback(LCStoreRef store, LCSHARef sha, LCDataRef data) {
+void putData(LCStoreRef store, LCSHARef sha, LCDataRef data) {
   LCStringRef shaString = LCSHACreateHexString(sha);
-  store->newDataCallback(LCStringStringRef(shaString), LCDataDataRef(data), LCDataLength(data));
+  LCDataStorePutData(store->dataStore, LCStringStringRef(shaString), LCDataDataRef(data), LCDataLength(data));
   LCRelease(shaString);
 }
 
@@ -55,7 +62,7 @@ void createSHAsAndInvokeCallback(LCStoreRef store, LCPathDataRef addPaths[], siz
   LCDataRef value;
   for (LCInteger i=0; i<length; i++) {
     value = LCPathDataValue(addPaths[i]);
-    invokeNewDataCallback(store, LCDataSHA1(value), value);
+    putData(store, LCDataSHA1(value), value);
     buffer[i] = LCPathDataCreatePathDataSHA(addPaths[i]);
   }
 }
