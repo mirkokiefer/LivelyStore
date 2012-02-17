@@ -4,8 +4,8 @@
 
 #include "LivelyStore.h"
 
-LCPathDataSHARef LCPathDataSHACreate(LCStringRef key, LCSHARef value);
-LCStringRef LCPathDataSHAPath(LCPathDataSHARef keyValue);
-LCSHARef LCPathDataSHAValue(LCPathDataSHARef keyValue);
+LCPathDataSHARef LCPathDataSHACreate(LCStringRef path, LCStringRef sha);
+LCStringRef LCPathDataSHAPath(LCPathDataSHARef pathValue);
+LCStringRef LCPathDataSHASHA(LCPathDataSHARef pathValue);
 
 #endif

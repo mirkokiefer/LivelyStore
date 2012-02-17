@@ -15,4 +15,5 @@ char* LCStringStringRef(LCStringRef string);
 LCDataRef LCStringCreateData(LCStringRef string);
 void LCStringPrint(LCStringRef string);
 LCBool LCStringEqual(LCStringRef string, LCStringRef otherString);
+LCStringRef LCStringCreateSHAString(LCStringRef string);
 #endif

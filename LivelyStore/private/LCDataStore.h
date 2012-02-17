@@ -14,6 +14,6 @@ void LCDataStorePutTreeData(LCDataStoreRef store, char* sha, char* data);
 void LCDataStorePutCommitData(LCDataStoreRef store, char* sha, char* data);
 void LCDataStorePutTagData(LCDataStoreRef store, char* tag, char* data);
 
-void LCDataStoreDelete(LCDataStoreRef store, LCSHARef key);
+void LCDataStoreDelete(LCDataStoreRef store, LCStringRef sha);
 
 #endif

@@ -1,41 +1,37 @@
 
 #include "LCStage.h"
 
-LCDataArrayRef LCTreeDataArrayCopy(void* data);
 void LCTreeDealloc(void* object);
+size_t serializationBufferSize(LCTreeRef tree);
+void serializeChildren(LCPathDataSHARef children[], size_t length, char buffer[]);
 
 struct LCTree {
   LCObjectInfo info;
-  LCSHARef sha;
+  LCStringRef sha;
   size_t childTreesLength;
-  size_t childDatasLength;
+  size_t childDataLength;
   LCPathDataSHARef children[];
-};
-
-LCHashableObject hashableTree = {
-  .dataArrayCopy = LCTreeDataArrayCopy,
 };
 
 LCType typeTree = {
   .dealloc = LCTreeDealloc,
-  .meta = &hashableTree
 };
 
 LCTreeRef LCTreeCreate(LCPathDataSHARef childTrees[], size_t childTreesLength,
-                       LCPathDataSHARef childDatas[], size_t childDatasLength) {
-  LCTreeRef newTree = malloc(sizeof(struct LCTree)+sizeof(LCPathDataSHARef)*(childDatasLength+childTreesLength));
+                       LCPathDataSHARef childData[], size_t childDataLength) {
+  LCTreeRef newTree = malloc(sizeof(struct LCTree)+sizeof(LCPathDataSHARef)*(childDataLength+childTreesLength));
   if (newTree != NULL) {
     newTree->info.type = &typeTree;
     for (LCInteger i=0; i<childTreesLength; i++) {
       LCRetain(childTrees[i]);
     }
-    for (LCInteger i=0; i<childDatasLength; i++) {
-      LCRetain(childDatas[i]);
+    for (LCInteger i=0; i<childDataLength; i++) {
+      LCRetain(childData[i]);
     }
     memcpy(newTree->children, childTrees, childTreesLength*sizeof(LCPathDataSHARef));
-    memcpy(&(newTree->children[childTreesLength]), childDatas, childDatasLength*sizeof(LCPathDataSHARef));
+    memcpy(&(newTree->children[childTreesLength]), childData, childDataLength*sizeof(LCPathDataSHARef));
     newTree->childTreesLength = childTreesLength;
-    newTree->childDatasLength = childDatasLength;
+    newTree->childDataLength = childDataLength;
   }
   return newTree;
 };
@@ -44,43 +40,65 @@ size_t LCTreeChildTreesLength(LCTreeRef tree) {
   return tree->childTreesLength;
 }
 
-size_t LCTreeChildDatasLength(LCTreeRef tree) {
-  return tree->childDatasLength;
+size_t LCTreeChildDataLength(LCTreeRef tree) {
+  return tree->childDataLength;
 }
 
 LCPathDataSHARef* LCTreeChildTrees(LCTreeRef tree) {
   return tree->children;
 }
 
-LCPathDataSHARef* LCTreeChildDatas(LCTreeRef tree) {
+LCPathDataSHARef* LCTreeChildData(LCTreeRef tree) {
   return &(tree->children[tree->childTreesLength]);
 }
 
-LCDataArrayRef LCTreeDataArrayCopy(void* data) {
-  LCTreeRef tree = (LCTreeRef)data;
-  size_t dataCount = tree->childTreesLength*2 + tree->childDatasLength*2;
-  LCDataRef buffer[dataCount];
-  LCInteger bufferIndex = 0;
-  for (LCInteger i=0; i<dataCount/2; i++) {
-    LCDataRef key = LCStringCreateData(LCPathDataSHAPath(tree->children[i]));
-    LCDataRef value = LCSHASHAData(LCPathDataSHAValue(tree->children[i]));
-    buffer[bufferIndex] = key;
-    buffer[bufferIndex+1] = value;
-    bufferIndex = bufferIndex+2;
+size_t serializationBufferSize(LCTreeRef tree) {
+  size_t childrenLength = tree->childTreesLength + tree->childDataLength;
+  size_t sumPathLength = 0;
+  for (LCInteger i=0; i<childrenLength; i++) {
+    sumPathLength = sumPathLength + LCStringLength(LCPathDataSHAPath(tree->children[i]));
   }
-  return LCDataArrayCreate(buffer, dataCount);
+  return sumPathLength + childrenLength * (LC_SHA1_HEX_Length + 2) + 1;  
 }
 
-LCSHARef LCTreeSHA(LCTreeRef tree) {
+void serializeChildren(LCPathDataSHARef children[], size_t length, char buffer[]) {
+  char* path;
+  char* sha;
+  LCPathDataSHARef dataSHA;
+  for (LCInteger i=0; i<length; i++) {
+    dataSHA = children[i];
+    path = LCStringStringRef(LCPathDataSHAPath(dataSHA));
+    sha = LCStringStringRef(LCPathDataSHASHA(dataSHA));
+    strcat(buffer, path);
+    strcat(buffer, " ");
+    strcat(buffer, sha);
+    strcat(buffer, "\n");
+  }
+}
+
+LCStringRef LCTreeCreateSerializedString(LCTreeRef tree) {
+  size_t bufferSize = serializationBufferSize(tree);
+  char buffer[bufferSize];
+  // write child trees:
+  serializeChildren(tree->children, tree->childTreesLength, buffer);
+  strcat(buffer, "\n");
+  // write child data:
+  serializeChildren(&(tree->children[tree->childTreesLength]), tree->childDataLength, buffer);
+  return LCStringCreate(buffer);
+}
+
+LCStringRef LCTreeSHA(LCTreeRef tree) {
   if(tree->sha == NULL) {
-    tree->sha = LCSHACreateFromHashableObject(tree);
+    LCStringRef serialized = LCTreeCreateSerializedString(tree);
+    tree->sha = LCStringCreateSHAString(serialized);
+    LCRelease(serialized);
   }
   return tree->sha;
 }
 
 void LCTreeDealloc(void* object) {
   LCTreeRef tree = (LCTreeRef)object;
-  for (LCInteger i=0; i<(tree->childTreesLength+tree->childDatasLength); i++) {
+  for (LCInteger i=0; i<(tree->childTreesLength+tree->childDataLength); i++) {
     LCRelease(tree->children[i]);
   }
 }

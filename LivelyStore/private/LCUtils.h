@@ -10,7 +10,7 @@ char hexDigitToASCIChar(char hexDigit);
 char asciCharToHexDigit(char hexDigit);
 void byteToHexDigits(LCByte input, char* buffer);
 LCByte hexDigitsToByte(char* hexDigits);
-LCStringRef createHexStringFromData(LCDataRef data);
+LCStringRef createHexString(LCByte data[], size_t length);
 LCDataRef createDataFromHexString(LCStringRef hexString);
 
 #endif

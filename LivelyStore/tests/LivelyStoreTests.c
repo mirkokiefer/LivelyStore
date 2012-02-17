@@ -30,66 +30,24 @@ static char* test_string() {
   return 0;
 }
 
-static char* test_dataArray() {
-  char* string1 = "abc";
-  char* string2 = "def";
-  
-  LCDataRef data1 = LCDataCreate((LCByte*)string1, strlen(string1)+1);
-  LCDataRef data2 = LCDataCreate((LCByte*)string2, strlen(string2)+1);
-  LCDataRef datas[] = {data1, data2};
-  LCDataArrayRef array = LCDataArrayCreate(datas, 2);
-  LCBool correct = (LCDataDataAtIndex(array, 0) == data1) && (LCDataDataAtIndex(array, 1) == data2);
-  mu_assert("LCDataArray stores elements correctly", correct);
-  return 0;
-}
-
 static char* test_sha1() {
   char* testData1 = "compute sha1";
-  char* testData2 = " abc";
-  //char* testData3 = "compute sha1 abc";
-  LCStringRef testData1RealSHA = LCStringCreate("a0e1e14cb346a01f9fd10e60080b945f995524af");
-  LCStringRef testData3RealSHA = LCStringCreate("253f7e747aa2bd4107cc0af2f78fe60fc075d090");
+  LCStringRef testData1RealSHA = LCStringCreate("eefbec885d1042d22ea36fd1690d94dec9029680");
   
-  LCDataRef testData1Data = LCStringCreateData(LCStringCreate(testData1));
-  LCDataRef testData1DataNoNull = LCDataCreate((LCByte*)testData1, strlen(testData1));
-  LCDataRef testData2Data = LCStringCreateData(LCStringCreate(testData2));
-  LCDataRef testData1and2Datas[] = {testData1DataNoNull, testData2Data};
-  LCDataArrayRef testData1and2DataArray = LCDataArrayCreate(testData1and2Datas, 2);
+  LCStringRef testData1SHA = LCCreateSHAString((LCByte*)testData1, strlen(testData1));
   
-  LCSHARef testData1SHA = LCSHACreateFromHashableObject(testData1Data);
-  LCSHARef testData1SHAClone = LCDataSHA1(testData1Data);
-  LCSHARef testData1and2SHA = LCSHACreateFromHashableObject(testData1and2DataArray);
-  
-  mu_assert("SHA1 from testData1 is correct", LCStringEqual(LCSHACreateHexString(testData1SHA), testData1RealSHA));
-  mu_assert("SHA1 from two LCDatas is correct", LCStringEqual(LCSHACreateHexString(testData1and2SHA), testData3RealSHA));
-  mu_assert("LCSHAEqual is correct", LCSHAEqual(testData1SHA, testData1SHAClone));
-  
-  LCSHARef fromHexString = LCSHACreateFromHexString(testData1RealSHA, NULL);
-  LCStringRef hexStringAgain = LCSHACreateHexString(fromHexString);
-  mu_assert("LCSHA can be created from hex string", LCStringEqual(hexStringAgain, testData1RealSHA));
+  mu_assert("SHA1 from testData1 is correct", LCStringEqual(testData1SHA, testData1RealSHA));
   return 0;
 }
 
 
 static char* test_data() {
   char* aCString = "normal string";
-  char* sameCString = "normal string";
-  char* differentCString = "different string";
-
+  
   LCDataRef aData = LCDataCreate((LCByte*)aCString, strlen(aCString)+1);
-  LCDataRef sameData = LCDataCreate((LCByte*)sameCString, strlen(sameCString)+1);
-  LCDataRef differentData = LCDataCreate((LCByte*)differentCString, strlen(differentCString)+1);
-
+  LCByte* dataFromLCData = LCDataDataRef(aData);
   
-  LCByte dataData[LCDataLength(aData)];
-  LCDataData(aData, dataData);
-  
-  mu_assert("LCData stores data correctly", strcmp(aCString, (char*)dataData)==0);
-  mu_assert("LCDataEqual works with same data data", LCDataEqual(aData, sameData));
-  mu_assert("LCDataEqual works with differing data data", LCDataEqual(aData, differentData)==false);
-  LCStringRef aLCString = LCStringCreate(aCString);
-  LCStringRef stringFromData = LCBLobCreateString(aData);
-  mu_assert("LCData returns correct string", LCStringEqual(stringFromData, aLCString));
+  mu_assert("LCData stores data correctly", strcmp(aCString, (char*)dataFromLCData)==0);
   return 0;
 }
 
@@ -121,8 +79,8 @@ static char* test_tree() {
   LCStringRef path1 = LCStringCreate("path1");
   LCStringRef path2 = LCStringCreate("path2");
   LCStringRef path3 = LCStringCreate("path3");
-  LCSHARef value1SHA = LCDataSHA1(LCDataCreate((LCByte*)"12345", 6));
-  LCSHARef value2SHA = LCDataSHA1(LCDataCreate((LCByte*)"67890", 6));
+  LCStringRef value1SHA = LCCreateSHAString((LCByte*)"12345", 6);
+  LCStringRef value2SHA = LCCreateSHAString((LCByte*)"67890", 6);
   LCPathDataSHARef entry1 = LCPathDataSHACreate(path1, value1SHA);
   LCPathDataSHARef entry2 = LCPathDataSHACreate(path2, value2SHA);
   LCPathDataSHARef entry3 = LCPathDataSHACreate(path3, value2SHA);
@@ -130,26 +88,28 @@ static char* test_tree() {
   LCPathDataSHARef datas1[] = {entry1};
   LCPathDataSHARef datas2[] = {entry2, entry3};
   
-  LCStringRef tree1Name = LCStringCreate("");
+  LCStringRef tree1Name = LCStringCreate("root");
   LCTreeRef tree1 = LCTreeCreate(NULL, 0, datas1, 1);
   LCPathDataSHARef childTree1 = LCPathDataSHACreate(tree1Name, LCTreeSHA(tree1));
   LCPathDataSHARef childTrees1[] = {childTree1};
   LCTreeRef tree2 = LCTreeCreate(childTrees1, 1, datas2, 2);
   
-  LCPathDataSHARef* tree1Datas = LCTreeChildDatas(tree1);
-  LCPathDataSHARef* tree2Datas = LCTreeChildDatas(tree2);
+  LCPathDataSHARef* tree1Data = LCTreeChildData(tree1);
+  LCPathDataSHARef* tree2Data = LCTreeChildData(tree2);
   LCPathDataSHARef* tree2ChildTrees = LCTreeChildTrees(tree2);
   
-  LCBool correct = (tree1Datas[0]==entry1) && (tree2Datas[0]==entry2) && (tree2Datas[1]==entry3);
+  LCBool correct = (tree1Data[0]==entry1) && (tree2Data[0]==entry2) && (tree2Data[1]==entry3);
   mu_assert("LCTree stores entries correctly", correct);
   mu_assert("LCTree stores child trees correctly", tree2ChildTrees[0] == childTree1);
   
   LCTreeRef tree2Clone = LCTreeCreate(childTrees1, 1, datas2, 2);
-  LCSHARef tree1SHA = LCTreeSHA(tree1);
-  LCSHARef tree2SHA = LCTreeSHA(tree2);
-  LCSHARef tree2CloneSHA = LCTreeSHA(tree2Clone);
-  mu_assert("LCTree SHA differs on differing trees", LCSHAEqual(tree1SHA, tree2SHA)==false);
-  mu_assert("LCTree SHA is identical on identical trees", LCSHAEqual(tree2SHA, tree2CloneSHA));
+  LCStringRef tree1SHA = LCTreeSHA(tree1);
+  LCStringRef tree2SHA = LCTreeSHA(tree2);
+  LCStringRef tree2CloneSHA = LCTreeSHA(tree2Clone);
+  mu_assert("LCTree SHA differs on differing trees", LCStringEqual(tree1SHA, tree2SHA)==false);
+  mu_assert("LCTree SHA is identical on identical trees", LCStringEqual(tree2SHA, tree2CloneSHA));
+  char* tests = LCStringStringRef(LCTreeCreateSerializedString(tree2));
+  printf("%s", tests);
   return 0;
 }
 
@@ -157,7 +117,6 @@ static char* all_tests() {
   mu_run_test(test_retain_counting);
   mu_run_test(test_string);
   mu_run_test(test_data);
-  mu_run_test(test_dataArray);
   mu_run_test(test_sha1);
   mu_run_test(test_pathData);
   mu_run_test(test_commit);

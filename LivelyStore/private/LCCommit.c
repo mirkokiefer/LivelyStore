@@ -5,15 +5,10 @@ struct LCCommit {
   LCObjectInfo info;
   LCCommitRef parent;
   LCTreeRef tree;
-  LCSHARef sha;
+  LCStringRef sha;
 };
 
-LCDataArrayRef LCCommitDataArray(void* object);
 void LCCommitDealloc(void* object);
-
-LCHashableObject hashableCommit = {
-  .dataArrayCopy = LCCommitDataArray
-};
 
 LCType typeCommit = {
   .dealloc = LCCommitDealloc
@@ -37,19 +32,20 @@ LCCommitRef LCCommitParent(LCCommitRef commit) {
   return commit->parent;
 }
 
-LCSHARef LCCommitSHA(LCCommitRef commit) {
+LCStringRef LCCommitSHA(LCCommitRef commit) {
   if(commit->sha == NULL) {
-    commit->sha = LCSHACreateFromHashableObject(commit);
+    LCStringRef serialized = LCCommitCreateSerializedString(commit);
+    commit->sha = LCStringCreateSHAString(serialized);
   }
   return commit->sha;
 }
 
-LCDataArrayRef LCCommitDataArray(void* object) {
-  LCCommitRef commit = (LCCommitRef)object;
-  LCSHARef parentSHA = LCCommitSHA(commit->parent);
-  LCSHARef treeSHA = LCTreeSHA(commit->tree);
-  LCDataRef datas[2] = {LCSHASHAData(parentSHA), LCSHASHAData(treeSHA)};
-  return LCDataArrayCreate(datas, 2);
+LCStringRef LCCommitCreateSerializedString(LCCommitRef commit) {
+  char* parentSHA = LCStringStringRef(LCCommitSHA(commit->parent));
+  char* treeSHA = LCStringStringRef(LCTreeSHA(commit->tree));
+  char string[LC_SHA1_Length + 1 + LC_SHA1_Length + 1];
+  sprintf(string, "%s\n%s", parentSHA, treeSHA);
+  return LCStringCreate(string);
 }
 
 void LCCommitDealloc(void* object) {

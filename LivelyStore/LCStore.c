@@ -8,8 +8,7 @@ struct LCStore {
 };
 
 void LCStoreDealloc(void* object);
-void putData(LCStoreRef store, LCSHARef sha, LCDataRef data);
-void createSHAsAndInvokeCallback(LCStoreRef store, LCPathDataRef addPaths[], size_t length, LCPathDataSHARef buffer[]);
+void storeDataWithSHAs(LCStoreRef store, LCPathDataRef addPaths[], size_t length, LCPathDataSHARef buffer[]);
 LCTreeRef buildTree(LCTreeRef current, LCPathDataSHARef* add, size_t newLength, LCStringRef* delete, size_t deleteLength);
 void setStoreHead(LCStoreRef store, LCCommitRef newHead);
 
@@ -44,7 +43,7 @@ void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
   size_t deletePathsLength = LCStageDeletePathsCount(stage);
 
   LCPathDataSHARef keyValueSHAs[addPathsLength];
-  createSHAsAndInvokeCallback(store, addPaths, addPathsLength, keyValueSHAs);
+  storeDataWithSHAs(store, addPaths, addPathsLength, keyValueSHAs);
   
   LCTreeRef newTree = buildTree(LCCommitTree(store->head), keyValueSHAs, addPathsLength, deletePaths, deletePathsLength);
   
@@ -52,17 +51,13 @@ void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
   setStoreHead(store, newHead);
 }
 
-void putData(LCStoreRef store, LCSHARef sha, LCDataRef data) {
-  LCStringRef shaString = LCSHACreateHexString(sha);
-  LCDataStorePutData(store->dataStore, LCStringStringRef(shaString), LCDataDataRef(data), LCDataLength(data));
-  LCRelease(shaString);
-}
-
-void createSHAsAndInvokeCallback(LCStoreRef store, LCPathDataRef addPaths[], size_t length, LCPathDataSHARef buffer[]) {
+void storeDataWithSHAs(LCStoreRef store, LCPathDataRef addPaths[], size_t length, LCPathDataSHARef buffer[]) {
   LCDataRef value;
+  char* sha;
   for (LCInteger i=0; i<length; i++) {
     value = LCPathDataValue(addPaths[i]);
-    putData(store, LCDataSHA1(value), value);
+    sha = LCStringStringRef(LCDataSHA1(value));
+    LCDataStorePutData(store->dataStore, sha, LCDataDataRef(value), LCDataLength(value));
     buffer[i] = LCPathDataCreatePathDataSHA(addPaths[i]);
   }
 }

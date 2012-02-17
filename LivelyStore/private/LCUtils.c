@@ -53,12 +53,10 @@ LCByte hexDigitsToByte(char* hexDigits) {
   return hexDigits[0]*16 + hexDigits[1];
 }
 
-LCStringRef createHexStringFromData(LCDataRef data) {
-  LCByte* input = LCDataDataRef(data);
-  size_t length = LCDataLength(data);
+LCStringRef createHexString(LCByte data[], size_t length) {
   char buffer[length*2];
   for(LCInteger i=0; i<length; i++) {
-    byteToHexDigits(input[i], &buffer[i*2]);
+    byteToHexDigits(data[i], &buffer[i*2]);
   }
   buffer[length*2] = '\0';
   return LCStringCreate(buffer);

@@ -37,7 +37,7 @@ char LCStringCharAtIndex(LCStringRef string, LCInteger index) {
 }
 
 size_t LCStringLength(LCStringRef string) {
-  return strlen(string->content)+1;
+  return strlen(string->content);
 }
 
 void LCStringString(LCStringRef string, char* buffer) {
@@ -60,4 +60,8 @@ void LCStringPrint(LCStringRef string) {
 
 LCBool LCStringEqual(LCStringRef string, LCStringRef otherString) {
   return strcmp(string->content, otherString->content) == 0;
+}
+
+LCStringRef LCStringCreateSHAString(LCStringRef string) {
+  return LCCreateSHAString((LCByte*)string->content, LCStringLength(string));
 }

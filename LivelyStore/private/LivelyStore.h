@@ -22,8 +22,6 @@ typedef struct LCStore* LCStoreRef;
 typedef struct LCStage* LCStageRef;
 typedef struct LCPathData* LCPathDataRef;
 typedef struct LCData* LCDataRef;
-typedef struct LCDataArray* LCDataArrayRef;
-typedef struct LCSHA* LCSHARef;
 typedef struct LCKeyValue* LCKeyValueRef;
 
 typedef struct LCTree* LCTreeRef;
@@ -49,12 +47,8 @@ struct LCObjectInfo {
   LCTypeRef type;
 };
 
-struct LCHashableObject {
-  LCDataArrayRef (*dataArrayCopy)(void* object);
-};
-
-
 #define LC_SHA1_Length 20
+#define LC_SHA1_HEX_Length 40
 
 #endif
 
@@ -66,7 +60,6 @@ struct LCHashableObject {
 #include "LCTree.h"
 #include "LCPathData.h"
 #include "LCData.h"
-#include "LCDataArray.h"
 #include "LCSHA.h"
 #include "LCUtils.h"
 #include "LCDataStore.h"

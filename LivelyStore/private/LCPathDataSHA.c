@@ -12,11 +12,11 @@ LCType typePathDataSHA = {
   .dealloc = LCPathDataSHADealloc
 };
 
-LCPathDataSHARef LCPathDataSHACreate(LCStringRef key, LCSHARef value) {
+LCPathDataSHARef LCPathDataSHACreate(LCStringRef path, LCStringRef sha) {
   LCPathDataSHARef newPathData = malloc(sizeof(struct LCPathDataSHA));
   if (newPathData != NULL) {
     newPathData->info.type = &typePathDataSHA;
-    newPathData->keyValue = LCKeyValueCreate(key, value);
+    newPathData->keyValue = LCKeyValueCreate(path, sha);
   }
   return newPathData;
 };
@@ -25,7 +25,7 @@ LCStringRef LCPathDataSHAPath(LCPathDataSHARef pathDataSHA) {
   return LCKeyValueKey(pathDataSHA->keyValue);
 }
 
-LCSHARef LCPathDataSHAValue(LCPathDataSHARef pathDataSHA) {
+LCStringRef LCPathDataSHASHA(LCPathDataSHARef pathDataSHA) {
   return LCKeyValueValue(pathDataSHA->keyValue);
 }
 
