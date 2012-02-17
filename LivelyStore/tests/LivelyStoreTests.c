@@ -108,8 +108,6 @@ static char* test_tree() {
   LCStringRef tree2CloneSHA = LCTreeSHA(tree2Clone);
   mu_assert("LCTree SHA differs on differing trees", LCStringEqual(tree1SHA, tree2SHA)==false);
   mu_assert("LCTree SHA is identical on identical trees", LCStringEqual(tree2SHA, tree2CloneSHA));
-  char* tests = LCStringStringRef(LCTreeCreateSerializedString(tree2));
-  printf("%s", tests);
   return 0;
 }
 
