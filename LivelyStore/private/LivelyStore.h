@@ -24,6 +24,7 @@ typedef struct LCPathValue* LCPathValueRef;
 typedef struct LCData* LCDataRef;
 typedef struct LCDataArray* LCDataArrayRef;
 typedef struct LCSHA* LCSHARef;
+typedef struct LCKeyValue* LCKeyValueRef;
 
 typedef struct LCTree* LCTreeRef;
 typedef struct LCDataStore* LCDataStoreRef;
@@ -58,6 +59,7 @@ struct LCHashableObject {
 #endif
 
 #include "LCString.h"
+#include "LCKeyValue.h"
 
 #include "LCStore.h"
 #include "LCStage.h"
