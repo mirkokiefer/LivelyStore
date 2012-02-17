@@ -11,8 +11,8 @@ struct LCStore {
 
 void LCStoreDealloc(void* object);
 void invokeNewDataCallback(LCStoreRef store, LCSHARef sha, LCDataRef data);
-void createSHAsAndInvokeCallback(LCStoreRef store, LCKeyValueRef addKeys[], size_t length, LCKeyValueSHARef buffer[]);
-LCTreeRef buildTree(LCTreeRef current, LCKeyValueSHARef* add, size_t newLength, LCStringRef* delete, size_t deleteLength);
+void createSHAsAndInvokeCallback(LCStoreRef store, LCPathValueRef addPaths[], size_t length, LCPathValueSHARef buffer[]);
+LCTreeRef buildTree(LCTreeRef current, LCPathValueSHARef* add, size_t newLength, LCStringRef* delete, size_t deleteLength);
 void setStoreHead(LCStoreRef store, LCCommitRef newHead);
 
 LCType typeStore = {
@@ -31,15 +31,15 @@ LCStoreRef LCStoreCreate(char* location) {
 };
 
 void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
-  LCKeyValueRef* addKeys = LCStageKeysToAdd(stage);
-  size_t addKeysLength = LCStageAddKeysCount(stage);
-  LCStringRef* deleteKeys = LCStageKeysToDelete(stage);
-  size_t deleteKeysLength = LCStageDeleteKeysCount(stage);
+  LCPathValueRef* addPaths = LCStagePathsToAdd(stage);
+  size_t addPathsLength = LCStageAddPathsCount(stage);
+  LCStringRef* deletePaths = LCStagePathsToDelete(stage);
+  size_t deletePathsLength = LCStageDeletePathsCount(stage);
 
-  LCKeyValueSHARef keyValueSHAs[addKeysLength];
-  createSHAsAndInvokeCallback(store, addKeys, addKeysLength, keyValueSHAs);
+  LCPathValueSHARef keyValueSHAs[addPathsLength];
+  createSHAsAndInvokeCallback(store, addPaths, addPathsLength, keyValueSHAs);
   
-  LCTreeRef newTree = buildTree(LCCommitTree(store->head), keyValueSHAs, addKeysLength, deleteKeys, deleteKeysLength);
+  LCTreeRef newTree = buildTree(LCCommitTree(store->head), keyValueSHAs, addPathsLength, deletePaths, deletePathsLength);
   
   LCCommitRef newHead = LCCommitCreate(store->head, newTree);
   setStoreHead(store, newHead);
@@ -51,17 +51,28 @@ void invokeNewDataCallback(LCStoreRef store, LCSHARef sha, LCDataRef data) {
   LCRelease(shaString);
 }
 
-void createSHAsAndInvokeCallback(LCStoreRef store, LCKeyValueRef addKeys[], size_t length, LCKeyValueSHARef buffer[]) {
+void createSHAsAndInvokeCallback(LCStoreRef store, LCPathValueRef addPaths[], size_t length, LCPathValueSHARef buffer[]) {
   LCDataRef value;
   for (LCInteger i=0; i<length; i++) {
-    value = LCKeyValueValue(addKeys[i]);
+    value = LCPathValueValue(addPaths[i]);
     invokeNewDataCallback(store, LCDataSHA1(value), value);
-    buffer[i] = LCKeyValueCreateKeyValueSHA(addKeys[i]);
+    buffer[i] = LCPathValueCreatePathValueSHA(addPaths[i]);
   }
 }
 
-LCTreeRef buildTree(LCTreeRef current, LCKeyValueSHARef* add, size_t newLength, LCStringRef* delete, size_t deleteLength) {
-  
+LCTreeRef buildTree(LCTreeRef current, LCPathValueSHARef* add, size_t newLength, LCStringRef* delete, size_t deleteLength) {
+  /*
+   Ich gehe gezielt runter zu den geänderten pfaden/trees - und erstelle dann rekursiv nach oben die bäume neu
+   Ich sollte die keys mit einem Pfad objekt ersetzen...
+   letzten endes sollte doch blob, tree oder commit immer dann einen newDataCallback aufrufen wenn der SHA berechnet wurde
+   da alle diese Objekte den SHA cachen, wird das auch nur einmal vorkommen.
+   wenn ich also den baum neu aufbau und am ende ganz oben SHA aufrufe, werden alle bäume automatisch gespeichert.
+   voll geil!
+   LCData wird gespeichtert sobald LCPathValueSHA erstellt wird.
+   LCTree wird gespeichter sobald, LCCommit den SHA vom top-tree will.
+   LCCommit wird gespeichert sobald LCStore den SHA will um den head neu zu setzen.
+   
+   */
 }
 
 void setStoreHead(LCStoreRef store, LCCommitRef newHead) {

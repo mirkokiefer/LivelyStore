@@ -68,12 +68,7 @@ void* LCSHAObject(LCSHARef sha) {
 LCBool LCSHAEqual(LCSHARef sha, LCSHARef anotherSHA) {
   LCByte* sha1Bytes = LCDataDataRef(sha->sha);
   LCByte* sha2Bytes = LCDataDataRef(anotherSHA->sha);
-  for(LCInteger i=0; i<LC_SHA1_Length; i++) {
-    if(sha1Bytes[i] != sha2Bytes[i]) {
-      return false;
-    }
-  }
-  return true;
+  return memcmp(sha1Bytes, sha2Bytes, LC_SHA1_Length) == 0;
 }
 
 void LCSHADealloc(void* object) {

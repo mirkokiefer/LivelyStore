@@ -9,7 +9,7 @@ struct LCTree {
   LCSHARef sha;
   size_t childTreesLength;
   size_t childDatasLength;
-  LCKeyValueSHARef children[];
+  LCPathValueSHARef children[];
 };
 
 LCHashableObject hashableTree = {
@@ -21,9 +21,9 @@ LCType typeTree = {
   .meta = &hashableTree
 };
 
-LCTreeRef LCTreeCreate(LCKeyValueSHARef childTrees[], size_t childTreesLength,
-                       LCKeyValueSHARef childDatas[], size_t childDatasLength) {
-  LCTreeRef newTree = malloc(sizeof(struct LCTree)+sizeof(LCKeyValueSHARef)*(childDatasLength+childTreesLength));
+LCTreeRef LCTreeCreate(LCPathValueSHARef childTrees[], size_t childTreesLength,
+                       LCPathValueSHARef childDatas[], size_t childDatasLength) {
+  LCTreeRef newTree = malloc(sizeof(struct LCTree)+sizeof(LCPathValueSHARef)*(childDatasLength+childTreesLength));
   if (newTree != NULL) {
     newTree->info.type = &typeTree;
     for (LCInteger i=0; i<childTreesLength; i++) {
@@ -32,8 +32,8 @@ LCTreeRef LCTreeCreate(LCKeyValueSHARef childTrees[], size_t childTreesLength,
     for (LCInteger i=0; i<childDatasLength; i++) {
       LCRetain(childDatas[i]);
     }
-    memcpy(newTree->children, childTrees, childTreesLength*sizeof(LCKeyValueSHARef));
-    memcpy(&(newTree->children[childTreesLength]), childDatas, childDatasLength*sizeof(LCKeyValueSHARef));
+    memcpy(newTree->children, childTrees, childTreesLength*sizeof(LCPathValueSHARef));
+    memcpy(&(newTree->children[childTreesLength]), childDatas, childDatasLength*sizeof(LCPathValueSHARef));
     newTree->childTreesLength = childTreesLength;
     newTree->childDatasLength = childDatasLength;
   }
@@ -48,11 +48,11 @@ size_t LCTreeChildDatasLength(LCTreeRef tree) {
   return tree->childDatasLength;
 }
 
-LCKeyValueSHARef* LCTreeChildTrees(LCTreeRef tree) {
+LCPathValueSHARef* LCTreeChildTrees(LCTreeRef tree) {
   return tree->children;
 }
 
-LCKeyValueSHARef* LCTreeChildDatas(LCTreeRef tree) {
+LCPathValueSHARef* LCTreeChildDatas(LCTreeRef tree) {
   return &(tree->children[tree->childTreesLength]);
 }
 
@@ -62,8 +62,8 @@ LCDataArrayRef LCTreeDataArrayCopy(void* data) {
   LCDataRef buffer[dataCount];
   LCInteger bufferIndex = 0;
   for (LCInteger i=0; i<dataCount/2; i++) {
-    LCDataRef key = LCStringCreateData(LCKeyValueSHAKey(tree->children[i]));
-    LCDataRef value = LCSHASHAData(LCKeyValueSHAValue(tree->children[i]));
+    LCDataRef key = LCStringCreateData(LCPathValueSHAPath(tree->children[i]));
+    LCDataRef value = LCSHASHAData(LCPathValueSHAValue(tree->children[i]));
     buffer[bufferIndex] = key;
     buffer[bufferIndex+1] = value;
     bufferIndex = bufferIndex+2;
