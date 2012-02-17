@@ -2,7 +2,7 @@
 #include "LCStage.h"
 
 void LCTreeDealloc(void* object);
-size_t serializationBufferSize(LCTreeRef tree);
+size_t childrenSerializationBufferSize(LCTreeRef tree);
 void serializeChildren(LCPathDataSHARef children[], size_t length, char buffer[]);
 
 struct LCTree {
@@ -52,13 +52,13 @@ LCPathDataSHARef* LCTreeChildData(LCTreeRef tree) {
   return &(tree->children[tree->childTreesLength]);
 }
 
-size_t serializationBufferSize(LCTreeRef tree) {
+size_t childrenSerializationBufferSize(LCTreeRef tree) {
   size_t childrenLength = tree->childTreesLength + tree->childDataLength;
   size_t sumPathLength = 0;
   for (LCInteger i=0; i<childrenLength; i++) {
     sumPathLength = sumPathLength + LCStringLength(LCPathDataSHAPath(tree->children[i]));
   }
-  return sumPathLength + childrenLength * (LC_SHA1_HEX_Length + 2) + 1;  
+  return sumPathLength + childrenLength * (LC_SHA1_HEX_Length + 2);  
 }
 
 void serializeChildren(LCPathDataSHARef children[], size_t length, char buffer[]) {
@@ -77,8 +77,10 @@ void serializeChildren(LCPathDataSHARef children[], size_t length, char buffer[]
 }
 
 LCStringRef LCTreeCreateSerializedString(LCTreeRef tree) {
-  size_t bufferSize = serializationBufferSize(tree);
+  size_t bufferSize = childrenSerializationBufferSize(tree) + 1;
   char buffer[bufferSize];
+  strcpy(buffer, "");
+  
   // write child trees:
   serializeChildren(tree->children, tree->childTreesLength, buffer);
   strcat(buffer, "\n");
