@@ -191,7 +191,7 @@
 		ACC5367614DC81E400DC693F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0430;
 			};
 			buildConfigurationList = ACC5367914DC81E400DC693F /* Build configuration list for PBXProject "LivelyStore" */;
 			compatibilityVersion = "Xcode 3.2";
