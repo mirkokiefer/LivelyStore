@@ -8,8 +8,8 @@ struct LCStore {
 };
 
 void LCStoreDealloc(void* object);
-void storeDataWithSHAs(LCStoreRef store, LCPathDataRef addPaths[], size_t length, LCPathDataSHARef buffer[]);
-LCTreeRef buildTree(LCTreeRef current, LCPathDataSHARef* add, size_t newLength, LCStringRef* delete, size_t deleteLength);
+void storeDataWithSHAs(LCStoreRef store, LCKeyValueRef addPaths[], size_t length, LCKeyValueRef pathSHABuffer[]);
+LCTreeRef buildTree(LCTreeRef current, LCKeyValueRef* addPathSHAs, size_t newLength, LCStringRef* delete, size_t deleteLength);
 void setStoreHead(LCStoreRef store, LCCommitRef newHead);
 
 LCType typeStore = {
@@ -35,14 +35,13 @@ void LCStoreSetDeletedDataCallback(LCStoreRef store, void(*callback)(char* sha))
   LCDataStoreSetDeletedDataCallback(store->dataStore, callback);
 }
 
-
 void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
-  LCPathDataRef* addPaths = LCStagePathsToAdd(stage);
+  LCKeyValueRef* addPaths = LCStagePathsToAdd(stage);
   size_t addPathsLength = LCStageAddPathsCount(stage);
   LCStringRef* deletePaths = LCStagePathsToDelete(stage);
   size_t deletePathsLength = LCStageDeletePathsCount(stage);
 
-  LCPathDataSHARef keyValueSHAs[addPathsLength];
+  LCKeyValueRef keyValueSHAs[addPathsLength];
   storeDataWithSHAs(store, addPaths, addPathsLength, keyValueSHAs);
   
   LCTreeRef newTree = buildTree(LCCommitTree(store->head), keyValueSHAs, addPathsLength, deletePaths, deletePathsLength);
@@ -51,18 +50,18 @@ void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
   setStoreHead(store, newHead);
 }
 
-void storeDataWithSHAs(LCStoreRef store, LCPathDataRef addPaths[], size_t length, LCPathDataSHARef buffer[]) {
+void storeDataWithSHAs(LCStoreRef store, LCKeyValueRef addPaths[], size_t length, LCKeyValueRef pathSHABuffer[]) {
   LCDataRef value;
   char* sha;
   for (LCInteger i=0; i<length; i++) {
-    value = LCPathDataValue(addPaths[i]);
+    value = LCKeyValueValue(addPaths[i]);
     sha = LCStringStringRef(LCDataSHA1(value));
     LCDataStorePutData(store->dataStore, sha, LCDataDataRef(value), LCDataLength(value));
-    buffer[i] = LCPathDataCreatePathDataSHA(addPaths[i]);
+    pathSHABuffer[i] = LCKeyValueCreate(addPaths[i], sha);
   }
 }
 
-LCTreeRef buildTree(LCTreeRef current, LCPathDataSHARef* add, size_t newLength, LCStringRef* delete, size_t deleteLength) {
+LCTreeRef buildTree(LCTreeRef current, LCKeyValueRef* addPathSHAs, size_t newLength, LCStringRef* delete, size_t deleteLength) {
   /*
    Ich gehe gezielt runter zu den geänderten pfaden/trees - und erstelle dann rekursiv nach oben die bäume neu
    Ich sollte die keys mit einem Pfad objekt ersetzen...

@@ -51,16 +51,7 @@ static char* test_data() {
   return 0;
 }
 
-static char* test_pathData() {
-  LCStringRef somePath = LCStringCreate("somepath");
-  LCDataRef someValue = LCDataCreate((LCByte*)"12345", 6);
-  LCPathDataRef pathData = LCPathDataCreate(somePath, someValue);
-  mu_assert("LCPathData stores path correctly", LCStringEqual(LCPathDataPath(pathData), somePath));
-  mu_assert("LCPathData stores value correctly", LCStringEqual(LCPathDataPath(pathData), somePath));
-  return 0;
-}
-
-static char* test_commit() {
+static char* test_stage() {
   char* path1 = "path1";
   char* path2 = "path2";
   LCByte value1[] = "12345";
@@ -70,8 +61,8 @@ static char* test_commit() {
   LCStageAddEntry(stage, path1, value1, 5);
   LCStageAddEntry(stage, path2, value2, 5);
   
-  LCPathDataRef* entries = LCStagePathsToAdd(stage);
-  mu_assert("LCStage stores entries correctly", (LCStringEqual(LCPathDataPath(entries[0]), LCStringCreate(path1))));
+  LCKeyValueRef* entries = LCStagePathsToAdd(stage);
+  mu_assert("LCStage stores entries correctly", (LCStringEqual(LCKeyValueKey(entries[0]), LCStringCreate(path1))));
   return 0;
 }
 
@@ -81,28 +72,28 @@ static char* test_tree() {
   LCStringRef path3 = LCStringCreate("path3");
   LCStringRef value1SHA = LCCreateSHAString((LCByte*)"12345", 6);
   LCStringRef value2SHA = LCCreateSHAString((LCByte*)"67890", 6);
-  LCPathDataSHARef entry1 = LCPathDataSHACreate(path1, value1SHA);
-  LCPathDataSHARef entry2 = LCPathDataSHACreate(path2, value2SHA);
-  LCPathDataSHARef entry3 = LCPathDataSHACreate(path3, value2SHA);
+  LCKeyValueRef entry1 = LCKeyValueCreate(path1, value1SHA);
+  LCKeyValueRef entry2 = LCKeyValueCreate(path2, value2SHA);
+  LCKeyValueRef entry3 = LCKeyValueCreate(path3, value2SHA);
   
-  LCPathDataSHARef datas1[] = {entry1};
-  LCPathDataSHARef datas2[] = {entry2, entry3};
+  LCKeyValueRef childData1[] = {entry1};
+  LCKeyValueRef childData2[] = {entry2, entry3};
   
   LCStringRef tree1Name = LCStringCreate("root");
-  LCTreeRef tree1 = LCTreeCreate(NULL, 0, datas1, 1);
-  LCPathDataSHARef childTree1 = LCPathDataSHACreate(tree1Name, LCTreeSHA(tree1));
-  LCPathDataSHARef childTrees1[] = {childTree1};
-  LCTreeRef tree2 = LCTreeCreate(childTrees1, 1, datas2, 2);
+  LCTreeRef tree1 = LCTreeCreate(NULL, 0, childData1, 1);
+  LCKeyValueRef childTree1 = LCKeyValueCreate(tree1Name, tree1);
+  LCKeyValueRef childTrees1[] = {childTree1};
+  LCTreeRef tree2 = LCTreeCreate(childTrees1, 1, childData2, 2);
   
-  LCPathDataSHARef* tree1Data = LCTreeChildData(tree1);
-  LCPathDataSHARef* tree2Data = LCTreeChildData(tree2);
-  LCPathDataSHARef* tree2ChildTrees = LCTreeChildTrees(tree2);
+  LCKeyValueRef* tree1Data = LCTreeChildData(tree1);
+  LCKeyValueRef* tree2Data = LCTreeChildData(tree2);
+  LCKeyValueRef* tree2ChildTrees = LCTreeChildTrees(tree2);
   
   LCBool correct = (tree1Data[0]==entry1) && (tree2Data[0]==entry2) && (tree2Data[1]==entry3);
   mu_assert("LCTree stores entries correctly", correct);
   mu_assert("LCTree stores child trees correctly", tree2ChildTrees[0] == childTree1);
   
-  LCTreeRef tree2Clone = LCTreeCreate(childTrees1, 1, datas2, 2);
+  LCTreeRef tree2Clone = LCTreeCreate(childTrees1, 1, childData2, 2);
   LCStringRef tree1SHA = LCTreeSHA(tree1);
   LCStringRef tree2SHA = LCTreeSHA(tree2);
   LCStringRef tree2CloneSHA = LCTreeSHA(tree2Clone);
@@ -116,8 +107,7 @@ static char* all_tests() {
   mu_run_test(test_string);
   mu_run_test(test_data);
   mu_run_test(test_sha1);
-  mu_run_test(test_pathData);
-  mu_run_test(test_commit);
+  mu_run_test(test_stage);
   mu_run_test(test_tree);
   return 0;
 }

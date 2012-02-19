@@ -26,7 +26,6 @@ typedef struct LCKeyValue* LCKeyValueRef;
 
 typedef struct LCTree* LCTreeRef;
 typedef struct LCDataStore* LCDataStoreRef;
-typedef struct LCPathDataSHA* LCPathDataSHARef;
 typedef struct LCCommit* LCCommitRef;
 
 // internal types
@@ -58,10 +57,8 @@ struct LCObjectInfo {
 #include "LCStore.h"
 #include "LCStage.h"
 #include "LCTree.h"
-#include "LCPathData.h"
 #include "LCData.h"
 #include "LCSHA.h"
 #include "LCUtils.h"
 #include "LCDataStore.h"
-#include "LCPathDataSHA.h"
 #include "LCCommit.h"
