@@ -35,11 +35,11 @@
          continueAfterRunningActions = "No"
          isPathRelative = "1"
          filePath = "LivelyStore/tests/LivelyStoreTests.c"
-         timestampString = "351210157.715578"
+         timestampString = "351364973.234611"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "104"
-         endingLineNumber = "104"
+         startingLineNumber = "95"
+         endingLineNumber = "95"
          landmarkName = "test_tree()"
          landmarkType = "7">
       </FileBreakpoint>
@@ -76,38 +76,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "LivelyStore/private/LCTree.c"
-         timestampString = "351212317.496492"
+         timestampString = "351364973.234611"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "88"
-         endingLineNumber = "88"
+         startingLineNumber = "96"
+         endingLineNumber = "96"
          landmarkName = "LCTreeCreateSerializedString()"
-         landmarkType = "7">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "LivelyStore/private/LCTree.c"
-         timestampString = "351212317.496492"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "72"
-         endingLineNumber = "72"
-         landmarkName = "serializeChildren()"
-         landmarkType = "7">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "LivelyStore/private/LCTree.c"
-         timestampString = "351212317.496492"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "73"
-         endingLineNumber = "73"
-         landmarkName = "serializeChildren()"
          landmarkType = "7">
       </FileBreakpoint>
       <FileBreakpoint

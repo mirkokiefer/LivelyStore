@@ -16,13 +16,12 @@
 		AC0C4DE414EF14B500B789BE /* LCCommit.c in Sources */ = {isa = PBXBuildFile; fileRef = AC0C4DCC14EF14B500B789BE /* LCCommit.c */; };
 		AC0C4DE514EF14B500B789BE /* LCData.c in Sources */ = {isa = PBXBuildFile; fileRef = AC0C4DCE14EF14B500B789BE /* LCData.c */; };
 		AC0C4DE614EF14B500B789BE /* LCDataStore.c in Sources */ = {isa = PBXBuildFile; fileRef = AC0C4DD014EF14B500B789BE /* LCDataStore.c */; };
-		AC0C4DE714EF14B500B789BE /* LCPathData.c in Sources */ = {isa = PBXBuildFile; fileRef = AC0C4DD214EF14B500B789BE /* LCPathData.c */; };
-		AC0C4DE814EF14B500B789BE /* LCPathDataSHA.c in Sources */ = {isa = PBXBuildFile; fileRef = AC0C4DD414EF14B500B789BE /* LCPathDataSHA.c */; };
 		AC0C4DE914EF14B500B789BE /* LCTree.c in Sources */ = {isa = PBXBuildFile; fileRef = AC0C4DD614EF14B500B789BE /* LCTree.c */; };
 		AC0C4DEA14EF14B500B789BE /* LivelyStoreTests.c in Sources */ = {isa = PBXBuildFile; fileRef = AC0C4DDA14EF14B500B789BE /* LivelyStoreTests.c */; };
 		AC0C4DEB14EF14B500B789BE /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = AC0C4DDC14EF14B500B789BE /* main.c */; };
 		AC54F88A14E4013D00F36F59 /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC54F88914E4013D00F36F59 /* libssl.dylib */; };
 		AC54F88C14E4131800F36F59 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC54F88B14E4131800F36F59 /* libcrypto.dylib */; };
+		ACCFEC2614F15FA400678136 /* LCPathTree.c in Sources */ = {isa = PBXBuildFile; fileRef = ACCFEC2514F15FA400678136 /* LCPathTree.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -57,10 +56,6 @@
 		AC0C4DCF14EF14B500B789BE /* LCData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCData.h; sourceTree = "<group>"; };
 		AC0C4DD014EF14B500B789BE /* LCDataStore.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LCDataStore.c; sourceTree = "<group>"; };
 		AC0C4DD114EF14B500B789BE /* LCDataStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCDataStore.h; sourceTree = "<group>"; };
-		AC0C4DD214EF14B500B789BE /* LCPathData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LCPathData.c; sourceTree = "<group>"; };
-		AC0C4DD314EF14B500B789BE /* LCPathData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCPathData.h; sourceTree = "<group>"; };
-		AC0C4DD414EF14B500B789BE /* LCPathDataSHA.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LCPathDataSHA.c; sourceTree = "<group>"; };
-		AC0C4DD514EF14B500B789BE /* LCPathDataSHA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCPathDataSHA.h; sourceTree = "<group>"; };
 		AC0C4DD614EF14B500B789BE /* LCTree.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LCTree.c; sourceTree = "<group>"; };
 		AC0C4DD714EF14B500B789BE /* LCTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCTree.h; sourceTree = "<group>"; };
 		AC0C4DD814EF14B500B789BE /* LivelyStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LivelyStore.h; sourceTree = "<group>"; };
@@ -71,6 +66,8 @@
 		AC54F88914E4013D00F36F59 /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = usr/lib/libssl.dylib; sourceTree = SDKROOT; };
 		AC54F88B14E4131800F36F59 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
 		ACC5367F14DC81E500DC693F /* LivelyStore */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LivelyStore; sourceTree = BUILT_PRODUCTS_DIR; };
+		ACCFEC2414F15F9400678136 /* LCPathTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LCPathTree.h; sourceTree = "<group>"; };
+		ACCFEC2514F15FA400678136 /* LCPathTree.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LCPathTree.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,10 +122,8 @@
 				AC0C4DCF14EF14B500B789BE /* LCData.h */,
 				AC0C4DD014EF14B500B789BE /* LCDataStore.c */,
 				AC0C4DD114EF14B500B789BE /* LCDataStore.h */,
-				AC0C4DD214EF14B500B789BE /* LCPathData.c */,
-				AC0C4DD314EF14B500B789BE /* LCPathData.h */,
-				AC0C4DD414EF14B500B789BE /* LCPathDataSHA.c */,
-				AC0C4DD514EF14B500B789BE /* LCPathDataSHA.h */,
+				ACCFEC2414F15F9400678136 /* LCPathTree.h */,
+				ACCFEC2514F15FA400678136 /* LCPathTree.c */,
 				AC0C4DD614EF14B500B789BE /* LCTree.c */,
 				AC0C4DD714EF14B500B789BE /* LCTree.h */,
 				AC0C4DD814EF14B500B789BE /* LivelyStore.h */,
@@ -224,11 +219,10 @@
 				AC0C4DE414EF14B500B789BE /* LCCommit.c in Sources */,
 				AC0C4DE514EF14B500B789BE /* LCData.c in Sources */,
 				AC0C4DE614EF14B500B789BE /* LCDataStore.c in Sources */,
-				AC0C4DE714EF14B500B789BE /* LCPathData.c in Sources */,
-				AC0C4DE814EF14B500B789BE /* LCPathDataSHA.c in Sources */,
 				AC0C4DE914EF14B500B789BE /* LCTree.c in Sources */,
 				AC0C4DEA14EF14B500B789BE /* LivelyStoreTests.c in Sources */,
 				AC0C4DEB14EF14B500B789BE /* main.c in Sources */,
+				ACCFEC2614F15FA400678136 /* LCPathTree.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
