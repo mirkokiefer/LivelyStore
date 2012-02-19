@@ -42,9 +42,13 @@ static char* test_string() {
 static char* test_array() {
   LCStringRef string1 = LCStringCreate("abc");
   LCStringRef string2 = LCStringCreate("def");
-  void* stringArray[] = {string1, string2};
-  LCArrayRef array = LCArrayCreate(stringArray, 2);
+  LCStringRef string3 = LCStringCreate("ghi");
+  void* stringArray[] = {string1, string2, string3};
+  LCArrayRef array = LCArrayCreate(stringArray, 3);
   mu_assert("LCArray stores elements correctly", (LCArrayObjectAtIndex(array, 0)==string1) && (LCArrayObjectAtIndex(array, 1)==string2));
+  
+  LCArrayRef subArray = LCArrayCreateSubArray(array, 1, -1);
+  mu_assert("LCArrayCreateSubArray is correct", (LCArrayObjectAtIndex(subArray, 0)==string2) && (LCArrayObjectAtIndex(subArray, 1)==string3));
   return 0;
 }
 

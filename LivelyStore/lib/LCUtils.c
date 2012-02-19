@@ -72,3 +72,7 @@ LCDataRef createDataFromHexString(LCStringRef hexString) {
   }
   return LCDataCreate(buffer, LC_SHA1_Length);
 }
+
+LCArrayRef createPathArray(LCStringRef path) {
+  return LCStringCreateTokens(path, '/');
+}

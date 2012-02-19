@@ -20,6 +20,7 @@ LCArrayRef LCArrayCreate(void** objects, size_t length) {
     for(LCInteger i=0; i<length; i++) {
       LCRetain(objects[i]);
     }
+    newArray->length = length;
     memcpy(newArray->objects, objects, length * sizeof(void*));
   }
   return newArray;
@@ -35,6 +36,13 @@ void* LCArrayObjectAtIndex(LCArrayRef array, LCInteger index) {
 
 size_t LCArrayLength(LCArrayRef array) {
   return array->length;
+}
+
+LCArrayRef LCArrayCreateSubArray(LCArrayRef array, LCInteger start, size_t length) {
+  if (length == -1) {
+    length = array->length-start;
+  }
+  return LCArrayCreate(&(array->objects[start]), length);
 }
 
 void LCArrayDealloc(void* object) {

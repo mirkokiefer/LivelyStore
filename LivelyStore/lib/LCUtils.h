@@ -12,5 +12,6 @@ void byteToHexDigits(LCByte input, char* buffer);
 LCByte hexDigitsToByte(char* hexDigits);
 LCStringRef createHexString(LCByte data[], size_t length);
 LCDataRef createDataFromHexString(LCStringRef hexString);
+LCArrayRef createPathArray(LCStringRef path);
 
 #endif
