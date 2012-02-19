@@ -42,7 +42,7 @@ static char* test_string() {
 static char* test_array() {
   LCStringRef string1 = LCStringCreate("abc");
   LCStringRef string2 = LCStringCreate("def");
-  LCStringRef stringArray[] = {string1, string2};
+  void* stringArray[] = {string1, string2};
   LCArrayRef array = LCArrayCreate(stringArray, 2);
   mu_assert("LCArray stores elements correctly", (LCArrayObjectAtIndex(array, 0)==string1) && (LCArrayObjectAtIndex(array, 1)==string2));
   return 0;
