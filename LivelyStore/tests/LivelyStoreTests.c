@@ -18,15 +18,24 @@ static char* test_retain_counting() {
 static char* test_string() {
   char* aCString = "abcd";
   char* anIdenticalCString = "abcd";
+  char charArray[] = {'a', 'b', 'c', 'd'};
   LCStringRef aLCString = LCStringCreate(aCString);
   LCStringRef anIdenticalLCString = LCStringCreate(anIdenticalCString);
+  LCStringRef stringFromCharArray = LCStringCreateFromChars(charArray, 4);
   
   mu_assert("LCStringEqual is correct", LCStringEqual(aLCString, anIdenticalLCString));
+  mu_assert("LCStringCreateFromChars is correct", LCStringEqual(stringFromCharArray, aLCString));
   
   LCStringRef bothStrings = LCStringCreate("abcdabcd");
   LCStringRef stringArray[] = {aLCString, anIdenticalLCString};
   LCStringRef mergedString = LCStringCreateFromStrings(stringArray, 2);
   mu_assert("LCStringCreateFromStrings is correct", LCStringEqual(mergedString, bothStrings));
+  
+  LCStringRef tokenString = LCStringCreate("ab/cd/ef");
+  LCArrayRef tokenArray = LCStringCreateTokens(tokenString, '/');
+  LCStringRef* tokens = (LCStringRef*)LCArrayObjects(tokenArray);
+  mu_assert("LCStringCreateTokens is correct", LCStringEqualCString(tokens[0], "ab") &&
+            LCStringEqualCString(tokens[1], "cd") && LCStringEqualCString(tokens[2], "ef"));
   return 0;
 }
 

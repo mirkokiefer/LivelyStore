@@ -19,6 +19,13 @@ LCStringRef LCStringCreate(char* string) {
   return newString;
 };
 
+LCStringRef LCStringCreateFromChars(char* characters, size_t length) {
+  char string[length+1];
+  string[length] = '\0';
+  memcpy(string, characters, length*sizeof(char));
+  return LCStringCreate(string);
+}
+
 LCStringRef LCStringCreateFromStrings(LCStringRef strings[], size_t count) {
   size_t totalLength = 1;
   for (LCInteger i=0; i<count; i++) {
@@ -60,6 +67,31 @@ void LCStringPrint(LCStringRef string) {
 
 LCBool LCStringEqual(LCStringRef string, LCStringRef otherString) {
   return strcmp(string->content, otherString->content) == 0;
+}
+
+LCBool LCStringEqualCString(LCStringRef string, char* cString) {
+  return strcmp(string->content, cString) == 0;
+}
+
+LCArrayRef LCStringCreateTokens(LCStringRef string, char delimiter) {
+  char* cString = string->content;
+  LCStringRef substrings[strlen(cString)/2];
+  LCInteger tokenStart = 0;
+  LCInteger substringCount = 0;
+  for (LCInteger i=0; i<strlen(cString); i++) {
+    if(cString[i] == delimiter) {
+      substrings[substringCount] = LCStringCreateFromChars(&cString[tokenStart], i-tokenStart);
+      substringCount = substringCount + 1;
+      tokenStart = i+1;
+    }
+  }
+  substrings[substringCount] = LCStringCreate(&cString[tokenStart]);
+  substringCount = substringCount + 1;
+  LCArrayRef array = LCArrayCreate((void**)substrings, substringCount);
+  for(LCInteger i=0; i<substringCount; i++) {
+    LCRelease(substrings[i]);
+  }
+  return array;
 }
 
 LCStringRef LCStringCreateSHAString(LCStringRef string) {
