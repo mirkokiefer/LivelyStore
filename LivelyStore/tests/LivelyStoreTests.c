@@ -30,6 +30,15 @@ static char* test_string() {
   return 0;
 }
 
+static char* test_array() {
+  LCStringRef string1 = LCStringCreate("abc");
+  LCStringRef string2 = LCStringCreate("def");
+  LCStringRef stringArray[] = {string1, string2};
+  LCArrayRef array = LCArrayCreate(stringArray, 2);
+  mu_assert("LCArray stores elements correctly", (LCArrayObjectAtIndex(array, 0)==string1) && (LCArrayObjectAtIndex(array, 1)==string2));
+  return 0;
+}
+
 static char* test_sha1() {
   char* testData1 = "compute sha1";
   LCStringRef testData1RealSHA = LCStringCreate("eefbec885d1042d22ea36fd1690d94dec9029680");
@@ -105,6 +114,7 @@ static char* test_tree() {
 static char* all_tests() {
   mu_run_test(test_retain_counting);
   mu_run_test(test_string);
+  mu_run_test(test_array);
   mu_run_test(test_data);
   mu_run_test(test_sha1);
   mu_run_test(test_stage);

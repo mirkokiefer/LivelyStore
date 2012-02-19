@@ -23,6 +23,7 @@ typedef struct LCStage* LCStageRef;
 typedef struct LCPathData* LCPathDataRef;
 typedef struct LCData* LCDataRef;
 typedef struct LCKeyValue* LCKeyValueRef;
+typedef struct LCArray* LCArrayRef;
 
 typedef struct LCTree* LCTreeRef;
 typedef struct LCDataStore* LCDataStoreRef;
@@ -62,3 +63,4 @@ struct LCObjectInfo {
 #include "LCUtils.h"
 #include "LCDataStore.h"
 #include "LCCommit.h"
+#include "LCArray.h"
