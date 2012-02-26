@@ -24,7 +24,7 @@ LCMutableArrayRef LCMutableArrayCreate(void* objects[], size_t length) {
       for(LCInteger i=0; i<length; i++) {
         LCRetain(objects[i]);
       }
-      resizeBuffer(newArray, length*2);    
+      resizeBuffer(newArray, length);    
       memcpy(newArray->objects, objects, length * sizeof(void*));  
     } else {
       resizeBuffer(newArray, 10);
@@ -82,6 +82,7 @@ void LCMutableArrayDealloc(void* object) {
   for (LCInteger i=0; i<array->length; i++) {
     LCRelease(array->objects[i]);
   }
+  free(array->objects);
 }
 
 LCBool resizeBuffer(LCMutableArrayRef array, size_t length) {
