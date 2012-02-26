@@ -54,35 +54,29 @@ LCKeyValueRef* LCTreeChildData(LCTreeRef tree) {
   return &(tree->children[tree->childTreesLength]);
 }
 
-size_t childrenSerializationBufferSize(LCTreeRef tree) {
-  size_t childrenLength = tree->childTreesLength + tree->childDataLength;
-  size_t sumPathLength = 0;
-  for (LCInteger i=0; i<childrenLength; i++) {
-    sumPathLength = sumPathLength + LCStringLength(LCKeyValueKey(tree->children[i]));
+LCTreeRef LCTreeChildTreeAtPath(LCTreeRef tree, LCArrayRef pathArray) {
+  LCStringRef subpath;
+  LCTreeRef childTreeAtPath;
+  for (LCInteger i=0; i<tree->childTreesLength; i++) {
+    subpath = LCKeyValueKey(tree->children[i]);
+    if(LCStringEqual(subpath, LCArrayObjectAtIndex(pathArray, 0))) {
+      childTreeAtPath = LCKeyValueValue(tree->children[i]);
+    }
   }
-  return sumPathLength + childrenLength * (LC_SHA1_HEX_Length + 2);  
+  if(childTreeAtPath) {
+    if (LCArrayLength(pathArray) == 1) {
+      return childTreeAtPath;
+    } else {
+      LCArrayRef subPathArray = LCArrayCreateSubArray(pathArray, 2, -1);
+      childTreeAtPath = LCTreeChildTreeAtPath(childTreeAtPath, subPathArray);
+      LCRelease(subPathArray);
+      return childTreeAtPath;
+    }
+  } else {
+    return NULL;
+  }
 }
 
-void serializeChildTrees(LCKeyValueRef children[], size_t length, char buffer[]) {
-  LCTreeRef childTree;
-  for (LCInteger i=0; i<length; i++) {
-    childTree = LCKeyValueValue(children[i]);
-    serializePathSHA(LCKeyValueKey(children[i]), LCTreeSHA(childTree), buffer);
-  }
-}
-
-void serializeChildData(LCKeyValueRef children[], size_t length, char buffer[]) {
-  for (LCInteger i=0; i<length; i++) {
-    serializePathSHA(LCKeyValueKey(children[i]), LCKeyValueValue(children[i]), buffer);
-  }
-}
-
-void serializePathSHA(LCStringRef path, LCStringRef sha, char buffer[]) {
-  strcat(buffer, LCStringStringRef(path));
-  strcat(buffer, " ");
-  strcat(buffer, LCStringStringRef(sha));
-  strcat(buffer, "\n");
-}
 
 LCStringRef LCTreeCreateSerializedString(LCTreeRef tree) {
   size_t bufferSize = childrenSerializationBufferSize(tree) + 1;
@@ -111,4 +105,35 @@ void LCTreeDealloc(void* object) {
   for (LCInteger i=0; i<(tree->childTreesLength+tree->childDataLength); i++) {
     LCRelease(tree->children[i]);
   }
+}
+
+// private
+size_t childrenSerializationBufferSize(LCTreeRef tree) {
+  size_t childrenLength = tree->childTreesLength + tree->childDataLength;
+  size_t sumPathLength = 0;
+  for (LCInteger i=0; i<childrenLength; i++) {
+    sumPathLength = sumPathLength + LCStringLength(LCKeyValueKey(tree->children[i]));
+  }
+  return sumPathLength + childrenLength * (LC_SHA1_HEX_Length + 2);  
+}
+
+void serializeChildTrees(LCKeyValueRef children[], size_t length, char buffer[]) {
+  LCTreeRef childTree;
+  for (LCInteger i=0; i<length; i++) {
+    childTree = LCKeyValueValue(children[i]);
+    serializePathSHA(LCKeyValueKey(children[i]), LCTreeSHA(childTree), buffer);
+  }
+}
+
+void serializeChildData(LCKeyValueRef children[], size_t length, char buffer[]) {
+  for (LCInteger i=0; i<length; i++) {
+    serializePathSHA(LCKeyValueKey(children[i]), LCKeyValueValue(children[i]), buffer);
+  }
+}
+
+void serializePathSHA(LCStringRef path, LCStringRef sha, char buffer[]) {
+  strcat(buffer, LCStringStringRef(path));
+  strcat(buffer, " ");
+  strcat(buffer, LCStringStringRef(sha));
+  strcat(buffer, "\n");
 }
