@@ -16,11 +16,13 @@ LCType typeStage = {
 };
 
 LCStageRef LCStageCreate() {
-  LCStageRef newCommit = malloc(sizeof(struct LCStage));
-  if (newCommit != NULL) {
-    newCommit->info.type = &typeStage;
+  LCStageRef newStage = malloc(sizeof(struct LCStage));
+  if (newStage != NULL) {
+    newStage->info.type = &typeStage;
+    newStage->addPathsLength = 0;
+    newStage->deletePathsLength = 0;
   }
-  return newCommit;
+  return newStage;
 };
 
 LCBool LCStageAddEntry(LCStageRef stage, char* path, unsigned char data[], size_t length) {  
