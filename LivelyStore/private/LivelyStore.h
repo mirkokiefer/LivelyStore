@@ -24,10 +24,10 @@ typedef struct LCPathData* LCPathDataRef;
 typedef struct LCData* LCDataRef;
 typedef struct LCKeyValue* LCKeyValueRef;
 typedef struct LCArray* LCArrayRef;
-
 typedef struct LCTree* LCTreeRef;
 typedef struct LCDataStore* LCDataStoreRef;
 typedef struct LCCommit* LCCommitRef;
+typedef struct LCMutableArray* LCMutableArrayRef;
 
 typedef enum {
   LCData,
@@ -74,3 +74,4 @@ struct LCObjectInfo {
 #include "LCDataStore.h"
 #include "LCCommit.h"
 #include "LCArray.h"
+#include "LCMutableArray.h"

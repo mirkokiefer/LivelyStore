@@ -54,6 +54,25 @@ static char* test_array() {
             (LCArrayObjectAtIndex(subArray, 0)==string2) && (LCArrayObjectAtIndex(subArray, 1)==string3));
   mu_assert("LCArrayCreateSubArray is correct",
             (LCArrayObjectAtIndex(subArray1, 0)==string2) && (LCArrayObjectAtIndex(subArray1, 1)==string3));
+  
+  LCMutableArrayRef mArray = LCMutableArrayCreate(stringArray, 3);
+  LCStringRef string4 = LCStringCreate("jkl");
+  LCMutableArrayAddObject(mArray, string4);
+  mu_assert("LCMutableArrayAddObject", LCMutableArrayObjectAtIndex(mArray, 3) == string4);
+  
+  for (LCInteger i=0; i<50; i++) {
+    LCMutableArrayAddObject(mArray, string4);
+  }
+  mu_assert("LCMutableArrayAddObject 50 times", (LCMutableArrayObjectAtIndex(mArray, 50) == string4) &&
+            (LCMutableArrayObjectAtIndex(mArray, 1) == string2));
+  
+  LCMutableArrayRemoveIndex(mArray, 1);
+  mu_assert("LCMutableArrayRemoveIndex", LCMutableArrayObjectAtIndex(mArray, 1)==string3);
+  
+  LCMutableArrayRemoveObject(mArray, string3);
+  mu_assert("LCMutableArrayRemoveObject", LCMutableArrayObjectAtIndex(mArray, 1)==string4);
+
+  
   return 0;
 }
 
