@@ -5,8 +5,8 @@
 #include "LivelyStore.h"
 
 LCDataStoreRef LCDataStoreCreate(LCStringRef location);
-void LCDataStoreSetNewDataCallback(LCDataStoreRef store, void(*callback)(char* sha, unsigned char* data, size_t length));
-void LCDataStoreSetDeletedDataCallback(LCDataStoreRef store, void(*callback)(char* sha));
+void LCDataStoreSetNewDataCallback(LCDataStoreRef store, LCStoreDataCb callback);
+void LCDataStoreSetDeletedDataCallback(LCDataStoreRef store, LCDeleteDataCb callback);
 
 void LCDataStorePutData(LCDataStoreRef store, char* sha, unsigned char* data, size_t length);
 void LCDataStoreDeleteData(LCDataStoreRef store, char* sha);

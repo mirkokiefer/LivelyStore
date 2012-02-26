@@ -27,11 +27,11 @@ LCStoreRef LCStoreCreate(char* location) {
   return newStore;
 };
 
-void LCStoreSetNewDataCallback(LCStoreRef store, void(*callback)(char* sha, unsigned char* data, size_t length)) {
+void LCStoreSetStoreCallback(LCStoreRef store, LCStoreDataCb callback) {
   LCDataStoreSetNewDataCallback(store->dataStore, callback);
 }
 
-void LCStoreSetDeletedDataCallback(LCStoreRef store, void(*callback)(char* sha)) {
+void LCStoreSetDeleteCallback(LCStoreRef store, LCDeleteDataCb callback) {
   LCDataStoreSetDeletedDataCallback(store->dataStore, callback);
 }
 
@@ -61,19 +61,8 @@ void storeDataWithSHAs(LCStoreRef store, LCKeyValueRef addPaths[], size_t length
   }
 }
 
-LCTreeRef buildTree(LCTreeRef current, LCKeyValueRef* addPathSHAs, size_t newLength, LCStringRef* delete, size_t deleteLength) {
-  /*
-   Ich gehe gezielt runter zu den geänderten pfaden/trees - und erstelle dann rekursiv nach oben die bäume neu
-   Ich sollte die keys mit einem Pfad objekt ersetzen...
-   letzten endes sollte doch blob, tree oder commit immer dann einen newDataCallback aufrufen wenn der SHA berechnet wurde
-   da alle diese Objekte den SHA cachen, wird das auch nur einmal vorkommen.
-   wenn ich also den baum neu aufbau und am ende ganz oben SHA aufrufe, werden alle bäume automatisch gespeichert.
-   voll geil!
-   LCData wird gespeichtert sobald LCPathDataSHA erstellt wird.
-   LCTree wird gespeichter sobald, LCCommit den SHA vom top-tree will.
-   LCCommit wird gespeichert sobald LCStore den SHA will um den head neu zu setzen.
-   
-   */
+LCTreeRef buildTree(LCTreeRef current, LCKeyValueRef addPathSHAs[], size_t newLength, LCStringRef* delete, size_t deleteLength) {
+  
 }
 
 void setStoreHead(LCStoreRef store, LCCommitRef newHead) {

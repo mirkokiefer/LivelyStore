@@ -29,6 +29,16 @@ typedef struct LCTree* LCTreeRef;
 typedef struct LCDataStore* LCDataStoreRef;
 typedef struct LCCommit* LCCommitRef;
 
+typedef enum {
+  LCData,
+  LCTree,
+  LCCommit
+} LCDataType;
+
+
+typedef void(*LCStoreDataCb)(LCDataType type, char* sha, unsigned char* data, size_t length);
+typedef void(*LCDeleteDataCb)(LCDataType type, char* sha);
+
 // internal types
 typedef struct LCType LCType;
 typedef struct LCType* LCTypeRef;
