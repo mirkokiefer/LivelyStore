@@ -3,10 +3,8 @@
 
 struct LCStage {
   LCObjectInfo info;
-  size_t addPathsLength;
-  size_t deletePathsLength;
-  LCStringRef* deletePaths;
-  LCKeyValueRef* addPaths;
+  LCMutableArrayRef deletePaths;
+  LCMutableArrayRef addPathValues;
 };
 
 void LCStageDealloc(void* object);
@@ -19,64 +17,46 @@ LCStageRef LCStageCreate() {
   LCStageRef newStage = malloc(sizeof(struct LCStage));
   if (newStage != NULL) {
     newStage->info.type = &typeStage;
-    newStage->addPathsLength = 0;
-    newStage->deletePathsLength = 0;
+    newStage->addPathValues = LCMutableArrayCreate(NULL, 0);
+    newStage->deletePaths = LCMutableArrayCreate(NULL, 0);
   }
   return newStage;
 };
 
-LCBool LCStageAddEntry(LCStageRef stage, char* path, unsigned char data[], size_t length) {  
-  LCKeyValueRef* keyValues = realloc(stage->addPaths, (stage->addPathsLength+1)*sizeof(LCKeyValueRef));
-  if(keyValues) {
-    LCStringRef lcPath = LCStringCreate(path);
-    LCDataRef lcData = LCDataCreate(data, length);
-    LCKeyValueRef keyValue = LCKeyValueCreate(lcPath, lcData);
-    LCRelease(lcPath);
-    LCRelease(lcData);
-
-    keyValues[stage->addPathsLength] = keyValue;
-    stage->addPaths = keyValues;
-    stage->addPathsLength ++;
-  } else {
-    return false;
-  }
-  return true;
+void LCStageAddEntry(LCStageRef stage, char* path, unsigned char data[], size_t length) {  
+  LCStringRef lcPath = LCStringCreate(path);
+  LCDataRef lcData = LCDataCreate(data, length);
+  LCKeyValueRef keyValue = LCKeyValueCreate(lcPath, lcData);
+  LCRelease(lcPath);
+  LCRelease(lcData);
+  
+  LCMutableArrayAddObject(stage->addPathValues, keyValue);
 }
 
-bool LCStageDeletePath(LCStageRef stage, char* key) {
-  LCStringRef* deletePaths = realloc(stage->deletePaths, (stage->deletePathsLength+1)*sizeof(LCStringRef));
-  if(deletePaths) {
-    
-  } else {
-    return false;
-  }
-  return true;
+void LCStageDeletePath(LCStageRef stage, char* key) {
+  LCStringRef keyString = LCStringCreate(key);
+  LCMutableArrayAddObject(stage->deletePaths, keyString);
+  LCRelease(keyString);
 }
 
 LCKeyValueRef* LCStagePathsToAdd(LCStageRef stage) {
-  return stage->addPaths;
+  return (LCKeyValueRef*)LCMutableArrayObjects(stage->addPathValues);
 }
 
 LCStringRef* LCStagePathsToDelete(LCStageRef stage) {
-  return stage->deletePaths;
+  return (LCStringRef*)LCMutableArrayObjects(stage->deletePaths);
 }
 
 size_t LCStageAddPathsCount(LCStageRef stage) {
-  return stage->addPathsLength;
+  return LCMutableArrayLength(stage->addPathValues);
 }
 
 size_t LCStageDeletePathsCount(LCStageRef stage) {
-  return stage->deletePathsLength;
+  return LCMutableArrayLength(stage->deletePaths);
 }
 
 void LCStageDealloc(void* object) {
   LCStageRef stage = (LCStageRef)object;
-  for(LCInteger i=0; i<stage->addPathsLength; i++) {
-    LCRelease(stage->addPaths[i]);
-  }
-  for(LCInteger i=0; i<stage->deletePathsLength; i++) {
-    LCRelease(stage->deletePaths[i]);
-  }
-  free(stage->addPaths);
-  free(stage->deletePaths);
+  LCRelease(stage->addPathValues);
+  LCRelease(stage->deletePaths);
 }

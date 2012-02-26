@@ -6,8 +6,8 @@
 #include "LivelyStore.h"
 
 LCStageRef LCStageCreate();
-bool LCStageAddEntry(LCStageRef stage, char* path, unsigned char data[], size_t length);
-bool LCStageDeletePath(LCStageRef stage, char* path);
+void LCStageAddEntry(LCStageRef stage, char* path, unsigned char data[], size_t length);
+void LCStageDeletePath(LCStageRef stage, char* path);
 void LCStageCommitToStore(LCStoreRef store);
 
 // private
