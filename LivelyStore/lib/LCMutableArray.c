@@ -54,6 +54,10 @@ LCArrayRef LCMutableArrayCreateSubArray(LCMutableArrayRef array, LCInteger start
   return LCArrayCreate(&(array->objects[start]), length);
 }
 
+LCArrayRef LCMutableArrayCreateArray(LCMutableArrayRef array) {
+  return LCArrayCreate(array->objects, array->length);
+}
+
 void LCMutableArrayAddObject(LCMutableArrayRef array, void* object) {
   if(array->length+1 > array->bufferLength) {
     resizeBuffer(array, array->bufferLength*2);

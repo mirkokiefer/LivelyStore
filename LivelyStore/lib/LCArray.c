@@ -45,6 +45,11 @@ LCArrayRef LCArrayCreateSubArray(LCArrayRef array, LCInteger start, size_t lengt
   return LCArrayCreate(&(array->objects[start]), length);
 }
 
+LCMutableArrayRef LCArrayCreateMutableArray(LCArrayRef array) {
+  return LCMutableArrayCreate(array->objects, array->length);
+}
+
+
 void LCArrayDealloc(void* object) {
   LCArrayRef array = (LCArrayRef)object;
   for (LCInteger i=0; i<array->length; i++) {
