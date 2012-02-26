@@ -19,11 +19,17 @@ LCMutableArrayRef LCMutableArrayCreate(void* objects[], size_t length) {
   LCMutableArrayRef newArray = malloc(sizeof(struct LCMutableArray));
   if (newArray != NULL) {
     newArray->info.type = &typeMutableArray;
-    for(LCInteger i=0; i<length; i++) {
-      LCRetain(objects[i]);
+    newArray->objects = NULL;
+    if(length > 0) {
+      for(LCInteger i=0; i<length; i++) {
+        LCRetain(objects[i]);
+      }
+      resizeBuffer(newArray, length*2);    
+      memcpy(newArray->objects, objects, length * sizeof(void*));  
+    } else {
+      resizeBuffer(newArray, 10);
     }
-    resizeBuffer(newArray, length*2);    
-    memcpy(newArray->objects, objects, length * sizeof(void*));
+    
     newArray->length = length;
   }
   return newArray;
