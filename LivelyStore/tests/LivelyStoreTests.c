@@ -36,6 +36,17 @@ static char* test_string() {
   LCStringRef* tokens = (LCStringRef*)LCArrayObjects(tokenArray);
   mu_assert("LCStringCreateTokens is correct", LCStringEqualCString(tokens[0], "ab") &&
             LCStringEqualCString(tokens[1], "cd") && LCStringEqualCString(tokens[2], "ef"));
+  
+  LCStringRef string1 = LCStringCreate("abcd");
+  LCStringRef string2 = LCStringCreate("abcde");
+  LCStringRef string3 = LCStringCreate("abd");
+  mu_assert("LCStringCompare", (LCStringCompare(string1, string2) == LCGreater) &&
+            (LCStringCompare(string1, string3) == LCSmaller) &&
+            (LCStringCompare(string1, string1) == LCEqual) &&
+            (LCStringCompare(string2, string3) == LCSmaller));
+  
+  LCStringRef strings[] = {string1, string2, string3};
+  sortStringArray(strings, 3);
   return 0;
 }
 

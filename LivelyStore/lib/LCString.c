@@ -73,6 +73,34 @@ LCBool LCStringEqualCString(LCStringRef string, char* cString) {
   return strcmp(string->content, cString) == 0;
 }
 
+LCCompare LCStringCompare(LCStringRef string, LCStringRef otherString) {
+  char* string1 = string->content;
+  char* string2 = otherString->content;
+  LCInteger string1Length = strlen(string1);
+  LCInteger string2Length = strlen(string2);
+  LCInteger maxCompareLength = string1Length;
+  if (maxCompareLength > string2Length) {
+    maxCompareLength = string2Length;
+  }
+  
+  for (LCInteger i=0; i<maxCompareLength; i++) {
+    if (string1[i] > string2[i]) {
+      return LCGreater;
+    }
+    if (string1[i] < string2[i]) {
+      return LCSmaller;
+    }
+  }
+  if (string1Length == string2Length) {
+    return LCEqual;
+  }
+  if (string1Length < string2Length) {
+    return LCGreater;
+  } else {
+    return LCSmaller;
+  }
+}
+
 LCArrayRef LCStringCreateTokens(LCStringRef string, char delimiter) {
   char* cString = string->content;
   LCStringRef substrings[strlen(cString)/2];

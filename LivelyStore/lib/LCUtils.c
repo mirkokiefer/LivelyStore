@@ -1,6 +1,8 @@
 
 #include "LivelyStoreTests.h"
 
+int stringCompare(const void * elem1, const void * elem2);
+
 void* LCRetain(void* object) {
   LCObjectInfo* info = (LCObjectInfo*)object;
   info->rCount++;
@@ -75,4 +77,21 @@ LCDataRef createDataFromHexString(LCStringRef hexString) {
 
 LCArrayRef createPathArray(LCStringRef path) {
   return LCStringCreateTokens(path, '/');
+}
+
+int stringCompare(const void * elem1, const void * elem2) {
+  LCStringRef* string1 = (LCStringRef*)elem1;
+  LCStringRef* string2 = (LCStringRef*)elem2;
+  LCCompare result = LCStringCompare(*string1, *string2);
+  if (result == LCGreater) {
+    return  1; 
+  }
+  if (result == LCSmaller) {
+    return -1; 
+  }
+  return 0;
+}
+
+void sortStringArray(LCStringRef strings[], size_t length) {
+  qsort(strings, length, sizeof(LCStringRef), stringCompare);
 }

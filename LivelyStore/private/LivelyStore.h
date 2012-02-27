@@ -35,6 +35,12 @@ typedef enum {
   LCCommit
 } LCDataType;
 
+typedef enum {
+  LCEqual,
+  LCGreater,
+  LCSmaller
+} LCCompare;
+
 
 typedef void(*LCStoreDataCb)(LCDataType type, char* sha, unsigned char* data, size_t length);
 typedef void(*LCDeleteDataCb)(LCDataType type, char* sha);
