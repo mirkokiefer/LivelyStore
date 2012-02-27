@@ -8,9 +8,11 @@ struct LCKeyValue {
 };
 
 void LCKeyValueDealloc(void* object);
+LCCompare LCKeyValueCompare(void* object1, void* object2);
 
 LCType typeKeyValue = {
-  .dealloc = LCKeyValueDealloc
+  .dealloc = LCKeyValueDealloc,
+  .compare = LCKeyValueCompare
 };
 
 LCKeyValueRef LCKeyValueCreate(void* key, void* value) {
@@ -31,6 +33,10 @@ void* LCKeyValueKey(LCKeyValueRef keyValue) {
 
 void* LCKeyValueValue(LCKeyValueRef keyValue) {
   return keyValue->value;
+}
+
+LCCompare LCKeyValueCompare(void* object1, void* object2) {
+  return LCCompareObjects(LCKeyValueKey(object1), LCKeyValueKey(object2));
 }
 
 void LCKeyValueDealloc(void* object) {
