@@ -122,24 +122,24 @@ static char* test_tree() {
   LCKeyValueRef entry2 = LCKeyValueCreate(path2, value2SHA);
   LCKeyValueRef entry3 = LCKeyValueCreate(path3, value2SHA);
   
-  LCKeyValueRef childData1[] = {entry1};
-  LCKeyValueRef childData2[] = {entry2, entry3};
+  void* childData1[] = {entry1};
+  void* childData2[] = {entry2, entry3};
   
   LCStringRef tree1Name = LCStringCreate("root");
-  LCTreeRef tree1 = LCTreeCreate(NULL, 0, childData1, 1);
+  LCTreeRef tree1 = LCTreeCreate(LCArrayCreate(NULL, 0), LCArrayCreate(childData1, 1));
   LCKeyValueRef childTree1 = LCKeyValueCreate(tree1Name, tree1);
-  LCKeyValueRef childTrees1[] = {childTree1};
-  LCTreeRef tree2 = LCTreeCreate(childTrees1, 1, childData2, 2);
+  void* childTrees1[] = {childTree1};
+  LCTreeRef tree2 = LCTreeCreate(LCArrayCreate(childTrees1, 1), LCArrayCreate(childData2, 2));
   
-  LCKeyValueRef* tree1Data = LCTreeChildData(tree1);
-  LCKeyValueRef* tree2Data = LCTreeChildData(tree2);
-  LCKeyValueRef* tree2ChildTrees = LCTreeChildTrees(tree2);
+  LCKeyValueRef* tree1Data = (LCKeyValueRef*)LCMutableArrayObjects(LCTreeChildData(tree1));
+  LCKeyValueRef* tree2Data = (LCKeyValueRef*)LCMutableArrayObjects(LCTreeChildData(tree2));
+  LCKeyValueRef* tree2ChildTrees = (LCKeyValueRef*)LCMutableArrayObjects(LCTreeChildTrees(tree2));
   
   LCBool correct = (tree1Data[0]==entry1) && (tree2Data[0]==entry2) && (tree2Data[1]==entry3);
   mu_assert("LCTree stores entries correctly", correct);
   mu_assert("LCTree stores child trees correctly", tree2ChildTrees[0] == childTree1);
   
-  LCTreeRef tree2Clone = LCTreeCreate(childTrees1, 1, childData2, 2);
+  LCTreeRef tree2Clone = LCTreeCreate(LCArrayCreate(childTrees1, 1), LCArrayCreate(childData2, 2));
   LCStringRef tree1SHA = LCTreeSHA(tree1);
   LCStringRef tree2SHA = LCTreeSHA(tree2);
   LCStringRef tree2CloneSHA = LCTreeSHA(tree2Clone);
