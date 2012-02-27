@@ -81,6 +81,10 @@ void LCMutableArrayRemoveObject(LCMutableArrayRef array, void* object) {
   }
 }
 
+void LCMutableArraySort(LCMutableArrayRef array) {
+  LCSortObjects(array->objects, array->length);
+}
+
 void LCMutableArrayDealloc(void* object) {
   LCMutableArrayRef array = (LCMutableArrayRef)object;
   for (LCInteger i=0; i<array->length; i++) {
