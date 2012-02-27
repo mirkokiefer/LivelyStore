@@ -83,7 +83,11 @@ static char* test_array() {
   LCMutableArrayRemoveObject(mArray, string3);
   mu_assert("LCMutableArrayRemoveObject", LCMutableArrayObjectAtIndex(mArray, 1)==string4);
 
-  
+  void* sortStrings[] = {string2, string3, string1};
+  LCMutableArrayRef sortArray = LCMutableArrayCreate(sortStrings, 3);
+  LCMutableArraySort(sortArray);
+  void** sorted = LCMutableArrayObjects(sortArray);
+  mu_assert("LCMutableArraySort", (sorted[0] == string1) && (sorted[1] == string2) && (sorted[2] == string3));
   return 0;
 }
 
