@@ -55,6 +55,7 @@ typedef struct LCHashableObject* LCHashableObjectRef;
 
 struct LCType {
   void (*dealloc)(void* object);
+  LCCompare (*compare)(void* object1, void* object2);
   void* meta;
 };
 

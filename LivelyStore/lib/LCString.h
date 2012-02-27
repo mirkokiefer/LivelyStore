@@ -17,7 +17,6 @@ LCDataRef LCStringCreateData(LCStringRef string);
 void LCStringPrint(LCStringRef string);
 LCBool LCStringEqual(LCStringRef string, LCStringRef otherString);
 LCBool LCStringEqualCString(LCStringRef string, char* cString);
-LCCompare LCStringCompare(LCStringRef string, LCStringRef otherString);
 void LCStringSort(LCStringRef strings[], size_t length);
 LCStringRef LCStringCreateSHAString(LCStringRef string);
 LCArrayRef LCStringCreateTokens(LCStringRef string, char delimiter);

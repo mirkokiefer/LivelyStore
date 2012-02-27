@@ -5,6 +5,8 @@
 void* LCRetain(void* object);
 void* LCRelease(void* object);
 LCInteger LCRetainCount(void* object);
+LCCompare LCCompareObjects(void* object1, void* object2);
+void LCSortObjects(void* objects[], size_t length);
 
 char hexDigitToASCIChar(char hexDigit);
 char asciCharToHexDigit(char hexDigit);
@@ -13,5 +15,4 @@ LCByte hexDigitsToByte(char* hexDigits);
 LCStringRef createHexString(LCByte data[], size_t length);
 LCDataRef createDataFromHexString(LCStringRef hexString);
 LCArrayRef createPathArray(LCStringRef path);
-void sortStringArray(LCStringRef strings[], size_t length);
 #endif

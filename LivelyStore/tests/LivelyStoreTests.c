@@ -40,13 +40,13 @@ static char* test_string() {
   LCStringRef string1 = LCStringCreate("abcd");
   LCStringRef string2 = LCStringCreate("abcde");
   LCStringRef string3 = LCStringCreate("abd");
-  mu_assert("LCStringCompare", (LCStringCompare(string1, string2) == LCGreater) &&
-            (LCStringCompare(string1, string3) == LCSmaller) &&
-            (LCStringCompare(string1, string1) == LCEqual) &&
-            (LCStringCompare(string2, string3) == LCSmaller));
+  mu_assert("LCStringCompare", (LCCompareObjects(string1, string2) == LCGreater) &&
+            (LCCompareObjects(string1, string3) == LCSmaller) &&
+            (LCCompareObjects(string1, string1) == LCEqual) &&
+            (LCCompareObjects(string2, string3) == LCSmaller));
   
   LCStringRef strings[] = {string1, string2, string3};
-  sortStringArray(strings, 3);
+  LCSortObjects((void**)strings, 3);
   return 0;
 }
 

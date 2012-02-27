@@ -1,16 +1,21 @@
 
 #include "LivelyStoreTests.h"
 
-int stringCompare(const void * elem1, const void * elem2);
+int objectCompare(const void * elem1, const void * elem2);
+LCObjectInfo* LCGetObjectInfo(void* object);
+
+LCObjectInfo* LCGetObjectInfo(void* object) {
+  return (LCObjectInfo*)object;
+}
 
 void* LCRetain(void* object) {
-  LCObjectInfo* info = (LCObjectInfo*)object;
+  LCObjectInfo* info = LCGetObjectInfo(object);
   info->rCount++;
   return object;
 }
 
 void* LCRelease(void* object) {
-  LCObjectInfo* info = (LCObjectInfo*)object;
+  LCObjectInfo* info = LCGetObjectInfo(object);
   info->rCount--;
   if(info->rCount == -1) {
     LCTypeRef type = (*info).type;
@@ -21,6 +26,40 @@ void* LCRelease(void* object) {
     //printf("dealloc: %p", object);
   }
   return object;
+}
+
+LCCompare LCCompareObjects(void* object1, void* object2) {
+  LCType* type1 = LCGetObjectInfo(object1)->type;
+  if(type1->compare == NULL) {
+    if(object1 == object2) {
+      return LCEqual;
+    } else {
+      if (object1 > object2) {
+        return LCGreater;
+      } else {
+        return LCSmaller;
+      }
+    }
+  } else {
+    return LCGetObjectInfo(object1)->type->compare(object1, object2);    
+  }
+}
+
+int objectCompare(const void * elem1, const void * elem2) {
+  void** object1 = (void**)elem1;
+  void** object2 = (void**)elem2;
+  LCCompare result = LCCompareObjects(*object1, *object2);
+  if (result == LCGreater) {
+    return  1; 
+  }
+  if (result == LCSmaller) {
+    return -1; 
+  }
+  return 0;
+}
+
+void LCSortObjects(void* objects[], size_t length) {
+  qsort(objects, length, sizeof(void*), objectCompare);
 }
 
 LCInteger LCRetainCount(void* object) {
@@ -77,21 +116,4 @@ LCDataRef createDataFromHexString(LCStringRef hexString) {
 
 LCArrayRef createPathArray(LCStringRef path) {
   return LCStringCreateTokens(path, '/');
-}
-
-int stringCompare(const void * elem1, const void * elem2) {
-  LCStringRef* string1 = (LCStringRef*)elem1;
-  LCStringRef* string2 = (LCStringRef*)elem2;
-  LCCompare result = LCStringCompare(*string1, *string2);
-  if (result == LCGreater) {
-    return  1; 
-  }
-  if (result == LCSmaller) {
-    return -1; 
-  }
-  return 0;
-}
-
-void sortStringArray(LCStringRef strings[], size_t length) {
-  qsort(strings, length, sizeof(LCStringRef), stringCompare);
 }

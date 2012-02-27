@@ -1,6 +1,8 @@
 
 #include "LCString.h"
 
+LCCompare LCStringCompare(void* object1, void* object2);
+
 struct LCString {
   LCObjectInfo info;
   char content[];
@@ -8,6 +10,7 @@ struct LCString {
 
 LCType typeString = {
   .dealloc = NULL,
+  .compare = LCStringCompare
 };
 
 LCStringRef LCStringCreate(char* string) {
@@ -73,9 +76,9 @@ LCBool LCStringEqualCString(LCStringRef string, char* cString) {
   return strcmp(string->content, cString) == 0;
 }
 
-LCCompare LCStringCompare(LCStringRef string, LCStringRef otherString) {
-  char* string1 = string->content;
-  char* string2 = otherString->content;
+LCCompare LCStringCompare(void* object1, void* object2) {
+  char* string1 = ((LCStringRef)object1)->content;
+  char* string2 = ((LCStringRef)object2)->content;
   LCInteger string1Length = strlen(string1);
   LCInteger string2Length = strlen(string2);
   LCInteger maxCompareLength = string1Length;
