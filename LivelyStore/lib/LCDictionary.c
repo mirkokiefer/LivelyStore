@@ -51,6 +51,14 @@ LCDictionaryRef LCDictionaryCopy(LCDictionaryRef dict) {
   return LCDictionaryCreate((LCKeyValueRef*)LCMutableArrayObjects(dict->keyValues), LCMutableArrayLength(dict->keyValues));
 }
 
+size_t LCDictionaryLength(LCDictionaryRef dict) {
+  return LCMutableArrayLength(dict->keyValues);
+}
+
+LCKeyValueRef* LCDictionaryEntries(LCDictionaryRef dict) {
+  return (LCKeyValueRef*)LCMutableArrayObjects(dict->keyValues);
+}
+
 void LCDictionaryDealloc(void* object) {
   LCDictionaryRef dict = (LCDictionaryRef)object;
   LCRelease(dict->keyValues);

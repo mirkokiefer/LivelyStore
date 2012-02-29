@@ -9,5 +9,7 @@ void* LCDictionaryValueForKey(LCDictionaryRef dict, void* key);
 void LCDictionarySetValueForKey(LCDictionaryRef dict, void* key, void* value);
 void LCDictionaryDeleteKey(LCDictionaryRef dict, void* key);
 LCDictionaryRef LCDictionaryCopy(LCDictionaryRef dict);
+size_t LCDictionaryLength(LCDictionaryRef dict);
+LCKeyValueRef* LCDictionaryEntries(LCDictionaryRef dict);
 
 #endif
