@@ -3,37 +3,39 @@
 
 void LCTreeDealloc(void* object);
 size_t childrenSerializationBufferSize(LCTreeRef tree);
-void serializeChildTrees(LCMutableArrayRef childTrees, char buffer[]);
-void serializeChildData(LCMutableArrayRef childData, char buffer[]);
+void serializeChildTrees(LCDictionaryRef childTrees, char buffer[]);
+void serializeChildData(LCDictionaryRef childData, char buffer[]);
 void serializePathSHA(LCStringRef path, LCStringRef sha, char buffer[]);
 LCTreeRef LCTreeChildTreeAtPath(LCTreeRef tree, LCArrayRef pathArray);
 
 struct LCTree {
   LCObjectInfo info;
   LCStringRef sha;
-  LCMutableArrayRef childTrees;
-  LCMutableArrayRef childData;
+  LCDictionaryRef childTrees;
+  LCDictionaryRef childData;
 };
 
 LCType typeTree = {
   .dealloc = LCTreeDealloc
 };
 
-LCTreeRef LCTreeCreate(LCArrayRef childTrees, LCArrayRef childDataSHAs) {
+LCTreeRef LCTreeCreate(LCDictionaryRef childTrees, LCDictionaryRef childDataSHAs) {
   LCTreeRef newTree = malloc(sizeof(struct LCTree));
   if (newTree != NULL) {
     newTree->info.type = &typeTree;
-    newTree->childTrees = LCArrayCreateMutableArray(childTrees);
-    newTree->childData = LCArrayCreateMutableArray(childDataSHAs);
+    LCRetain(childTrees);
+    LCRetain(childDataSHAs);
+    newTree->childTrees = childTrees;
+    newTree->childData = childDataSHAs;
   }
   return newTree;
 };
 
-LCMutableArrayRef LCTreeChildTrees(LCTreeRef tree) {
+LCDictionaryRef LCTreeChildTrees(LCTreeRef tree) {
   return tree->childTrees;
 }
 
-LCMutableArrayRef LCTreeChildData(LCTreeRef tree) {
+LCDictionaryRef LCTreeChildData(LCTreeRef tree) {
   return tree->childData;
 }
 
@@ -83,6 +85,10 @@ LCStringRef LCTreeSHA(LCTreeRef tree) {
   return tree->sha;
 }
 
+LCTreeRef LCTreeCopy(LCTreeRef tree) {
+  return LCTreeCreate(LCDictionaryCopy(tree->childTrees), LCDictionaryCopy(tree->childData));
+}
+
 void LCTreeDealloc(void* object) {
   LCTreeRef tree = (LCTreeRef)object;
   LCRelease(tree->childTrees);
@@ -91,32 +97,32 @@ void LCTreeDealloc(void* object) {
 
 // private
 size_t childrenSerializationBufferSize(LCTreeRef tree) {
-  size_t childrenLength = LCMutableArrayLength(tree->childTrees) + LCMutableArrayLength(tree->childData);
+  size_t childrenLength = LCDictionaryLength(tree->childTrees) + LCDictionaryLength(tree->childData);
   size_t sumPathLength = 0;
-  for (LCInteger i=0; i<LCMutableArrayLength(tree->childTrees); i++) {
-    sumPathLength = sumPathLength + LCStringLength(LCKeyValueKey(LCMutableArrayObjectAtIndex(tree->childTrees, i)));
+  LCKeyValueRef* keyValues = LCDictionaryEntries(tree->childTrees);
+  for (LCInteger i=0; i<LCDictionaryLength(tree->childTrees); i++) {
+    sumPathLength = sumPathLength + LCStringLength(LCKeyValueKey(keyValues[i]));
   }
-  for (LCInteger i=0; i<LCMutableArrayLength(tree->childData); i++) {
-    sumPathLength = sumPathLength + LCStringLength(LCKeyValueKey(LCMutableArrayObjectAtIndex(tree->childData, i)));
+  keyValues = LCDictionaryEntries(tree->childData);
+  for (LCInteger i=0; i<LCDictionaryLength(tree->childData); i++) {
+    sumPathLength = sumPathLength + LCStringLength(LCKeyValueKey(keyValues[i]));
   }
-  return sumPathLength + childrenLength * (LC_SHA1_HEX_Length + 2);  
+  return sumPathLength + childrenLength * (LC_SHA1_HEX_Length + 2);
 }
 
-void serializeChildTrees(LCMutableArrayRef childTrees, char buffer[]) {
-  LCKeyValueRef childKeyTree;
+void serializeChildTrees(LCDictionaryRef childTrees, char buffer[]) {
   LCTreeRef childTree;
-  for (LCInteger i=0; i<LCMutableArrayLength(childTrees); i++) {
-    childKeyTree = LCMutableArrayObjectAtIndex(childTrees, i);
-    childTree = LCKeyValueValue(childKeyTree);
-    serializePathSHA(LCKeyValueKey(childKeyTree), LCTreeSHA(childTree), buffer);
+  LCKeyValueRef* keyValues = LCDictionaryEntries(childTrees);
+  for (LCInteger i=0; i<LCDictionaryLength(childTrees); i++) {
+    childTree = LCKeyValueValue(keyValues[i]);
+    serializePathSHA(LCKeyValueKey(keyValues[i]), LCTreeSHA(childTree), buffer);
   }
 }
 
-void serializeChildData(LCMutableArrayRef childData, char buffer[]) {
-  LCKeyValueRef childKeyData;
-  for (LCInteger i=0; i<LCMutableArrayLength(childData); i++) {
-    childKeyData = LCMutableArrayObjectAtIndex(childData, i);
-    serializePathSHA(LCKeyValueKey(childKeyData), LCKeyValueValue(childKeyData), buffer);
+void serializeChildData(LCDictionaryRef childData, char buffer[]) {
+  LCKeyValueRef* keyValues = LCDictionaryEntries(childData);
+  for (LCInteger i=0; i<LCDictionaryLength(childData); i++) {
+    serializePathSHA(LCKeyValueKey(keyValues[i]), LCKeyValueValue(keyValues[i]), buffer);
   }
 }
 
