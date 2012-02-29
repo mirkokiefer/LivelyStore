@@ -91,6 +91,30 @@ static char* test_array() {
   return 0;
 }
 
+static char* test_dictionary() {
+  LCStringRef string1 = LCStringCreate("abc");
+  LCStringRef string2 = LCStringCreate("def");
+  LCStringRef string3 = LCStringCreate("ghi");
+  LCStringRef string1c = LCStringCreate("abc");
+  LCStringRef string2c = LCStringCreate("def");
+  LCKeyValueRef kv1 = LCKeyValueCreate(string1, string2);
+  LCKeyValueRef kv2 = LCKeyValueCreate(string2, string3);
+  LCKeyValueRef kv3 = LCKeyValueCreate(string3, string1);
+  LCKeyValueRef keyValues[] = {kv1, kv2, kv3};
+  LCDictionaryRef dict = LCDictionaryCreate(keyValues, 3);
+  
+  mu_assert("LCDictionaryCreate, LCDictionaryValueForKey", (LCDictionaryValueForKey(dict, string1c) == string2) &&
+            (LCDictionaryValueForKey(dict, string2c) == string3) &&
+            (LCDictionaryValueForKey(dict, string3) == string1));
+  
+  LCDictionaryDeleteKey(dict, string2c);
+  mu_assert("LCDictionaryDeleteKey", LCDictionaryValueForKey(dict, string2c) == NULL);
+  
+  LCDictionarySetValueForKey(dict, string1c, string1);
+  mu_assert("LCDictionarySetValueForKey", LCDictionaryValueForKey(dict, string1) == string1);
+  return 0;
+}
+
 static char* test_sha1() {
   char* testData1 = "compute sha1";
   LCStringRef testData1RealSHA = LCStringCreate("eefbec885d1042d22ea36fd1690d94dec9029680");
@@ -168,6 +192,7 @@ static char* all_tests() {
   mu_run_test(test_string);
   mu_run_test(test_array);
   mu_run_test(test_data);
+  mu_run_test(test_dictionary);
   mu_run_test(test_sha1);
   mu_run_test(test_stage);
   mu_run_test(test_tree);
