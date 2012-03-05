@@ -72,8 +72,9 @@ void LCMutableArrayAddObject(LCMutableArrayRef array, void* object) {
 }
 
 void LCMutableArrayRemoveIndex(LCMutableArrayRef array, LCInteger index) {
+  LCRelease(array->objects[index]);
   size_t objectsToCopy = array->length - (index+1);
-  memmove(&(array->objects[index]), &(array->objects[index+1]), objectsToCopy);
+  memmove(&(array->objects[index]), &(array->objects[index+1]), objectsToCopy*sizeof(void*));
   array->length = array->length-1;
 }
 
