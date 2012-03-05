@@ -8,6 +8,11 @@ LCObjectInfo* LCGetObjectInfo(void* object) {
   return (LCObjectInfo*)object;
 }
 
+void LCFree(void* memory) {
+  //printf("free: %p\n", memory);
+  free(memory);
+}
+
 void* LCRetain(void* object) {
   LCObjectInfo* info = LCGetObjectInfo(object);
   info->rCount++;
@@ -22,8 +27,7 @@ void* LCRelease(void* object) {
     if(type->dealloc) {
       type->dealloc(object);      
     }
-    free(object);
-    //printf("dealloc: %p", object);
+    LCFree(object);
   }
   return object;
 }
