@@ -47,6 +47,19 @@ void LCDictionarySetValueForKey(LCDictionaryRef dict, void* key, void* value) {
   LCMutableArrayAddObject(dict->keyValues, keyValue);
 }
 
+void LCDictionaryAddEntry(LCDictionaryRef dict, LCKeyValueRef keyValue) {
+  LCDictionaryDeleteKey(dict, LCKeyValueKey(keyValue));
+  if (LCKeyValueValue(keyValue) != NULL) {
+    LCMutableArrayAddObject(dict->keyValues, keyValue);
+  }
+}
+
+void LCDictionaryAddEntries(LCDictionaryRef dict, LCKeyValueRef keyValues[], size_t length) {
+  for (LCInteger i=0; i<length; i++) {
+    LCDictionaryAddEntry(dict, keyValues[i]);
+  }
+}
+
 LCDictionaryRef LCDictionaryCopy(LCDictionaryRef dict) {
   return LCDictionaryCreate((LCKeyValueRef*)LCMutableArrayObjects(dict->keyValues), LCMutableArrayLength(dict->keyValues));
 }
