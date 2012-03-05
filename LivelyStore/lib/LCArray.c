@@ -1,6 +1,7 @@
 
 #include "LCArray.h"
 
+LCCompare LCArrayCompare(void* object1, void* object2);
 void LCArrayDealloc(void* object);
 
 struct LCArray {
@@ -10,7 +11,8 @@ struct LCArray {
 };
 
 LCType typeArray = {
-  .dealloc = LCArrayDealloc
+  .dealloc = LCArrayDealloc,
+  .compare = LCArrayCompare
 };
 
 LCArrayRef LCArrayCreate(void** objects, size_t length) {
@@ -49,6 +51,11 @@ LCMutableArrayRef LCArrayCreateMutableArray(LCArrayRef array) {
   return LCMutableArrayCreate(array->objects, array->length);
 }
 
+LCCompare LCArrayCompare(void* object1, void* object2) {
+  LCArrayRef array1 = (LCArrayRef)object1;
+  LCArrayRef array2 = (LCArrayRef)object2;
+  return LCCompareObjects(array1->objects[0], array2->objects[0]);
+}
 
 void LCArrayDealloc(void* object) {
   LCArrayRef array = (LCArrayRef)object;
