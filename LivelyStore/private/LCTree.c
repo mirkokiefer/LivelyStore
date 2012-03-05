@@ -8,9 +8,9 @@ void serializeChildData(LCDictionaryRef childData, char buffer[]);
 void serializePathSHA(LCStringRef path, LCStringRef sha, char buffer[]);
 LCTreeRef LCTreeChildTreeAtPath(LCTreeRef tree, LCArrayRef pathArray);
 
-void deleteChildData(LCTreeRef tree, LCMutableArrayRef dataPaths);
+void updateChildData(LCTreeRef tree, LCMutableArrayRef dataPaths);
 void updateChildTrees(LCTreeRef parent, LCMutableArrayRef childTreeDataDeletes);
-void processDeletesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCMutableArrayRef deletePathArrays);
+void processUpdatesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCMutableArrayRef deletePathArrays);
 
 struct LCTree {
   LCObjectInfo info;
@@ -121,7 +121,7 @@ LCTreeRef LCTreeCreateTreeDeletingData(LCTreeRef oldTree, LCMutableArrayRef dele
     }
   }
 
-  deleteChildData(newTree, directDataDeletes);
+  updateChildData(newTree, directDataDeletes);
   updateChildTrees(newTree, childTreeDataDeletes);
   
   return newTree;
@@ -171,7 +171,7 @@ void serializePathSHA(LCStringRef path, LCStringRef sha, char buffer[]) {
   strcat(buffer, "\n");
 }
 
-void deleteChildData(LCTreeRef tree, LCMutableArrayRef dataPaths) {
+void updateChildData(LCTreeRef tree, LCMutableArrayRef dataPaths) {
   LCStringRef* dataPathsRef = (LCStringRef*)LCMutableArrayObjects(dataPaths);
   for (LCInteger i=0; i<LCMutableArrayLength(dataPaths); i++) {
     LCDictionaryDeleteKey(tree->childData, dataPathsRef[i]);
@@ -195,17 +195,17 @@ void updateChildTrees(LCTreeRef parent, LCMutableArrayRef childTreeDataDeletes) 
       if (LCStringEqual(currentKey, previousKey)) {
         LCMutableArrayAddObject(currentDeletePaths, currentChildPath);
       } else {
-        processDeletesForChildTreeKey(parent, currentKey, currentDeletePaths);
+        processUpdatesForChildTreeKey(parent, currentKey, currentDeletePaths);
         LCRelease(currentDeletePaths);
         currentDeletePaths = LCMutableArrayCreate((void**)&currentChildPath, 1);
       }
     }
-    processDeletesForChildTreeKey(parent, currentKey, currentDeletePaths);
+    processUpdatesForChildTreeKey(parent, currentKey, currentDeletePaths);
   }
 }
 
-void processDeletesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCMutableArrayRef deletePathArrays) {
-  LCTreeRef currentChildTree = LCDictionaryValueForKey(parent->childTrees, key);
+void processUpdatesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCMutableArrayRef deletePathArrays) {
+  LCTreeRef currentChildTree = LCTreeChildTreeAtKey(parent, key);
   if (currentChildTree) {
     LCTreeRef newChildTree = LCTreeCreateTreeDeletingData(currentChildTree, deletePathArrays);
     LCDictionarySetValueForKey(parent->childTrees, key, newChildTree);
