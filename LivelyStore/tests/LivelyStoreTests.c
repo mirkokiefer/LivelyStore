@@ -232,9 +232,8 @@ static char* test_tree_operations() {
   void* path2[] = {LCStringCreate("path2")};
   LCArrayRef path1Array = LCArrayCreate(path1, 2);
   LCArrayRef path2Array = LCArrayCreate(path2, 1);
-  void* deletePaths[] = {path1Array, path2Array};
-  LCMutableArrayRef deletePathsArray = LCMutableArrayCreate(deletePaths, 2);
-  LCTreeRef newTree = LCTreeCreateTreeUpdatingData(tree, deletePathsArray);
+  void* updates[] = {LCKeyValueCreate(path1Array, NULL), LCKeyValueCreate(path2Array, NULL)};
+  LCTreeRef newTree = LCTreeCreateTreeUpdatingData(tree, LCMutableArrayCreate(updates, 2));
   
   mu_assert("LCTreeCreateTreeDeletingData", (LCTreeChildDataAtPath(newTree, path2Array)==NULL) &&
             (LCTreeChildDataAtPath(newTree, path1Array)==NULL));
