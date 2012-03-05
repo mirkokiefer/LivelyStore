@@ -15,7 +15,7 @@ LCTreeRef LCTreeChildTreeAtKey(LCTreeRef tree, LCStringRef key);
 LCStringRef LCTreeChildDataAtKey(LCTreeRef tree, LCStringRef key);
 LCTreeRef LCTreeChildTreeAtPath(LCTreeRef tree, LCArrayRef path);
 LCStringRef LCTreeChildDataAtPath(LCTreeRef tree, LCArrayRef path);
-LCTreeRef LCTreeCreateTreeDeletingData(LCTreeRef oldTree, LCMutableArrayRef deletePaths);
+LCTreeRef LCTreeCreateTreeUpdatingData(LCTreeRef oldTree, LCMutableArrayRef deletePaths);
 LCTreeRef LCTreeCreateTreeAddingData(LCTreeRef tree, LCKeyValueRef pathData[], size_t length);
 LCTreeRef LCTreeCopy(LCTreeRef tree);
 #endif

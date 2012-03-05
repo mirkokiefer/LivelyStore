@@ -106,7 +106,7 @@ LCStringRef LCTreeChildDataAtPath(LCTreeRef tree, LCArrayRef path) {
   }
 }
 
-LCTreeRef LCTreeCreateTreeDeletingData(LCTreeRef oldTree, LCMutableArrayRef deletePathArrays) {
+LCTreeRef LCTreeCreateTreeUpdatingData(LCTreeRef oldTree, LCMutableArrayRef deletePathArrays) {
   LCTreeRef newTree = LCTreeCopy(oldTree);  
   
   LCMutableArrayRef directDataDeletes = LCMutableArrayCreate(NULL, 0);
@@ -207,7 +207,7 @@ void updateChildTrees(LCTreeRef parent, LCMutableArrayRef childTreeDataDeletes) 
 void processUpdatesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCMutableArrayRef deletePathArrays) {
   LCTreeRef currentChildTree = LCTreeChildTreeAtKey(parent, key);
   if (currentChildTree) {
-    LCTreeRef newChildTree = LCTreeCreateTreeDeletingData(currentChildTree, deletePathArrays);
+    LCTreeRef newChildTree = LCTreeCreateTreeUpdatingData(currentChildTree, deletePathArrays);
     LCDictionarySetValueForKey(parent->childTrees, key, newChildTree);
     LCRelease(newChildTree);
   }
