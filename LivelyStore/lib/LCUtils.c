@@ -17,19 +17,21 @@ void* LCRetain(void* object) {
   if (object) {
     LCObjectInfo* info = LCGetObjectInfo(object);
     info->rCount++;
-    return object;
   }
+  return object;
 }
 
 void* LCRelease(void* object) {
-  LCObjectInfo* info = LCGetObjectInfo(object);
-  info->rCount--;
-  if(info->rCount == -1) {
-    LCTypeRef type = (*info).type;
-    if(type->dealloc) {
-      type->dealloc(object);      
-    }
-    LCFree(object);
+  if (object) {
+    LCObjectInfo* info = LCGetObjectInfo(object);
+    info->rCount--;
+    if(info->rCount == -1) {
+      LCTypeRef type = (*info).type;
+      if(type->dealloc) {
+        type->dealloc(object);      
+      }
+      LCFree(object);
+    } 
   }
   return object;
 }
