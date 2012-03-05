@@ -216,6 +216,13 @@ static char* test_tree() {
   LCStringRef tree2CloneSHA = LCTreeSHA(tree2Clone);
   mu_assert("LCTree SHA differs on differing trees", LCStringEqual(tree1SHA, tree2SHA)==false);
   mu_assert("LCTree SHA is identical on identical trees", LCStringEqual(tree2SHA, tree2CloneSHA));
+  
+  mu_assert("LCTreeChildTreeAtKey", LCTreeChildTreeAtKey(tree2, tree1Key)==tree1);
+  
+  LCArrayRef path1 = LCArrayCreate((void**)&key2, 1);
+  void* path2C[] = {tree1Key, key1};
+  LCArrayRef path2 = LCArrayCreate(path2C, 2);
+  mu_assert("LCTreeChildDataAtPath", (LCTreeChildDataAtPath(tree2, path1)==value2SHA) && (LCTreeChildDataAtPath(tree2, path2)==value1SHA));
   return 0;
 }
 
@@ -228,10 +235,10 @@ static char* test_tree_operations() {
   void* deletePaths[] = {path1Array, path2Array};
   LCMutableArrayRef deletePathsArray = LCMutableArrayCreate(deletePaths, 2);
   LCTreeRef newTree = LCTreeCreateTreeDeletingData(tree, deletePathsArray);
-    
-  LCDictionaryRef newChildData = LCTreeChildData(newTree);
-  LCDictionaryRef newChildTrees = LCTreeChildTrees(newTree);
-  mu_assert("LCTreeCreateTreeDeletingData", LCDictionaryValueForKey(newChildData, LCStringCreate("path2"))==NULL);
+  
+  mu_assert("LCTreeCreateTreeDeletingData", (LCTreeChildDataAtPath(newTree, path2Array)==NULL) &&
+            (LCTreeChildDataAtPath(newTree, path1Array)==NULL));
+  return 0;
 }
 
 static char* all_tests() {
