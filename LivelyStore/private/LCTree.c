@@ -129,6 +129,9 @@ LCTreeRef LCTreeCreateTreeUpdatingData(LCTreeRef oldTree, LCMutableArrayRef upda
   updateChildData(newTree, directDataUpdates);
   updateChildTrees(newTree, childTreeDataUpdates);
   
+  LCRelease(directDataUpdates);
+  LCRelease(childTreeDataUpdates);
+  
   return newTree;
 }
 
@@ -194,6 +197,8 @@ void updateChildTrees(LCTreeRef parent, LCMutableArrayRef childTreeDataUpdates) 
       currentPath = LCKeyValueKey(childTreeDataUpdatesRef[i]);
       previousKey = currentKey;
       currentKey = LCArrayObjectAtIndex(currentPath, 0);
+      LCRelease(currentChildPath);
+      LCRelease(newChildPathValue);
       currentChildPath = LCArrayCreateSubArray(currentPath, 1, -1);
       newChildPathValue = LCKeyValueCreate(currentChildPath, LCKeyValueValue(childTreeDataUpdatesRef[i]));
       if (LCStringEqual(currentKey, previousKey)) {
@@ -216,5 +221,3 @@ void processUpdatesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCMutableA
     LCRelease(newChildTree);
   }
 }
- 
-//LCTreeRef LCTreeCreateTreeAddingData(LCTreeRef tree, LCKeyValueRef pathData[], size_t length);
