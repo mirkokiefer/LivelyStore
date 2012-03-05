@@ -14,9 +14,11 @@ void LCFree(void* memory) {
 }
 
 void* LCRetain(void* object) {
-  LCObjectInfo* info = LCGetObjectInfo(object);
-  info->rCount++;
-  return object;
+  if (object) {
+    LCObjectInfo* info = LCGetObjectInfo(object);
+    info->rCount++;
+    return object;
+  }
 }
 
 void* LCRelease(void* object) {
