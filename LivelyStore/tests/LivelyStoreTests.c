@@ -231,16 +231,21 @@ static char* test_tree_operations() {
   void* path1[] = {LCStringCreate("tree1"), LCStringCreate("path1")};
   void* path2[] = {LCStringCreate("path2")};
   void* path3[] = {LCStringCreate("path3")};
+  void* path4[] = {LCStringCreate("tree1"), LCStringCreate("tree2"), LCStringCreate("path4")};
   LCArrayRef path1Array = LCArrayCreate(path1, 2);
   LCArrayRef path2Array = LCArrayCreate(path2, 1);
   LCArrayRef path3Array = LCArrayCreate(path3, 1);
-  LCStringRef sha = LCStringCreateSHAString(LCStringCreate("test"));
-  void* updates[] = {LCKeyValueCreate(path1Array, NULL), LCKeyValueCreate(path2Array, NULL), LCKeyValueCreate(path3Array, sha)};
-  LCTreeRef newTree = LCTreeCreateTreeUpdatingData(tree, LCMutableArrayCreate(updates, 3));
+  LCArrayRef path4Array = LCArrayCreate(path4, 3);
+  LCStringRef sha1 = LCStringCreateSHAString(LCStringCreate("test1"));
+  LCStringRef sha2 = LCStringCreateSHAString(LCStringCreate("test2"));
+  void* updates[] = {LCKeyValueCreate(path1Array, NULL), LCKeyValueCreate(path2Array, NULL),
+    LCKeyValueCreate(path3Array, sha1), LCKeyValueCreate(path4Array, sha2)};
+  LCTreeRef newTree = LCTreeCreateTreeUpdatingData(tree, LCMutableArrayCreate(updates, 4));
   
   mu_assert("LCTreeCreateTreeDeletingData", (LCTreeChildDataAtPath(newTree, path1Array)==NULL) &&
             (LCTreeChildDataAtPath(newTree, path2Array)==NULL) &&
-            (LCTreeChildDataAtPath(newTree, path3Array)==sha));
+            (LCTreeChildDataAtPath(newTree, path3Array)==sha1) &&
+            (LCTreeChildDataAtPath(newTree, path4Array)==sha2));
   return 0;
 }
 

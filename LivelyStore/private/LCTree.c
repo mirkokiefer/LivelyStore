@@ -27,8 +27,16 @@ LCTreeRef LCTreeCreate(LCDictionaryRef childTrees, LCDictionaryRef childDataSHAs
   LCTreeRef newTree = malloc(sizeof(struct LCTree));
   if (newTree != NULL) {
     newTree->info.type = &typeTree;
-    LCRetain(childTrees);
-    LCRetain(childDataSHAs);
+    if(childTrees) {
+      LCRetain(childTrees);      
+    } else {
+      childTrees = LCDictionaryCreate(NULL, 0);
+    }
+    if (childDataSHAs) {
+      LCRetain(childDataSHAs);
+    } else {
+      childDataSHAs = LCDictionaryCreate(NULL, 0);
+    }
     newTree->childTrees = childTrees;
     newTree->childData = childDataSHAs;
   }
@@ -107,7 +115,12 @@ LCStringRef LCTreeChildDataAtPath(LCTreeRef tree, LCArrayRef path) {
 }
 
 LCTreeRef LCTreeCreateTreeUpdatingData(LCTreeRef oldTree, LCMutableArrayRef updatePathValues) {
-  LCTreeRef newTree = LCTreeCopy(oldTree);
+  LCTreeRef newTree;
+  if (oldTree) {
+    newTree = LCTreeCopy(oldTree);    
+  } else {
+    newTree = LCTreeCreate(NULL, NULL);
+  }
   
   LCMutableArrayRef directDataUpdates = LCMutableArrayCreate(NULL, 0);
   LCMutableArrayRef childTreeDataUpdates = LCMutableArrayCreate(NULL, 0);
@@ -215,9 +228,7 @@ void updateChildTrees(LCTreeRef parent, LCMutableArrayRef childTreeDataUpdates) 
 
 void processUpdatesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCMutableArrayRef updatePathArrays) {
   LCTreeRef currentChildTree = LCTreeChildTreeAtKey(parent, key);
-  if (currentChildTree) {
-    LCTreeRef newChildTree = LCTreeCreateTreeUpdatingData(currentChildTree, updatePathArrays);
-    LCDictionarySetValueForKey(parent->childTrees, key, newChildTree);
-    LCRelease(newChildTree);
-  }
+  LCTreeRef newChildTree = LCTreeCreateTreeUpdatingData(currentChildTree, updatePathArrays);
+  LCDictionarySetValueForKey(parent->childTrees, key, newChildTree);
+  LCRelease(newChildTree);
 }
