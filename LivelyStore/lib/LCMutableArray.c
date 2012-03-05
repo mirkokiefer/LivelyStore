@@ -94,7 +94,7 @@ void LCMutableArrayDealloc(void* object) {
   for (LCInteger i=0; i<array->length; i++) {
     LCRelease(array->objects[i]);
   }
-  free(array->objects);
+  LCFree(array->objects);
 }
 
 LCBool resizeBuffer(LCMutableArrayRef array, size_t length) {

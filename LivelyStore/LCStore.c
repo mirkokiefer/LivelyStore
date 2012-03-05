@@ -66,7 +66,7 @@ LCTreeRef buildTree(LCTreeRef current, LCKeyValueRef addPathSHAs[], size_t newLe
 }
 
 void setStoreHead(LCStoreRef store, LCCommitRef newHead) {
-  free(store->head);
+  LCFree(store->head);
   store->head = newHead;
 }
 
