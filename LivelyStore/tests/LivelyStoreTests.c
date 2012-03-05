@@ -4,6 +4,28 @@
 
 int tests_run = 0;
 
+static LCTreeRef testdata_tree() {
+  LCStringRef key1 = LCStringCreate("path1");
+  LCStringRef key2 = LCStringCreate("path2");
+  LCStringRef key3 = LCStringCreate("path3");
+  LCStringRef value1SHA = LCCreateSHAString((LCByte*)"12345", 6);
+  LCStringRef value2SHA = LCCreateSHAString((LCByte*)"67890", 6);
+  LCKeyValueRef entry1 = LCKeyValueCreate(key1, value1SHA);
+  LCKeyValueRef entry2 = LCKeyValueCreate(key2, value2SHA);
+  LCKeyValueRef entry3 = LCKeyValueCreate(key3, value2SHA);
+  
+  LCKeyValueRef childData1[] = {entry1};
+  LCKeyValueRef childData2[] = {entry2, entry3};
+  
+  LCStringRef tree1Key = LCStringCreate("tree1");
+  LCTreeRef tree1 = LCTreeCreate(LCDictionaryCreate(NULL, 0), LCDictionaryCreate(childData1, 1));
+  
+  LCKeyValueRef childTree1 = LCKeyValueCreate(tree1Key, tree1);
+  LCKeyValueRef childTrees1[] = {childTree1};
+  LCTreeRef tree2 = LCTreeCreate(LCDictionaryCreate(childTrees1, 1), LCDictionaryCreate(childData2, 2));
+  return tree2;
+}
+
 static char* test_retain_counting() {
   LCStringRef test = LCStringCreate("abc");
   mu_assert("initial retain count=0", LCRetainCount(test)==0);
@@ -67,6 +89,11 @@ static char* test_array() {
             (LCArrayObjectAtIndex(subArray1, 0)==string2) && (LCArrayObjectAtIndex(subArray1, 1)==string3));
   
   LCMutableArrayRef mArray = LCMutableArrayCreate(stringArray, 3);
+  mu_assert("LCMutableArrayCreate",
+            (LCMutableArrayObjectAtIndex(mArray, 0)==string1) &&
+            (LCMutableArrayObjectAtIndex(mArray, 1)==string2) &&
+            (LCMutableArrayObjectAtIndex(mArray, 2)==string3));
+
   LCStringRef string4 = LCStringCreate("jkl");
   LCMutableArrayAddObject(mArray, string4);
   mu_assert("LCMutableArrayAddObject", LCMutableArrayObjectAtIndex(mArray, 3) == string4);
@@ -78,10 +105,14 @@ static char* test_array() {
             (LCMutableArrayObjectAtIndex(mArray, 1) == string2));
   
   LCMutableArrayRemoveIndex(mArray, 1);
-  mu_assert("LCMutableArrayRemoveIndex", LCMutableArrayObjectAtIndex(mArray, 1)==string3);
+  mu_assert("LCMutableArrayRemoveIndex1", (LCMutableArrayObjectAtIndex(mArray, 0)==string1) &&
+            (LCMutableArrayObjectAtIndex(mArray, 1)==string3) &&
+            (LCMutableArrayObjectAtIndex(mArray, 2)==string4));
+  LCMutableArrayRemoveIndex(mArray, 0);
+  mu_assert("LCMutableArrayRemoveIndex2", LCMutableArrayObjectAtIndex(mArray, 0)==string3);
   
   LCMutableArrayRemoveObject(mArray, string3);
-  mu_assert("LCMutableArrayRemoveObject", LCMutableArrayObjectAtIndex(mArray, 1)==string4);
+  mu_assert("LCMutableArrayRemoveObject", LCMutableArrayObjectAtIndex(mArray, 0)==string4);
 
   void* sortStrings[] = {string2, string3, string1};
   LCMutableArrayRef sortArray = LCMutableArrayCreate(sortStrings, 3);
@@ -152,21 +183,22 @@ static char* test_stage() {
 }
 
 static char* test_tree() {
-  LCStringRef path1 = LCStringCreate("path1");
-  LCStringRef path2 = LCStringCreate("path2");
-  LCStringRef path3 = LCStringCreate("path3");
+  LCStringRef key1 = LCStringCreate("path1");
+  LCStringRef key2 = LCStringCreate("path2");
+  LCStringRef key3 = LCStringCreate("path3");
   LCStringRef value1SHA = LCCreateSHAString((LCByte*)"12345", 6);
   LCStringRef value2SHA = LCCreateSHAString((LCByte*)"67890", 6);
-  LCKeyValueRef entry1 = LCKeyValueCreate(path1, value1SHA);
-  LCKeyValueRef entry2 = LCKeyValueCreate(path2, value2SHA);
-  LCKeyValueRef entry3 = LCKeyValueCreate(path3, value2SHA);
+  LCKeyValueRef entry1 = LCKeyValueCreate(key1, value1SHA);
+  LCKeyValueRef entry2 = LCKeyValueCreate(key2, value2SHA);
+  LCKeyValueRef entry3 = LCKeyValueCreate(key3, value2SHA);
   
   LCKeyValueRef childData1[] = {entry1};
   LCKeyValueRef childData2[] = {entry2, entry3};
   
-  LCStringRef tree1Name = LCStringCreate("root");
+  LCStringRef tree1Key = LCStringCreate("tree1");
   LCTreeRef tree1 = LCTreeCreate(LCDictionaryCreate(NULL, 0), LCDictionaryCreate(childData1, 1));
-  LCKeyValueRef childTree1 = LCKeyValueCreate(tree1Name, tree1);
+  
+  LCKeyValueRef childTree1 = LCKeyValueCreate(tree1Key, tree1);
   LCKeyValueRef childTrees1[] = {childTree1};
   LCTreeRef tree2 = LCTreeCreate(LCDictionaryCreate(childTrees1, 1), LCDictionaryCreate(childData2, 2));
   
@@ -187,6 +219,21 @@ static char* test_tree() {
   return 0;
 }
 
+static char* test_tree_operations() {
+  LCTreeRef tree = testdata_tree();
+  void* path1[] = {LCStringCreate("tree1"), LCStringCreate("path1")};
+  void* path2[] = {LCStringCreate("path2")};
+  LCArrayRef path1Array = LCArrayCreate(path1, 2);
+  LCArrayRef path2Array = LCArrayCreate(path2, 1);
+  void* deletePaths[] = {path1Array, path2Array};
+  LCMutableArrayRef deletePathsArray = LCMutableArrayCreate(deletePaths, 2);
+  LCTreeRef newTree = LCTreeCreateTreeDeletingData(tree, deletePathsArray);
+    
+  LCDictionaryRef newChildData = LCTreeChildData(newTree);
+  LCDictionaryRef newChildTrees = LCTreeChildTrees(newTree);
+  mu_assert("LCTreeCreateTreeDeletingData", LCDictionaryValueForKey(newChildData, LCStringCreate("path2"))==NULL);
+}
+
 static char* all_tests() {
   mu_run_test(test_retain_counting);
   mu_run_test(test_string);
@@ -196,6 +243,7 @@ static char* all_tests() {
   mu_run_test(test_sha1);
   mu_run_test(test_stage);
   mu_run_test(test_tree);
+  mu_run_test(test_tree_operations);
   return 0;
 }
 
