@@ -15,13 +15,10 @@ LCType typeData = {
 };
 
 LCDataRef LCDataCreate(LCByte data[], size_t length) {
-  LCDataRef newData = malloc(sizeof(struct LCData) + length*sizeof(LCByte));
-  if (newData != NULL) {
-    newData->info.type = &typeData;
-    newData->length = length;
-    newData->sha = NULL;
-    memcpy(newData->data, data, length*sizeof(LCByte));
-  }
+  LCDataRef newData = LCNewObject(&typeData, sizeof(struct LCData) + length*sizeof(LCByte));
+  newData->length = length;
+  newData->sha = NULL;
+  memcpy(newData->data, data, length*sizeof(LCByte));
   return newData;
 };
 

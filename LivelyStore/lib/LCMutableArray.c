@@ -16,22 +16,18 @@ LCType typeMutableArray = {
 };
 
 LCMutableArrayRef LCMutableArrayCreate(void* objects[], size_t length) {
-  LCMutableArrayRef newArray = malloc(sizeof(struct LCMutableArray));
-  if (newArray != NULL) {
-    newArray->info.type = &typeMutableArray;
-    newArray->objects = NULL;
-    if(length > 0) {
-      for(LCInteger i=0; i<length; i++) {
-        LCRetain(objects[i]);
-      }
-      resizeBuffer(newArray, length);    
-      memcpy(newArray->objects, objects, length * sizeof(void*));  
-    } else {
-      resizeBuffer(newArray, 10);
+  LCMutableArrayRef newArray = LCNewObject(&typeMutableArray, sizeof(struct LCMutableArray));
+  newArray->objects = NULL;
+  if(length > 0) {
+    for(LCInteger i=0; i<length; i++) {
+      LCRetain(objects[i]);
     }
-    
-    newArray->length = length;
+    resizeBuffer(newArray, length);    
+    memcpy(newArray->objects, objects, length * sizeof(void*));  
+  } else {
+    resizeBuffer(newArray, 10);
   }
+  newArray->length = length;
   return newArray;
 };
 

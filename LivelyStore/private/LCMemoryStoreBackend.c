@@ -21,12 +21,9 @@ LCType typeMemoryStore = {
 };
 
 static LCMemoryStoreRef LCMemoryStoreCreate(LCStringRef location) {
-  LCMemoryStoreRef newStore = malloc(sizeof(struct LCMemoryStore));
-  if (newStore != NULL) {
-    newStore->info.type = &typeMemoryStore;
-    newStore->location = LCRetain(location);
-    newStore->dict = LCDictionaryCreate(NULL, 0);
-  }
+  LCMemoryStoreRef newStore = LCNewObject(&typeMemoryStore, sizeof(struct LCMemoryStore));
+  newStore->location = LCRetain(location);
+  newStore->dict = LCDictionaryCreate(NULL, 0);
   return newStore;
 };
 

@@ -13,10 +13,8 @@ LCType typeDictionary = {
 };
 
 LCDictionaryRef LCDictionaryCreate(LCKeyValueRef keyValues[], size_t length) {
-  LCDictionaryRef newDict = malloc(sizeof(struct LCDictionary));
-  if (newDict != NULL) {
-    newDict->keyValues = LCMutableArrayCreate((void**)keyValues, length);
-  }
+  LCDictionaryRef newDict = LCNewObject(&typeDictionary, sizeof(struct LCDictionary));
+  newDict->keyValues = LCMutableArrayCreate((void**)keyValues, length);
   return newDict;
 };
 

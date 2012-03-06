@@ -16,14 +16,11 @@ LCType typeKeyValue = {
 };
 
 LCKeyValueRef LCKeyValueCreate(void* key, void* value) {
-  LCKeyValueRef newKeyValue = malloc(sizeof(struct LCKeyValue));
-  if (newKeyValue != NULL) {
-    newKeyValue->info.type = &typeKeyValue;
-    LCRetain(key);
-    LCRetain(value);
-    newKeyValue->key=key;
-    newKeyValue->value=value;
-  }
+  LCKeyValueRef newKeyValue = LCNewObject(&typeKeyValue, sizeof(struct LCKeyValue));
+  LCRetain(key);
+  LCRetain(value);
+  newKeyValue->key=key;
+  newKeyValue->value=value;
   return newKeyValue;
 };
 

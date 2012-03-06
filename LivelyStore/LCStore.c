@@ -18,12 +18,9 @@ LCType typeStore = {
 };
 
 LCStoreRef LCStoreCreate(struct LCStoreBackend* backend) {
-  LCStoreRef newStore = malloc(sizeof(struct LCStore));
-  if (newStore != NULL) {
-    newStore->info.type = &typeStore;
-    newStore->dataStore = LCDataStoreCreate(backend);
-    newStore->head = LCCommitCreate(NULL, NULL);
-  }
+  LCStoreRef newStore = LCNewObject(&typeStore, sizeof(struct LCStore));
+  newStore->dataStore = LCDataStoreCreate(backend);
+  newStore->head = LCCommitCreate(NULL, NULL);
   return newStore;
 };
 

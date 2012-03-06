@@ -16,15 +16,12 @@ LCType typeArray = {
 };
 
 LCArrayRef LCArrayCreate(void** objects, size_t length) {
-  LCArrayRef newArray = malloc(sizeof(struct LCArray) + length * sizeof(void*));
-  if (newArray != NULL) {
-    newArray->info.type = &typeArray;
-    for(LCInteger i=0; i<length; i++) {
-      LCRetain(objects[i]);
-    }
-    newArray->length = length;
-    memcpy(newArray->objects, objects, length * sizeof(void*));
+  LCArrayRef newArray = LCNewObject(&typeArray, sizeof(struct LCArray) + length * sizeof(void*));
+  for(LCInteger i=0; i<length; i++) {
+    LCRetain(objects[i]);
   }
+  newArray->length = length;
+  memcpy(newArray->objects, objects, length * sizeof(void*));
   return newArray;
 };
 

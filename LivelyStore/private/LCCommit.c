@@ -15,12 +15,10 @@ LCType typeCommit = {
 };
 
 LCCommitRef LCCommitCreate(LCCommitRef parent, LCTreeRef tree) {
-  LCCommitRef newCommit = malloc(sizeof(struct LCCommit));
-  if (newCommit != NULL) {
-    newCommit->info.type = &typeCommit;
-    newCommit->parent = LCRetain(parent);
-    newCommit->tree = LCRetain(tree);
-  }
+  LCCommitRef newCommit = LCNewObject(&typeCommit, sizeof(struct LCCommit));
+  newCommit->sha = NULL;
+  newCommit->parent = LCRetain(parent);
+  newCommit->tree = LCRetain(tree);
   return newCommit;
 };
 

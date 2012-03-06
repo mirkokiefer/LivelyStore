@@ -14,12 +14,9 @@ LCType typeStage = {
 };
 
 LCStageRef LCStageCreate() {
-  LCStageRef newStage = malloc(sizeof(struct LCStage));
-  if (newStage != NULL) {
-    newStage->info.type = &typeStage;
-    newStage->addPathValues = LCMutableArrayCreate(NULL, 0);
-    newStage->deletePaths = LCMutableArrayCreate(NULL, 0);
-  }
+  LCStageRef newStage = LCNewObject(&typeStage, sizeof(struct LCStage));
+  newStage->addPathValues = LCMutableArrayCreate(NULL, 0);
+  newStage->deletePaths = LCMutableArrayCreate(NULL, 0);
   return newStage;
 };
 

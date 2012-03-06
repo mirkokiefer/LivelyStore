@@ -18,11 +18,8 @@ LCType typeDataStore = {
 };
 
 LCDataStoreRef LCDataStoreCreate(struct LCStoreBackend* backend) {
-  LCDataStoreRef newStore = malloc(sizeof(struct LCDataStore));
-  if (newStore != NULL) {
-    newStore->info.type = &typeDataStore;
-    newStore->backend = backend;
-  }
+  LCDataStoreRef newStore = LCNewObject(&typeDataStore, sizeof(struct LCDataStore));
+  newStore->backend = backend;
   return newStore;
 };
 

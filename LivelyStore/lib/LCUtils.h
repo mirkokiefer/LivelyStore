@@ -2,6 +2,7 @@
 #ifndef LivelyStore_LCUtils_h
 #define LivelyStore_LCUtils_h
 
+void* LCNewObject(LCType* type, size_t size);
 void LCFree(void* memory);
 void* LCRetain(void* object);
 void* LCRelease(void* object);

@@ -14,11 +14,8 @@ LCType typeString = {
 };
 
 LCStringRef LCStringCreate(char* string) {
-  LCStringRef newString = malloc(sizeof(struct LCString) + strlen(string)+1);
-  if (newString != NULL) {
-    newString->info.type = &typeString;
-    memcpy(newString->content, string, strlen(string)+1);
-  }
+  LCStringRef newString = LCNewObject(&typeString, sizeof(struct LCString) + strlen(string)+1);
+  memcpy(newString->content, string, strlen(string)+1);
   return newString;
 };
 

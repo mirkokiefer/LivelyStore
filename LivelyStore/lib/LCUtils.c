@@ -8,6 +8,16 @@ LCObjectInfo* LCGetObjectInfo(void* object) {
   return (LCObjectInfo*)object;
 }
 
+void* LCNewObject(LCType* type, size_t size) {
+  void* newObj = malloc(size);
+  if (newObj) {
+    LCObjectInfo* info = LCGetObjectInfo(newObj);
+    info->rCount = 0;
+    info->type = type;
+  }
+  return newObj;
+}
+
 void LCFree(void* memory) {
   //printf("free: %p\n", memory);
   free(memory);
