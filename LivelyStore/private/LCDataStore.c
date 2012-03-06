@@ -1,11 +1,16 @@
 
 #include "LCDataStore.h"
 
+void putData(LCDataStoreRef store, LCDataType type, LCStringRef key, LCByte data[], size_t length);
+void deleteData(LCDataStoreRef store, LCDataType type, LCStringRef key);
+void getData(LCDataStoreRef store, LCDataType type, LCStringRef key);
+
 struct LCDataStore {
   LCObjectInfo info;
   LCStringRef location;
   LCStoreDataCb storeCb;
   LCDeleteDataCb deleteCb;
+  LCGetDataCb getCb;
 };
 
 void LCDataStoreDealloc(void* object);
@@ -32,15 +37,43 @@ void LCDataStoreSetDeletedDataCallback(LCDataStoreRef store, LCDeleteDataCb call
   store->deleteCb = callback;
 }
 
-void LCDataStorePutData(LCDataStoreRef store, char* sha, unsigned char* data, size_t length) {
-  store->storeCb(LCData, sha, data, length);
+void LCDataStoreSetGetDataCallback(LCDataStoreRef store, LCGetDataCb callback) {
+  store->getCb = callback;
 }
 
-void LCDataStoreDeleteData(LCDataStoreRef store, char* sha) {
-  store->deleteCb(LCData, sha);
+void LCDataStorePutData(LCDataStoreRef store, LCStringRef sha, LCByte data[], size_t length) {
+  putData(store, LCData, sha, data, length);
+}
+
+void LCDataStoreDeleteData(LCDataStoreRef store, LCStringRef sha) {
+  deleteData(store, LCData, sha);
+}
+
+void LCDataStorePutTreeData(LCDataStoreRef store, LCStringRef sha, LCStringRef data) {
+  putData(store, LCTree, sha, (LCByte*)LCStringStringRef(data), LCStringLength(data)+1);
+}
+
+void LCDataStorePutCommitData(LCDataStoreRef store, LCStringRef sha, LCStringRef data) {
+  putData(store, LCCommit, sha, (LCByte*)LCStringStringRef(data), LCStringLength(data)+1);  
+}
+
+void LCDataStorePutTagData(LCDataStoreRef store, LCStringRef tag, LCStringRef data) {
+  //TODO
 }
 
 void LCDataStoreDealloc(void* object) {
   LCDataStoreRef store = (LCDataStoreRef)object;
   LCRelease(store->location);
+}
+
+void putData(LCDataStoreRef store, LCDataType type, LCStringRef key, LCByte data[], size_t length) {
+  store->storeCb(type, LCStringStringRef(key), (unsigned char*)data, length);
+}
+
+void deleteData(LCDataStoreRef store, LCDataType type, LCStringRef key) {
+  store->deleteCb(type, LCStringStringRef(key));
+}
+
+void getData(LCDataStoreRef store, LCDataType type, LCStringRef key) {
+  store->getCb(type, LCStringStringRef(key));
 }

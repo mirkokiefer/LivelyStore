@@ -7,13 +7,12 @@
 LCDataStoreRef LCDataStoreCreate(LCStringRef location);
 void LCDataStoreSetNewDataCallback(LCDataStoreRef store, LCStoreDataCb callback);
 void LCDataStoreSetDeletedDataCallback(LCDataStoreRef store, LCDeleteDataCb callback);
+void LCDataStoreSetGetDataCallback(LCDataStoreRef store, LCGetDataCb callback);
 
-void LCDataStorePutData(LCDataStoreRef store, char* sha, unsigned char* data, size_t length);
-void LCDataStoreDeleteData(LCDataStoreRef store, char* sha);
-void LCDataStorePutTreeData(LCDataStoreRef store, char* sha, char* data);
-void LCDataStorePutCommitData(LCDataStoreRef store, char* sha, char* data);
-void LCDataStorePutTagData(LCDataStoreRef store, char* tag, char* data);
-
-void LCDataStoreDelete(LCDataStoreRef store, LCStringRef sha);
+void LCDataStorePutData(LCDataStoreRef store, LCStringRef sha, LCByte data[], size_t length);
+void LCDataStoreDeleteData(LCDataStoreRef store, LCStringRef sha);
+void LCDataStorePutTreeData(LCDataStoreRef store, LCStringRef sha, LCStringRef data);
+void LCDataStorePutCommitData(LCDataStoreRef store, LCStringRef sha, LCStringRef data);
+void LCDataStorePutTagData(LCDataStoreRef store, LCStringRef tag, LCStringRef data);
 
 #endif
