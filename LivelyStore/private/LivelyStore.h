@@ -30,6 +30,9 @@ typedef struct LCCommit* LCCommitRef;
 typedef struct LCMutableArray* LCMutableArrayRef;
 typedef struct LCDictionary* LCDictionaryRef;
 
+typedef struct LCMemoryStore* LCMemoryStoreRef;
+typedef struct LCFileStore* LCFileStoreRef;
+
 typedef enum {
   LCData,
   LCTree,
@@ -43,10 +46,10 @@ typedef enum {
 } LCCompare;
 
 
-typedef void(*LCStoreDataCb)(LCDataType type, char* sha, unsigned char data[], size_t length);
-typedef void(*LCDeleteDataCb)(LCDataType type, char* sha);
-typedef size_t(*LCGetDataLengthCb)(LCDataType type, char* sha);
-typedef void(*LCGetDataCb)(LCDataType type, char* sha, unsigned char buffer[]);
+typedef void(*LCStoreDataCb)(void* storeObj, LCDataType type, char* sha, unsigned char data[], size_t length);
+typedef void(*LCDeleteDataCb)(void* storeObj, LCDataType type, char* sha);
+typedef size_t(*LCGetDataLengthCb)(void* storeObj, LCDataType type, char* sha);
+typedef void(*LCGetDataCb)(void* storeObj, LCDataType type, char* sha, unsigned char buffer[]);
 
 // internal types
 typedef struct LCType LCType;
@@ -86,3 +89,6 @@ struct LCObjectInfo {
 #include "LCArray.h"
 #include "LCMutableArray.h"
 #include "LCDictionary.h"
+#include "LCMemoryStore.h"
+#include "LCFileStore.h"
+

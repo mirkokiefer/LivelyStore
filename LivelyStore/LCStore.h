@@ -6,6 +6,7 @@
 #include "LivelyStore.h"
 
 LCStoreRef LCStoreCreate(char* location);
+void LCStoreSetStoreObject(LCStoreRef store, void* storeObject);
 void LCStoreSetStoreCallback(LCStoreRef store, LCStoreDataCb callback);
 void LCStoreSetDeleteCallback(LCStoreRef store, LCDeleteDataCb callback);
 void LCStoreSetGetDataCallback(LCStoreRef store, LCGetDataCb callback);

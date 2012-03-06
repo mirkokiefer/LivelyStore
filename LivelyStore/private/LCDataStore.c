@@ -8,6 +8,7 @@ LCDataRef getData(LCDataStoreRef store, LCDataType type, LCStringRef key);
 struct LCDataStore {
   LCObjectInfo info;
   LCStringRef location;
+  void* storeObject;
   LCStoreDataCb storeCb;
   LCDeleteDataCb deleteCb;
   LCGetDataCb getCb;
@@ -29,6 +30,10 @@ LCDataStoreRef LCDataStoreCreate(LCStringRef location) {
   }
   return newStore;
 };
+
+void LCDataStoreSetStoreObject(LCDataStoreRef store, void* storeObject) {
+  store->storeObject = LCRetain(storeObject);
+}
 
 void LCDataStoreSetNewDataCallback(LCDataStoreRef store, LCStoreDataCb callback) {
   store->storeCb = callback;
@@ -79,16 +84,16 @@ void LCDataStoreDealloc(void* object) {
 }
 
 void putData(LCDataStoreRef store, LCDataType type, LCStringRef key, LCByte data[], size_t length) {
-  store->storeCb(type, LCStringStringRef(key), (unsigned char*)data, length);
+  store->storeCb(store->storeObject, type, LCStringStringRef(key), (unsigned char*)data, length);
 }
 
 void deleteData(LCDataStoreRef store, LCDataType type, LCStringRef key) {
-  store->deleteCb(type, LCStringStringRef(key));
+  store->deleteCb(store->storeObject, type, LCStringStringRef(key));
 }
 
 LCDataRef getData(LCDataStoreRef store, LCDataType type, LCStringRef key) {
-  size_t length = store->getLengthCb(type, LCStringStringRef(key));
+  size_t length = store->getLengthCb(store->storeObject, type, LCStringStringRef(key));
   LCByte buffer[length];
-  store->getCb(type, LCStringStringRef(key), buffer);
+  store->getCb(store->storeObject, type, LCStringStringRef(key), buffer);
   return LCDataCreate(buffer, length);
 }

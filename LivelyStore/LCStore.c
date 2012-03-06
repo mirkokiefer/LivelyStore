@@ -29,6 +29,10 @@ LCStoreRef LCStoreCreate(char* location) {
   return newStore;
 };
 
+void LCStoreSetStoreObject(LCStoreRef store, void* storeObject) {
+  LCDataStoreSetStoreObject(store->dataStore, storeObject);
+}
+
 void LCStoreSetStoreCallback(LCStoreRef store, LCStoreDataCb callback) {
   LCDataStoreSetNewDataCallback(store->dataStore, callback);
 }
