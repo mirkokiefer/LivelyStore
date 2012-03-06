@@ -13,5 +13,6 @@ void LCDataStorePutTagData(LCDataStoreRef store, LCStringRef tag, LCStringRef da
 size_t LCDataStoreGetDataLength(LCDataStoreRef store, char* sha);
 LCDataRef LCDataStoreGetData(LCDataStoreRef store, LCStringRef sha);
 LCStringRef LCDataStoreGetTreeData(LCDataStoreRef store, LCStringRef sha);
+LCStringRef LCDataStoreGetCommitData(LCDataStoreRef store, LCStringRef sha);
 
 #endif

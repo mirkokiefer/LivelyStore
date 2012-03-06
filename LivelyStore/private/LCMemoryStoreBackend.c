@@ -73,7 +73,11 @@ size_t memoryStoreGetDataLength(void* storeObj, LCDataType type, char* sha) {
   LCStringRef shaObj = LCStringCreate(sha);
   LCDataRef data = LCDictionaryValueForKey(store->dict, shaObj);
   LCRelease(shaObj);
-  return LCDataLength(data);
+  if (data) {
+    return LCDataLength(data);
+  } else {
+    return -1;
+  }
 }
 
 void memoryStoreGetData(void* storeObj, LCDataType type, char* sha, unsigned char buffer[]) {

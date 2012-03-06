@@ -18,10 +18,16 @@ LCType typeStore = {
   .dealloc = LCStoreDealloc
 };
 
-LCStoreRef LCStoreCreate(struct LCStoreBackend* backend) {
+LCStoreRef LCStoreCreate(struct LCStoreBackend* backend, char headCommit[LC_SHA1_HEX_Length]) {
   LCStoreRef newStore = LCNewObject(&typeStore, sizeof(struct LCStore));
   newStore->dataStore = LCDataStoreCreate(backend);
-  newStore->head = LCCommitCreate(NULL, NULL);
+  if (headCommit) {
+    LCStringRef headCommitObj = LCStringCreate(headCommit);
+    newStore->head = LCCommitCreateFromSHA(newStore->dataStore, headCommitObj);
+    LCRelease(headCommitObj);
+  } else {
+    newStore->head = LCCommitCreate(newStore->dataStore, NULL, NULL);
+  }
   return newStore;
 };
 
@@ -36,7 +42,7 @@ void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
   
   LCTreeRef newTree = buildTree(store, LCCommitTree(store->head), keyValueSHAs, addPathsLength, deletePaths, deletePathsLength);
   
-  LCCommitRef newHead = LCCommitCreate(store->head, newTree);
+  LCCommitRef newHead = LCCommitCreate(store->dataStore, store->head, newTree);
   setStoreHead(store, newHead);
 }
 

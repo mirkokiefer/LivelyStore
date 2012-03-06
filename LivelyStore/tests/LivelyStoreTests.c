@@ -250,7 +250,7 @@ static char* test_tree_operations() {
 
 static char* test_library_interface() {
   struct LCStoreBackend* backend = createLCMemoryStoreBackend("test_interface");
-  LCStoreRef store = LCStoreCreate(backend);
+  LCStoreRef store = LCStoreCreate(backend, NULL);
   
   LCStageRef stage1 = LCStageCreate();
   char* data1 = "123456";
@@ -302,6 +302,13 @@ static char* test_library_interface() {
   char historyBuffer[historyLength][LC_SHA1_HEX_Length];
   LCStoreCommitHistory(store, historyBuffer, 0, historyLength);
   mu_assert("commit history", strcmp(historyBuffer[1], head1)==0);
+  
+  // create new store from commit SHA
+  LCStoreRef store2 = LCStoreCreate(backend, head1);
+  char dataSHA7[LC_SHA1_HEX_Length];
+  LCStoreDataSHA(store2, NULL, "tree1/value1", dataSHA7);
+  mu_assert("create store from commit SHA", strcmp(dataSHA7, dataSHA1)==0);
+  
   return 0;
 }
 

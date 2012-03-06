@@ -58,6 +58,16 @@ LCStringRef LCDataStoreGetTreeData(LCDataStoreRef store, LCStringRef sha) {
   return stringData;
 }
 
+LCStringRef LCDataStoreGetCommitData(LCDataStoreRef store, LCStringRef sha) {
+  LCDataRef data = getData(store, LCCommit, sha);
+  if (data == NULL) {
+    return NULL;
+  }
+  LCStringRef stringData = LCStringCreate((char*)LCDataDataRef(data));
+  LCRelease(data);
+  return stringData;
+}
+
 void LCDataStoreDealloc(void* object) {
   LCDataStoreRef store = (LCDataStoreRef)object;
   LCRelease(store->location);
@@ -77,6 +87,9 @@ LCDataRef getData(LCDataStoreRef store, LCDataType type, LCStringRef key) {
   LCGetDataCb getCb = store->backend->getCb;
   LCGetDataLengthCb lengthCb = store->backend->getLengthCb;
   size_t length = lengthCb(store->backend->storeObject, type, LCStringStringRef(key));
+  if (length == -1) {
+    return NULL;
+  }
   LCByte buffer[length];
   getCb(store->backend->storeObject, type, LCStringStringRef(key), buffer);
   return LCDataCreate(buffer, length);
