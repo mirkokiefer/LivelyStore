@@ -41,9 +41,15 @@ LCStringRef LCCommitSHA(LCCommitRef commit) {
 }
 
 LCStringRef LCCommitCreateSerializedString(LCCommitRef commit) {
-  char* parentSHA = LCStringStringRef(LCCommitSHA(commit->parent));
-  char* treeSHA = LCStringStringRef(LCTreeSHA(commit->tree));
-  char string[LC_SHA1_Length + 1 + LC_SHA1_Length + 1];
+  char* parentSHA = "";
+  if (commit->parent) {
+    parentSHA = LCStringStringRef(LCCommitSHA(commit->parent));
+  }
+  char* treeSHA = "";
+  if (commit->tree) {
+    treeSHA = LCStringStringRef(LCTreeSHA(commit->tree));
+  }
+  char string[LC_SHA1_Length + 1 + LC_SHA1_Length];
   sprintf(string, "%s\n%s", parentSHA, treeSHA);
   return LCStringCreate(string);
 }
