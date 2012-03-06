@@ -256,7 +256,7 @@ static char* test_library_interface() {
   LCStoreDataSHA(store, head1, "value2", dataSHA2);
   LCStoreDataSHA(store, head1, "tree1/tree1_1/value3", dataSHA3);
 
-  mu_assert("commited objects are stored", (strcmp(dataSHA1, "7c4a8d09ca3762af61e59520943dc26494f8941b")==0) &&
+  mu_assert("commited objects and verify", (strcmp(dataSHA1, "7c4a8d09ca3762af61e59520943dc26494f8941b")==0) &&
             (strcmp(dataSHA2, "20eabe5d64b0e216796e834f52d61fd0b70332fc")==0) &&
             (strcmp(dataSHA3, "caaf32408c386c8d6db5112225e5faf59efa88e2")==0));
 
@@ -268,17 +268,15 @@ static char* test_library_interface() {
   
   char dataSHA4[LC_SHA1_HEX_Length];
   char dataSHA5[LC_SHA1_HEX_Length];
-  LCSuccess succ4 = LCStoreDataSHA(store, NULL, "tree1/value1", dataSHA4);
+  LCStoreDataSHA(store, NULL, "tree1/value1", dataSHA4);
   LCSuccess succ5 = LCStoreDataSHA(store, NULL, "tree1/tree1_1/value3", dataSHA5);
-  mu_assert("subsequent commits are stored correctly", (strcmp(dataSHA4, "f7c3bc1d808e04732adf679965ccc34ca7ae3441")==0) &&
+  mu_assert("perform subsequent commit", (strcmp(dataSHA4, "f7c3bc1d808e04732adf679965ccc34ca7ae3441")==0) &&
             succ5 == LCSuccessFalse);
 
   
   char dataSHA6[LC_SHA1_HEX_Length];
-  LCSuccess succ6 = LCStoreDataSHA(store, head1, "tree1/value1", dataSHA6);
-
-  printf("%s\n", dataSHA4);
-
+  LCStoreDataSHA(store, head1, "tree1/value1", dataSHA6);
+  mu_assert("retrieving previous commit data", strcmp(dataSHA6, dataSHA1)==0);
   
   return 0;
 }
