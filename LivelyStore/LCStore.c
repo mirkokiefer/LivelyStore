@@ -17,21 +17,15 @@ LCType typeStore = {
   .dealloc = LCStoreDealloc
 };
 
-LCStoreRef LCStoreCreate(char* location) {
+LCStoreRef LCStoreCreate(struct LCStoreBackend* backend) {
   LCStoreRef newStore = malloc(sizeof(struct LCStore));
   if (newStore != NULL) {
     newStore->info.type = &typeStore;
-    LCStringRef lcLocation = LCStringCreate(location);
-    newStore->dataStore = LCDataStoreCreate(lcLocation);
+    newStore->dataStore = LCDataStoreCreate(backend);
     newStore->head = LCCommitCreate(NULL, NULL);
-    LCRelease(lcLocation);
   }
   return newStore;
 };
-
-void LCStoreSetBackend(LCStoreRef store, struct LCStoreBackend* backend) {
-  LCDataStoreSetBackend(store->dataStore, backend);
-}
 
 void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
   LCKeyValueRef* addPaths = LCStagePathsToAdd(stage);

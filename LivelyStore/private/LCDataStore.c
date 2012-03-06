@@ -17,19 +17,14 @@ LCType typeDataStore = {
   .dealloc = LCDataStoreDealloc
 };
 
-LCDataStoreRef LCDataStoreCreate(LCStringRef location) {
+LCDataStoreRef LCDataStoreCreate(struct LCStoreBackend* backend) {
   LCDataStoreRef newStore = malloc(sizeof(struct LCDataStore));
   if (newStore != NULL) {
     newStore->info.type = &typeDataStore;
-    LCRetain(location);
-    newStore->location = location;
+    newStore->backend = backend;
   }
   return newStore;
 };
-
-void LCDataStoreSetBackend(LCDataStoreRef store, struct LCStoreBackend* backend) {
-  store->backend = backend;
-}
 
 void LCDataStorePutData(LCDataStoreRef store, LCStringRef sha, LCDataRef data) {
   putData(store, LCData, sha, LCDataDataRef(data), LCDataLength(data));

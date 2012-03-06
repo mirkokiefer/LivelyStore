@@ -4,9 +4,7 @@
 
 #include "LivelyStore.h"
 
-LCDataStoreRef LCDataStoreCreate(LCStringRef location);
-void LCDataStoreSetBackend(LCDataStoreRef store, struct LCStoreBackend* backend);
-
+LCDataStoreRef LCDataStoreCreate(struct LCStoreBackend* backend);
 void LCDataStorePutData(LCDataStoreRef store, LCStringRef sha, LCDataRef data);
 void LCDataStoreDeleteData(LCDataStoreRef store, LCStringRef sha);
 void LCDataStorePutTreeData(LCDataStoreRef store, LCStringRef sha, LCStringRef data);
