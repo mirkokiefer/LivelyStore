@@ -54,8 +54,10 @@ static void treeSetSHA(LCTreeRef tree, LCStringRef sha) {
   if (sha != tree->sha) {
     LCRelease(tree->sha);
   }
-  tree->sha = LCRetain(sha);
-  LCDataStorePutTreeData(treeStore(tree), sha, LCTreeCreateSerializedString(tree));
+  if (sha) {
+    tree->sha = LCRetain(sha);
+    LCDataStorePutTreeData(treeStore(tree), sha, LCTreeCreateSerializedString(tree));
+  }
 }
 
 static void treeSetChildTrees(LCTreeRef tree, LCDictionaryRef childTrees) {
@@ -96,8 +98,10 @@ static LCDictionaryRef treeChildData(LCTreeRef tree) {
 
 static void treeDeserialize(LCTreeRef tree) {
   LCStringRef data = LCDataStoreGetTreeData(treeStore(tree), treeSHA(tree));
-  LCArrayRef lines = LCStringCreateTokens(data, '\n');
+  LCArrayRef tokens = LCStringCreateTokens(data, '\n');
+  LCArrayRef lines = LCArrayCreateSubArray(tokens, 0, LCArrayLength(tokens)-1);
   LCRelease(data);
+  LCRelease(tokens);
   LCDictionaryRef childTrees = LCDictionaryCreate(NULL, 0);
   LCDictionaryRef childData = LCDictionaryCreate(NULL, 0);
   LCInteger i;
@@ -112,15 +116,15 @@ static void treeDeserialize(LCTreeRef tree) {
       sscanf(LCStringStringRef(currentLine), "%s %s", keyBuffer, shaBuffer);
       LCStringRef key = LCStringCreate(keyBuffer);
       LCStringRef sha = LCStringCreate(shaBuffer);
-      LCTreeRef tree = LCTreeCreateFromSHA(treeStore(tree), sha);
-      LCDictionarySetValueForKey(childTrees, key, tree);
+      LCTreeRef childTree = LCTreeCreateFromSHA(treeStore(tree), sha);
+      LCDictionarySetValueForKey(childTrees, key, childTree);
       LCRelease(key);
       LCRelease(sha);
-      LCRelease(tree);
+      LCRelease(childTree);
     }
   }
   // read child data
-  for (; i<LCArrayLength(lines); i++) {
+  for (i=i+1; i<LCArrayLength(lines); i++) {
     LCStringRef currentLine = (LCStringRef)LCArrayObjectAtIndex(lines, i);
     char keyBuffer[LCStringLength(currentLine)-LC_SHA1_HEX_Length];
     char shaBuffer[LC_SHA1_HEX_Length];
@@ -139,6 +143,7 @@ static void treeDeserialize(LCTreeRef tree) {
 LCTreeRef LCTreeCreateFromSHA(LCDataStoreRef store, LCStringRef sha) {
   LCTreeRef newTree = treeCreate();
   newTree->sha = LCRetain(sha);
+  newTree->store = LCRetain(store);
   return newTree;
 }
 

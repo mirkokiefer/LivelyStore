@@ -210,6 +210,12 @@ static char* test_tree() {
   void* path2C[] = {tree1Key, key1};
   LCArrayRef path2 = LCArrayCreate(path2C, 2);
   mu_assert("LCTreeChildDataAtPath", (LCTreeChildDataAtPath(tree2, path1)==value2SHA) && (LCTreeChildDataAtPath(tree2, path2)==value1SHA));
+  
+  LCTreeRef tree2FromSHA = LCTreeCreateFromSHA(testStore, tree2SHA);
+  LCStringRef lazyData1 = LCTreeChildDataAtPath(tree2FromSHA, path1);
+  LCStringRef lazyData2 = LCTreeChildDataAtPath(tree2FromSHA, path2);
+  mu_assert("lazy loading of tree", LCStringEqual(lazyData1, value2SHA) && LCStringEqual(lazyData2, value1SHA));
+
   return 0;
 }
 
