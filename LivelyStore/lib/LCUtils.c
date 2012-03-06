@@ -103,7 +103,7 @@ LCByte hexDigitsToByte(char* hexDigits) {
 }
 
 LCStringRef createHexString(LCByte data[], size_t length) {
-  char buffer[length*2];
+  char buffer[length*2+1];
   for(LCInteger i=0; i<length; i++) {
     byteToHexDigits(data[i], &buffer[i*2]);
   }

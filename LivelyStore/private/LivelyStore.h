@@ -67,7 +67,7 @@ struct LCObjectInfo {
 };
 
 #define LC_SHA1_Length 20
-#define LC_SHA1_HEX_Length 40
+#define LC_SHA1_HEX_Length 41
 
 #endif
 

@@ -166,7 +166,7 @@ size_t childrenSerializationBufferSize(LCTreeRef tree) {
   for (LCInteger i=0; i<LCDictionaryLength(tree->childData); i++) {
     sumPathLength = sumPathLength + LCStringLength(LCKeyValueKey(keyValues[i]));
   }
-  return sumPathLength + childrenLength * (LC_SHA1_HEX_Length + 2);
+  return sumPathLength + childrenLength * (LC_SHA1_HEX_Length + 1);
 }
 
 void serializeChildTrees(LCDictionaryRef childTrees, char buffer[]) {
