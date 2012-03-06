@@ -96,16 +96,9 @@ static LCDictionaryRef treeChildData(LCTreeRef tree) {
   return tree->childData;
 }
 
-static void treeDeserialize(LCTreeRef tree) {
-  LCStringRef data = LCDataStoreGetTreeData(treeStore(tree), treeSHA(tree));
-  LCArrayRef tokens = LCStringCreateTokens(data, '\n');
-  LCArrayRef lines = LCArrayCreateSubArray(tokens, 0, LCArrayLength(tokens)-1);
-  LCRelease(data);
-  LCRelease(tokens);
-  LCDictionaryRef childTrees = LCDictionaryCreate(NULL, 0);
-  LCDictionaryRef childData = LCDictionaryCreate(NULL, 0);
-  LCInteger i;
+static void treeDeserializeLines(LCTreeRef tree, LCArrayRef lines, LCDictionaryRef childTrees, LCDictionaryRef childData) {
   // read child trees
+  LCInteger i;
   for (i=0; i<LCArrayLength(lines); i++) {
     LCStringRef currentLine = (LCStringRef)LCArrayObjectAtIndex(lines, i);
     if (LCStringEqualCString(currentLine, "")) {
@@ -134,6 +127,19 @@ static void treeDeserialize(LCTreeRef tree) {
     LCDictionarySetValueForKey(childData, key, sha);
     LCRelease(key);
     LCRelease(sha);
+  }
+}
+
+static void treeDeserialize(LCTreeRef tree) {
+  LCStringRef data = LCDataStoreGetTreeData(treeStore(tree), treeSHA(tree));
+  LCArrayRef tokens = LCStringCreateTokens(data, '\n');
+  LCArrayRef lines = LCArrayCreateSubArray(tokens, 0, LCArrayLength(tokens)-1);
+  LCRelease(data);
+  LCRelease(tokens);
+  LCDictionaryRef childTrees = LCDictionaryCreate(NULL, 0);
+  LCDictionaryRef childData = LCDictionaryCreate(NULL, 0);
+  if(LCArrayLength(lines)>1) {
+    treeDeserializeLines(tree, lines, childTrees, childData);    
   }
   LCRelease(lines);
   treeSetChildTrees(tree, childTrees);
@@ -222,7 +228,13 @@ LCStringRef LCTreeChildDataAtPath(LCTreeRef tree, LCArrayRef path) {
     return LCTreeChildDataAtKey(tree, first);
   } else {
     LCArrayRef rest = LCArrayCreateSubArray(path, 1, -1);
-    LCStringRef result = LCTreeChildDataAtPath(LCTreeChildTreeAtKey(tree, first), rest);
+    LCTreeRef childTree = LCTreeChildTreeAtKey(tree, first);
+    LCStringRef result;
+    if (childTree) {
+      result = LCTreeChildDataAtPath(childTree, rest);
+    } else {
+      result = NULL;
+    }
     LCRelease(rest);
     return result;
   }

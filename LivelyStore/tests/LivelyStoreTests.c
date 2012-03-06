@@ -216,6 +216,12 @@ static char* test_tree() {
   LCStringRef lazyData2 = LCTreeChildDataAtPath(tree2FromSHA, path2);
   mu_assert("lazy loading of tree", LCStringEqual(lazyData1, value2SHA) && LCStringEqual(lazyData2, value1SHA));
 
+  
+  LCTreeRef nullTree = LCTreeCreate(testStore, NULL, NULL);
+  LCStringRef nullTreeSHA = LCTreeSHA(nullTree);
+  LCTreeRef nullTreeFromSHA = LCTreeCreateFromSHA(testStore, nullTreeSHA);
+  mu_assert("test null tree", LCTreeChildDataAtPath(nullTreeFromSHA, path2)==NULL);
+  
   return 0;
 }
 
