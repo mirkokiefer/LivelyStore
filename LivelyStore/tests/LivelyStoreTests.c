@@ -167,21 +167,6 @@ static char* test_data() {
   return 0;
 }
 
-static char* test_stage() {
-  char* path1 = "path1";
-  char* path2 = "path2";
-  LCByte value1[] = "12345";
-  LCByte value2[] = "67890";
-  
-  LCStageRef stage = LCStageCreate();
-  LCStageAddEntry(stage, path1, value1, 5);
-  LCStageAddEntry(stage, path2, value2, 5);
-  
-  LCKeyValueRef* entries = LCStagePathsToAdd(stage);
-  mu_assert("LCStage stores entries correctly", (LCStringEqual(LCKeyValueKey(entries[0]), LCStringCreate(path1))));
-  return 0;
-}
-
 static char* test_tree() {
   LCStringRef key1 = LCStringCreate("path1");
   LCStringRef key2 = LCStringCreate("path2");
@@ -256,7 +241,6 @@ static char* all_tests() {
   mu_run_test(test_data);
   mu_run_test(test_dictionary);
   mu_run_test(test_sha1);
-  mu_run_test(test_stage);
   mu_run_test(test_tree);
   mu_run_test(test_tree_operations);
   return 0;

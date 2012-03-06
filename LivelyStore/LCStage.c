@@ -25,18 +25,22 @@ LCStageRef LCStageCreate() {
 
 void LCStageAddEntry(LCStageRef stage, char* path, unsigned char data[], size_t length) {  
   LCStringRef lcPath = LCStringCreate(path);
+  LCArrayRef pathArray = createPathArray(lcPath);
   LCDataRef lcData = LCDataCreate(data, length);
-  LCKeyValueRef keyValue = LCKeyValueCreate(lcPath, lcData);
+  LCKeyValueRef keyValue = LCKeyValueCreate(pathArray, lcData);
   LCRelease(lcPath);
+  LCRelease(pathArray);
   LCRelease(lcData);
   
   LCMutableArrayAddObject(stage->addPathValues, keyValue);
 }
 
-void LCStageDeletePath(LCStageRef stage, char* key) {
-  LCStringRef keyString = LCStringCreate(key);
-  LCMutableArrayAddObject(stage->deletePaths, keyString);
-  LCRelease(keyString);
+void LCStageDeletePath(LCStageRef stage, char* path) {
+  LCStringRef lcPath = LCStringCreate(path);
+  LCArrayRef pathArray = createPathArray(lcPath);
+  LCMutableArrayAddObject(stage->deletePaths, pathArray);
+  LCRelease(lcPath);
+  LCRelease(pathArray);
 }
 
 LCKeyValueRef* LCStagePathsToAdd(LCStageRef stage) {
