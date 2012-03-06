@@ -4,7 +4,7 @@
 
 #include "LivelyStore.h"
 
-LCMemoryStoreRef LCMemoryStoreCreate(char* location);
-void LCMemoryStoreRegister(LCMemoryStoreRef store, LCStoreRef storeInterface);
+struct LCStoreBackend* createLCMemoryStoreBackend(char* location);
+void freeLCMemoryStore(struct LCStoreBackend* backend);
 
 #endif

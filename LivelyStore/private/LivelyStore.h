@@ -30,9 +30,6 @@ typedef struct LCCommit* LCCommitRef;
 typedef struct LCMutableArray* LCMutableArrayRef;
 typedef struct LCDictionary* LCDictionaryRef;
 
-typedef struct LCMemoryStore* LCMemoryStoreRef;
-typedef struct LCFileStore* LCFileStoreRef;
-
 typedef enum {
   LCData,
   LCTree,
@@ -68,6 +65,14 @@ struct LCType {
 struct LCObjectInfo {
   LCInteger rCount;
   LCTypeRef type;
+};
+
+struct LCStoreBackend {
+  void* storeObject;
+  LCStoreDataCb storeCb;
+  LCDeleteDataCb deleteCb;
+  LCGetDataCb getCb;
+  LCGetDataLengthCb getLengthCb;
 };
 
 #define LC_SHA1_Length 20

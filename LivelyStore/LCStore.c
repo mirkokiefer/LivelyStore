@@ -29,24 +29,8 @@ LCStoreRef LCStoreCreate(char* location) {
   return newStore;
 };
 
-void LCStoreSetStoreObject(LCStoreRef store, void* storeObject) {
-  LCDataStoreSetStoreObject(store->dataStore, storeObject);
-}
-
-void LCStoreSetStoreCallback(LCStoreRef store, LCStoreDataCb callback) {
-  LCDataStoreSetNewDataCallback(store->dataStore, callback);
-}
-
-void LCStoreSetDeleteCallback(LCStoreRef store, LCDeleteDataCb callback) {
-  LCDataStoreSetDeletedDataCallback(store->dataStore, callback);
-}
-
-void LCStoreSetGetDataCallback(LCStoreRef store, LCGetDataCb callback) {
-  LCDataStoreSetGetDataCallback(store->dataStore, callback);
-}
-
-void LCStoreSetGetDataLengthCallback(LCStoreRef store, LCGetDataLengthCb callback) {
-  LCDataStoreSetGetDataLengthCallback(store->dataStore, callback);
+void LCStoreSetBackend(LCStoreRef store, struct LCStoreBackend* backend) {
+  LCDataStoreSetBackend(store->dataStore, backend);
 }
 
 void LCStoreCommit(LCStoreRef store, LCStageRef stage) {

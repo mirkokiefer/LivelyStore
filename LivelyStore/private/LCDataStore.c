@@ -8,11 +8,7 @@ LCDataRef getData(LCDataStoreRef store, LCDataType type, LCStringRef key);
 struct LCDataStore {
   LCObjectInfo info;
   LCStringRef location;
-  void* storeObject;
-  LCStoreDataCb storeCb;
-  LCDeleteDataCb deleteCb;
-  LCGetDataCb getCb;
-  LCGetDataLengthCb getLengthCb;
+  struct LCStoreBackend* backend;
 };
 
 void LCDataStoreDealloc(void* object);
@@ -31,24 +27,8 @@ LCDataStoreRef LCDataStoreCreate(LCStringRef location) {
   return newStore;
 };
 
-void LCDataStoreSetStoreObject(LCDataStoreRef store, void* storeObject) {
-  store->storeObject = LCRetain(storeObject);
-}
-
-void LCDataStoreSetNewDataCallback(LCDataStoreRef store, LCStoreDataCb callback) {
-  store->storeCb = callback;
-}
-
-void LCDataStoreSetDeletedDataCallback(LCDataStoreRef store, LCDeleteDataCb callback) {
-  store->deleteCb = callback;
-}
-
-void LCDataStoreSetGetDataCallback(LCDataStoreRef store, LCGetDataCb callback) {
-  store->getCb = callback;
-}
-
-void LCDataStoreSetGetDataLengthCallback(LCDataStoreRef store, LCGetDataLengthCb callback) {
-  store->getLengthCb = callback;
+void LCDataStoreSetBackend(LCDataStoreRef store, struct LCStoreBackend* backend) {
+  store->backend = backend;
 }
 
 void LCDataStorePutData(LCDataStoreRef store, LCStringRef sha, LCDataRef data) {
@@ -84,16 +64,20 @@ void LCDataStoreDealloc(void* object) {
 }
 
 void putData(LCDataStoreRef store, LCDataType type, LCStringRef key, LCByte data[], size_t length) {
-  store->storeCb(store->storeObject, type, LCStringStringRef(key), (unsigned char*)data, length);
+  LCStoreDataCb cb = store->backend->storeCb;
+  cb(store->backend->storeObject, type, LCStringStringRef(key), (unsigned char*)data, length);
 }
 
 void deleteData(LCDataStoreRef store, LCDataType type, LCStringRef key) {
-  store->deleteCb(store->storeObject, type, LCStringStringRef(key));
+  LCDeleteDataCb cb = store->backend->deleteCb;
+  cb(store->backend->storeObject, type, LCStringStringRef(key));
 }
 
 LCDataRef getData(LCDataStoreRef store, LCDataType type, LCStringRef key) {
-  size_t length = store->getLengthCb(store->storeObject, type, LCStringStringRef(key));
+  LCGetDataCb getCb = store->backend->getCb;
+  LCGetDataLengthCb lengthCb = store->backend->getLengthCb;
+  size_t length = lengthCb(store->backend->storeObject, type, LCStringStringRef(key));
   LCByte buffer[length];
-  store->getCb(store->storeObject, type, LCStringStringRef(key), buffer);
+  getCb(store->backend->storeObject, type, LCStringStringRef(key), buffer);
   return LCDataCreate(buffer, length);
 }
