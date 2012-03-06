@@ -5,6 +5,6 @@
 #include "LivelyStore.h"
 
 struct LCStoreBackend* createLCMemoryStoreBackend(char* location);
-void freeLCMemoryStore(struct LCStoreBackend* backend);
+void freeLCMemoryStoreBackend(struct LCStoreBackend* backend);
 
 #endif

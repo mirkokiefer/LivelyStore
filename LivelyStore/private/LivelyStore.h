@@ -94,6 +94,6 @@ struct LCStoreBackend {
 #include "LCArray.h"
 #include "LCMutableArray.h"
 #include "LCDictionary.h"
-#include "LCMemoryStore.h"
-#include "LCFileStore.h"
+#include "LCMemoryStoreBackend.h"
+#include "LCFileStoreBackend.h"
 

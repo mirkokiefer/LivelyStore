@@ -1,5 +1,5 @@
 
-#include "LCMemoryStore.h"
+#include "LCMemoryStoreBackend.h"
 
 typedef struct LCMemoryStore* LCMemoryStoreRef;
 
@@ -50,7 +50,7 @@ struct LCStoreBackend* createLCMemoryStoreBackend(char* location) {
   return backend;
 }
 
-void freeLCMemoryStore(struct LCStoreBackend* backend) {
+void freeLCMemoryStoreBackend(struct LCStoreBackend* backend) {
   LCRelease(backend->storeObject);
   free(backend);
 }
