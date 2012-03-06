@@ -19,6 +19,7 @@ LCDataRef LCDataCreate(LCByte data[], size_t length) {
   if (newData != NULL) {
     newData->info.type = &typeData;
     newData->length = length;
+    newData->sha = NULL;
     memcpy(newData->data, data, length*sizeof(LCByte));
   }
   return newData;

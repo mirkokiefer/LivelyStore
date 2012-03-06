@@ -30,6 +30,10 @@ static LCTreeRef treeCreate() {
   LCTreeRef newTree = malloc(sizeof(struct LCTree));
   if (newTree) {
     newTree->info.type = &typeTree;
+    newTree->store = NULL;
+    newTree->sha = NULL;
+    newTree->childTrees = NULL;
+    newTree->childData = NULL;
   }
   return newTree;
 }
