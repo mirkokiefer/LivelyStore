@@ -10,6 +10,7 @@ void LCDataStoreDeleteData(LCDataStoreRef store, LCStringRef sha);
 void LCDataStorePutTreeData(LCDataStoreRef store, LCStringRef sha, LCStringRef data);
 void LCDataStorePutCommitData(LCDataStoreRef store, LCStringRef sha, LCStringRef data);
 void LCDataStorePutTagData(LCDataStoreRef store, LCStringRef tag, LCStringRef data);
+LCDataRef LCDataStoreGetData(LCDataStoreRef store, LCStringRef sha);
 LCStringRef LCDataStoreGetTreeData(LCDataStoreRef store, LCStringRef sha);
 
 #endif

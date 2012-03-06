@@ -12,6 +12,7 @@ void storeDataWithSHAs(LCStoreRef store, LCKeyValueRef addPaths[], size_t length
 LCTreeRef buildTree(LCStoreRef store, LCTreeRef current, LCKeyValueRef* addPathSHAs, size_t newLength,
                     LCStringRef* delete, size_t deleteLength);
 void setStoreHead(LCStoreRef store, LCCommitRef newHead);
+LCCommitRef storeCommit(LCStoreRef store, LCStringRef sha);
 
 LCType typeStore = {
   .dealloc = LCStoreDealloc
@@ -37,6 +38,73 @@ void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
   
   LCCommitRef newHead = LCCommitCreate(store->head, newTree);
   setStoreHead(store, newHead);
+}
+
+void LCStoreHead(LCStoreRef store, char* buffer) {
+  strcpy(buffer, LCStringStringRef(LCCommitSHA(store->head)));
+}
+
+size_t LCStoreCommitHistoryLength(LCStoreRef store) {
+  LCCommitRef commit = store->head;
+  size_t count = 0;
+  while (commit != NULL) {
+    count++;
+    commit = LCCommitParent(commit);
+  }
+  return count;
+}
+
+LCSuccess LCStoreCommitHistory(LCStoreRef store, char* commitsSHABuffer[], size_t start, size_t elements) {
+  LCCommitRef commit = store->head;
+  for (LCInteger i=0; i<start; i++) {
+    commit = LCCommitParent(commit);
+  }
+  for (LCInteger i=0; i<elements; i++) {
+    strcpy(commitsSHABuffer[i], LCStringStringRef(LCCommitSHA(commit)));
+    commit = LCCommitParent(commit);
+  }
+  return LCSuccessTrue;
+}
+
+LCSuccess LCStoreDataSHA(LCStoreRef store, char* commit, char* path, char* dataSHABuffer) {
+  LCCommitRef commitObj;
+  if (commit) {
+    LCStringRef commitSHAObj = LCStringCreate(commit);
+    commitObj = storeCommit(store, commitSHAObj); 
+    LCRelease(commitSHAObj);
+  } else {
+    commitObj = store->head;
+  }
+  LCStringRef pathObj = LCStringCreate(path);
+  LCArrayRef pathArray = createPathArray(pathObj);
+  LCStringRef dataSHA = LCTreeChildDataAtPath(LCCommitTree(commitObj), pathArray);
+  if (dataSHA) {
+    strcpy(dataSHABuffer, LCStringStringRef(dataSHA));
+  } else {
+    return LCSuccessFalse;
+  }
+  LCRelease(pathObj);
+  LCRelease(pathArray);
+  return LCSuccessTrue;
+}
+
+size_t LCStoreDataLength(LCStoreRef store, char* sha);
+
+LCSuccess LCStoreData(LCStoreRef store, char* sha, unsigned char dataBuffer[]) {
+  LCStringRef shaObj = LCStringCreate(sha);
+  LCDataRef data = LCDataStoreGetData(store->dataStore, shaObj);
+  if (data) {
+    memcpy(dataBuffer, LCDataDataRef(data), LCDataLength(data)*sizeof(LCByte));    
+  } else {
+    return LCSuccessFalse;
+  }
+  return LCSuccessTrue;
+}
+
+void LCStoreDealloc(void* object) {
+  LCStoreRef store = (LCStoreRef)object;
+  LCRelease(store->dataStore);
+  LCRelease(store->head);
 }
 
 void storeDataWithSHAs(LCStoreRef store, LCKeyValueRef addPaths[], size_t length, LCKeyValueRef pathSHABuffer[]) {
@@ -65,12 +133,19 @@ LCTreeRef buildTree(LCStoreRef store, LCTreeRef current, LCKeyValueRef addPathSH
 }
 
 void setStoreHead(LCStoreRef store, LCCommitRef newHead) {
-  LCRelease(store->head);
+  if (newHead != store->head) {
+    LCRelease(store->head);
+  }
   store->head = newHead;
 }
 
-void LCStoreDealloc(void* object) {
-  LCStoreRef store = (LCStoreRef)object;
-  LCRelease(store->dataStore);
-  LCRelease(store->head);
+LCCommitRef storeCommit(LCStoreRef store, LCStringRef sha) {
+  LCCommitRef commit = store->head;
+  while (LCStringEqual(LCCommitSHA(commit), sha) == false) {
+    commit = LCCommitParent(commit);
+    if (commit == NULL) {
+      return NULL;
+    }
+  }
+  return commit;
 }

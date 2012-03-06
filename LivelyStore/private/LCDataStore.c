@@ -43,6 +43,10 @@ void LCDataStorePutTagData(LCDataStoreRef store, LCStringRef tag, LCStringRef da
   //TODO
 }
 
+LCDataRef LCDataStoreGetData(LCDataStoreRef store, LCStringRef sha) {
+  return getData(store, LCData, sha);
+}
+
 LCStringRef LCDataStoreGetTreeData(LCDataStoreRef store, LCStringRef sha) {
   LCDataRef data = getData(store, LCTree, sha);
   LCStringRef stringData = LCStringCreate((char*)LCDataDataRef(data));

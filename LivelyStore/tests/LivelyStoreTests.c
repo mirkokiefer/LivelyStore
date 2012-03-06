@@ -236,8 +236,56 @@ static char* test_tree_operations() {
   return 0;
 }
 
+static char* test_library_interface() {
+  struct LCStoreBackend* backend = createLCMemoryStoreBackend("test_interface");
+  LCStoreRef store = LCStoreCreate(backend);
+  
+  LCStageRef stage1 = LCStageCreate();
+  LCStageAddEntry(stage1, "tree1/value1", (LCByte*)"123456", 6);
+  LCStageAddEntry(stage1, "value2", (LCByte*)"1234567", 7);
+  LCStageAddEntry(stage1, "tree1/tree1_1/value3", (LCByte*)"1234568", 8);
+  
+  LCStoreCommit(store, stage1);
+  char head1[LC_SHA1_HEX_Length];
+  LCStoreHead(store, head1);
+  
+  char dataSHA1[LC_SHA1_HEX_Length];
+  char dataSHA2[LC_SHA1_HEX_Length];
+  char dataSHA3[LC_SHA1_HEX_Length];
+  LCStoreDataSHA(store, head1, "tree1/value1", dataSHA1);
+  LCStoreDataSHA(store, head1, "value2", dataSHA2);
+  LCStoreDataSHA(store, head1, "tree1/tree1_1/value3", dataSHA3);
+
+  mu_assert("commited objects are stored", (strcmp(dataSHA1, "7c4a8d09ca3762af61e59520943dc26494f8941b")==0) &&
+            (strcmp(dataSHA2, "20eabe5d64b0e216796e834f52d61fd0b70332fc")==0) &&
+            (strcmp(dataSHA3, "caaf32408c386c8d6db5112225e5faf59efa88e2")==0));
+
+  // another commit
+  LCStageRef stage2 = LCStageCreate();
+  LCStageAddEntry(stage2, "tree1/value1", (LCByte*)"123456789", 9);
+  LCStageDeletePath(stage2, "tree1/tree1_1/value3");
+  LCStoreCommit(store, stage2);
+  
+  char dataSHA4[LC_SHA1_HEX_Length];
+  char dataSHA5[LC_SHA1_HEX_Length];
+  LCSuccess succ4 = LCStoreDataSHA(store, NULL, "tree1/value1", dataSHA4);
+  LCSuccess succ5 = LCStoreDataSHA(store, NULL, "tree1/tree1_1/value3", dataSHA5);
+  mu_assert("subsequent commits are stored correctly", (strcmp(dataSHA4, "f7c3bc1d808e04732adf679965ccc34ca7ae3441")==0) &&
+            succ5 == LCSuccessFalse);
+
+  
+  char dataSHA6[LC_SHA1_HEX_Length];
+  LCSuccess succ6 = LCStoreDataSHA(store, head1, "tree1/value1", dataSHA6);
+
+  printf("%s\n", dataSHA4);
+
+  
+  return 0;
+}
+
 static char* all_tests() {
-  testStore = LCDataStoreCreate(NULL);
+  struct LCStoreBackend* backend = createLCMemoryStoreBackend("testing");
+  testStore = LCDataStoreCreate(backend);
   mu_run_test(test_retain_counting);
   mu_run_test(test_string);
   mu_run_test(test_array);
@@ -246,6 +294,7 @@ static char* all_tests() {
   mu_run_test(test_sha1);
   mu_run_test(test_tree);
   mu_run_test(test_tree_operations);
+  mu_run_test(test_library_interface);
   return 0;
 }
 

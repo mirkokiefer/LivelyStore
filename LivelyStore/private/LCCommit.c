@@ -34,6 +34,7 @@ LCStringRef LCCommitSHA(LCCommitRef commit) {
   if(commit->sha == NULL) {
     LCStringRef serialized = LCCommitCreateSerializedString(commit);
     commit->sha = LCStringCreateSHAString(serialized);
+    LCRelease(serialized);
   }
   return commit->sha;
 }
@@ -47,7 +48,7 @@ LCStringRef LCCommitCreateSerializedString(LCCommitRef commit) {
   if (commit->tree) {
     treeSHA = LCStringStringRef(LCTreeSHA(commit->tree));
   }
-  char string[LC_SHA1_Length + 1 + LC_SHA1_Length];
+  char string[LC_SHA1_HEX_Length + 1 + LC_SHA1_HEX_Length];
   sprintf(string, "%s\n%s", parentSHA, treeSHA);
   return LCStringCreate(string);
 }
@@ -56,4 +57,5 @@ void LCCommitDealloc(void* object) {
   LCCommitRef commit = (LCCommitRef)object;
   LCRelease(commit->parent);
   LCRelease(commit->tree);
+  LCRelease(commit->sha);
 }

@@ -42,6 +42,11 @@ typedef enum {
   LCSmaller
 } LCCompare;
 
+typedef enum {
+  LCSuccessTrue,
+  LCSuccessFalse
+} LCSuccess;
+
 
 typedef void(*LCStoreDataCb)(void* storeObj, LCDataType type, char* sha, unsigned char data[], size_t length);
 typedef void(*LCDeleteDataCb)(void* storeObj, LCDataType type, char* sha);
