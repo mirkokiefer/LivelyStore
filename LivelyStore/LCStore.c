@@ -88,7 +88,9 @@ LCSuccess LCStoreDataSHA(LCStoreRef store, char* commit, char* path, char* dataS
   return LCSuccessTrue;
 }
 
-size_t LCStoreDataLength(LCStoreRef store, char* sha);
+size_t LCStoreDataLength(LCStoreRef store, char* sha) {
+  return LCDataStoreGetDataLength(store->dataStore, sha);
+}
 
 LCSuccess LCStoreData(LCStoreRef store, char* sha, unsigned char dataBuffer[]) {
   LCStringRef shaObj = LCStringCreate(sha);

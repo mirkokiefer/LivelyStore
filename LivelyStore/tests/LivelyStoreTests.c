@@ -241,7 +241,8 @@ static char* test_library_interface() {
   LCStoreRef store = LCStoreCreate(backend);
   
   LCStageRef stage1 = LCStageCreate();
-  LCStageAddEntry(stage1, "tree1/value1", (LCByte*)"123456", 6);
+  char* data1 = "123456";
+  LCStageAddEntry(stage1, "tree1/value1", (LCByte*)data1, 6);
   LCStageAddEntry(stage1, "value2", (LCByte*)"1234567", 7);
   LCStageAddEntry(stage1, "tree1/tree1_1/value3", (LCByte*)"1234568", 8);
   
@@ -278,6 +279,11 @@ static char* test_library_interface() {
   LCStoreDataSHA(store, head1, "tree1/value1", dataSHA6);
   mu_assert("retrieving previous commit data", strcmp(dataSHA6, dataSHA1)==0);
   
+  // retrieve actual data
+  size_t dataLength1 = LCStoreDataLength(store, dataSHA1);
+  char data1Buffer[dataLength1];
+  LCStoreData(store, dataSHA1, (LCByte*)data1Buffer);
+  mu_assert("retrieve actual data", strcmp(data1Buffer, data1)==0);
   return 0;
 }
 

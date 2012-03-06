@@ -43,6 +43,10 @@ void LCDataStorePutTagData(LCDataStoreRef store, LCStringRef tag, LCStringRef da
   //TODO
 }
 
+size_t LCDataStoreGetDataLength(LCDataStoreRef store, char* sha) {
+  return store->backend->getLengthCb(store->backend->storeObject, LCData, sha);
+}
+
 LCDataRef LCDataStoreGetData(LCDataStoreRef store, LCStringRef sha) {
   return getData(store, LCData, sha);
 }
