@@ -14,6 +14,7 @@ void processUpdatesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCMutableA
 
 struct LCTree {
   LCObjectInfo info;
+  LCDataStoreRef store;
   LCStringRef sha;
   LCDictionaryRef childTrees;
   LCDictionaryRef childData;
@@ -23,10 +24,11 @@ LCType typeTree = {
   .dealloc = LCTreeDealloc
 };
 
-LCTreeRef LCTreeCreate(LCDictionaryRef childTrees, LCDictionaryRef childDataSHAs) {
+LCTreeRef LCTreeCreate(LCDataStoreRef store, LCDictionaryRef childTrees, LCDictionaryRef childDataSHAs) {
   LCTreeRef newTree = malloc(sizeof(struct LCTree));
   if (newTree != NULL) {
     newTree->info.type = &typeTree;
+    newTree->store = LCRetain(store);
     if(childTrees) {
       LCRetain(childTrees);      
     } else {
@@ -76,7 +78,7 @@ LCStringRef LCTreeSHA(LCTreeRef tree) {
 LCTreeRef LCTreeCopy(LCTreeRef tree) {
   LCDictionaryRef childTreesCopy = LCDictionaryCopy(tree->childTrees);
   LCDictionaryRef childDataCopy = LCDictionaryCopy(tree->childData);
-  LCTreeRef treeCopy = LCTreeCreate(childTreesCopy, childDataCopy);
+  LCTreeRef treeCopy = LCTreeCreate(tree->store, childTreesCopy, childDataCopy);
   LCRelease(childTreesCopy);
   LCRelease(childDataCopy);
   return treeCopy;
@@ -114,12 +116,12 @@ LCStringRef LCTreeChildDataAtPath(LCTreeRef tree, LCArrayRef path) {
   }
 }
 
-LCTreeRef LCTreeCreateTreeUpdatingData(LCTreeRef oldTree, LCMutableArrayRef updatePathValues) {
+LCTreeRef LCTreeCreateTreeUpdatingData(LCTreeRef oldTree, LCDataStoreRef store, LCMutableArrayRef updatePathValues) {
   LCTreeRef newTree;
   if (oldTree) {
     newTree = LCTreeCopy(oldTree);    
   } else {
-    newTree = LCTreeCreate(NULL, NULL);
+    newTree = LCTreeCreate(store, NULL, NULL);
   }
   
   LCMutableArrayRef directDataUpdates = LCMutableArrayCreate(NULL, 0);
@@ -228,7 +230,7 @@ void updateChildTrees(LCTreeRef parent, LCMutableArrayRef childTreeDataUpdates) 
 
 void processUpdatesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCMutableArrayRef updatePathArrays) {
   LCTreeRef currentChildTree = LCTreeChildTreeAtKey(parent, key);
-  LCTreeRef newChildTree = LCTreeCreateTreeUpdatingData(currentChildTree, updatePathArrays);
+  LCTreeRef newChildTree = LCTreeCreateTreeUpdatingData(currentChildTree, parent->store, updatePathArrays);
   LCDictionarySetValueForKey(parent->childTrees, key, newChildTree);
   LCRelease(newChildTree);
 }

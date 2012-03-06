@@ -9,7 +9,8 @@ struct LCStore {
 
 void LCStoreDealloc(void* object);
 void storeDataWithSHAs(LCStoreRef store, LCKeyValueRef addPaths[], size_t length, LCKeyValueRef pathSHABuffer[]);
-LCTreeRef buildTree(LCTreeRef current, LCKeyValueRef* addPathSHAs, size_t newLength, LCStringRef* delete, size_t deleteLength);
+LCTreeRef buildTree(LCStoreRef store, LCTreeRef current, LCKeyValueRef* addPathSHAs, size_t newLength,
+                    LCStringRef* delete, size_t deleteLength);
 void setStoreHead(LCStoreRef store, LCCommitRef newHead);
 
 LCType typeStore = {
@@ -49,7 +50,7 @@ void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
   LCKeyValueRef keyValueSHAs[addPathsLength];
   storeDataWithSHAs(store, addPaths, addPathsLength, keyValueSHAs);
   
-  LCTreeRef newTree = buildTree(LCCommitTree(store->head), keyValueSHAs, addPathsLength, deletePaths, deletePathsLength);
+  LCTreeRef newTree = buildTree(store, LCCommitTree(store->head), keyValueSHAs, addPathsLength, deletePaths, deletePathsLength);
   
   LCCommitRef newHead = LCCommitCreate(store->head, newTree);
   setStoreHead(store, newHead);
@@ -66,7 +67,7 @@ void storeDataWithSHAs(LCStoreRef store, LCKeyValueRef addPaths[], size_t length
   }
 }
 
-LCTreeRef buildTree(LCTreeRef current, LCKeyValueRef addPathSHAs[], size_t addPathSHAsLength,
+LCTreeRef buildTree(LCStoreRef store, LCTreeRef current, LCKeyValueRef addPathSHAs[], size_t addPathSHAsLength,
                     LCStringRef* delete, size_t deleteLength) {
   LCMutableArrayRef updates = LCMutableArrayCreate((void**)addPathSHAs, addPathSHAsLength);
   LCKeyValueRef deleteUpdate;
@@ -75,7 +76,7 @@ LCTreeRef buildTree(LCTreeRef current, LCKeyValueRef addPathSHAs[], size_t addPa
     LCMutableArrayAddObject(updates, deleteUpdate);
     LCRelease(deleteUpdate);
   }
-  LCTreeRef newTree = LCTreeCreateTreeUpdatingData(current, updates);
+  LCTreeRef newTree = LCTreeCreateTreeUpdatingData(current, store->dataStore, updates);
   LCRelease(updates);
   return newTree;
 }
