@@ -54,7 +54,7 @@ size_t LCStoreCommitHistoryLength(LCStoreRef store) {
   return count;
 }
 
-LCSuccess LCStoreCommitHistory(LCStoreRef store, char* commitsSHABuffer[], size_t start, size_t elements) {
+LCSuccess LCStoreCommitHistory(LCStoreRef store, char commitsSHABuffer[][LC_SHA1_HEX_Length], size_t start, size_t elements) {
   LCCommitRef commit = store->head;
   for (LCInteger i=0; i<start; i++) {
     commit = LCCommitParent(commit);
@@ -66,7 +66,7 @@ LCSuccess LCStoreCommitHistory(LCStoreRef store, char* commitsSHABuffer[], size_
   return LCSuccessTrue;
 }
 
-LCSuccess LCStoreDataSHA(LCStoreRef store, char* commit, char* path, char* dataSHABuffer) {
+LCSuccess LCStoreDataSHA(LCStoreRef store, char* commit, char* path, char dataSHABuffer[LC_SHA1_HEX_Length]) {
   LCCommitRef commitObj;
   if (commit) {
     LCStringRef commitSHAObj = LCStringCreate(commit);
@@ -88,11 +88,11 @@ LCSuccess LCStoreDataSHA(LCStoreRef store, char* commit, char* path, char* dataS
   return LCSuccessTrue;
 }
 
-size_t LCStoreDataLength(LCStoreRef store, char* sha) {
+size_t LCStoreDataLength(LCStoreRef store, char sha[LC_SHA1_HEX_Length]) {
   return LCDataStoreGetDataLength(store->dataStore, sha);
 }
 
-LCSuccess LCStoreData(LCStoreRef store, char* sha, unsigned char dataBuffer[]) {
+LCSuccess LCStoreData(LCStoreRef store, char sha[LC_SHA1_HEX_Length], unsigned char dataBuffer[]) {
   LCStringRef shaObj = LCStringCreate(sha);
   LCDataRef data = LCDataStoreGetData(store->dataStore, shaObj);
   if (data) {

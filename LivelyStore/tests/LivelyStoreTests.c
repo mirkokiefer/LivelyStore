@@ -279,11 +279,17 @@ static char* test_library_interface() {
   LCStoreDataSHA(store, head1, "tree1/value1", dataSHA6);
   mu_assert("retrieving previous commit data", strcmp(dataSHA6, dataSHA1)==0);
   
-  // retrieve actual data
+  // get actual data
   size_t dataLength1 = LCStoreDataLength(store, dataSHA1);
   char data1Buffer[dataLength1];
   LCStoreData(store, dataSHA1, (LCByte*)data1Buffer);
-  mu_assert("retrieve actual data", strcmp(data1Buffer, data1)==0);
+  mu_assert("get actual data", strcmp(data1Buffer, data1)==0);
+  
+  // get commit history
+  size_t historyLength = LCStoreCommitHistoryLength(store);
+  char historyBuffer[historyLength][LC_SHA1_HEX_Length];
+  LCStoreCommitHistory(store, historyBuffer, 0, historyLength);
+  mu_assert("commit history", strcmp(historyBuffer[1], head1)==0);
   return 0;
 }
 
