@@ -22,6 +22,7 @@ LCStoreRef LCStoreCreate(char* location) {
     newStore->info.type = &typeStore;
     LCStringRef lcLocation = LCStringCreate(location);
     newStore->dataStore = LCDataStoreCreate(lcLocation);
+    newStore->head = LCCommitCreate(NULL, NULL);
     LCRelease(lcLocation);
   }
   return newStore;
@@ -33,6 +34,10 @@ void LCStoreSetStoreCallback(LCStoreRef store, LCStoreDataCb callback) {
 
 void LCStoreSetDeleteCallback(LCStoreRef store, LCDeleteDataCb callback) {
   LCDataStoreSetDeletedDataCallback(store->dataStore, callback);
+}
+
+void LCStoreSetGetDataCallback(LCStoreRef store, LCGetDataCb callback) {
+  LCDataStoreSetGetDataCallback(store->dataStore, callback);
 }
 
 void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
@@ -52,21 +57,31 @@ void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
 
 void storeDataWithSHAs(LCStoreRef store, LCKeyValueRef addPaths[], size_t length, LCKeyValueRef pathSHABuffer[]) {
   LCDataRef value;
-  char* sha;
+  LCStringRef sha;
   for (LCInteger i=0; i<length; i++) {
     value = LCKeyValueValue(addPaths[i]);
-    sha = LCStringStringRef(LCDataSHA1(value));
-    LCDataStorePutData(store->dataStore, sha, LCDataDataRef(value), LCDataLength(value));
-    pathSHABuffer[i] = LCKeyValueCreate(addPaths[i], sha);
+    sha = LCDataSHA1(value);
+    LCDataStorePutData(store->dataStore, sha, value);
+    pathSHABuffer[i] = LCKeyValueCreate(LCKeyValueKey(addPaths[i]), sha);
   }
 }
 
-LCTreeRef buildTree(LCTreeRef current, LCKeyValueRef addPathSHAs[], size_t newLength, LCStringRef* delete, size_t deleteLength) {
-  
+LCTreeRef buildTree(LCTreeRef current, LCKeyValueRef addPathSHAs[], size_t addPathSHAsLength,
+                    LCStringRef* delete, size_t deleteLength) {
+  LCMutableArrayRef updates = LCMutableArrayCreate((void**)addPathSHAs, addPathSHAsLength);
+  LCKeyValueRef deleteUpdate;
+  for (LCInteger i=0; i<deleteLength; i++) {
+    deleteUpdate = LCKeyValueCreate(delete[i], NULL);
+    LCMutableArrayAddObject(updates, deleteUpdate);
+    LCRelease(deleteUpdate);
+  }
+  LCTreeRef newTree = LCTreeCreateTreeUpdatingData(current, updates);
+  LCRelease(updates);
+  return newTree;
 }
 
 void setStoreHead(LCStoreRef store, LCCommitRef newHead) {
-  LCFree(store->head);
+  LCRelease(store->head);
   store->head = newHead;
 }
 

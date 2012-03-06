@@ -9,7 +9,7 @@ void LCDataStoreSetNewDataCallback(LCDataStoreRef store, LCStoreDataCb callback)
 void LCDataStoreSetDeletedDataCallback(LCDataStoreRef store, LCDeleteDataCb callback);
 void LCDataStoreSetGetDataCallback(LCDataStoreRef store, LCGetDataCb callback);
 
-void LCDataStorePutData(LCDataStoreRef store, LCStringRef sha, LCByte data[], size_t length);
+void LCDataStorePutData(LCDataStoreRef store, LCStringRef sha, LCDataRef data);
 void LCDataStoreDeleteData(LCDataStoreRef store, LCStringRef sha);
 void LCDataStorePutTreeData(LCDataStoreRef store, LCStringRef sha, LCStringRef data);
 void LCDataStorePutCommitData(LCDataStoreRef store, LCStringRef sha, LCStringRef data);

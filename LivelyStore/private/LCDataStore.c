@@ -41,8 +41,8 @@ void LCDataStoreSetGetDataCallback(LCDataStoreRef store, LCGetDataCb callback) {
   store->getCb = callback;
 }
 
-void LCDataStorePutData(LCDataStoreRef store, LCStringRef sha, LCByte data[], size_t length) {
-  putData(store, LCData, sha, data, length);
+void LCDataStorePutData(LCDataStoreRef store, LCStringRef sha, LCDataRef data) {
+  putData(store, LCData, sha, LCDataDataRef(data), LCDataLength(data));
 }
 
 void LCDataStoreDeleteData(LCDataStoreRef store, LCStringRef sha) {
