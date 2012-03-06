@@ -1,6 +1,8 @@
 
 #include "LCStage.h"
 
+static void treeDeserialize(LCTreeRef tree);
+
 void LCTreeDealloc(void* object);
 size_t childrenSerializationBufferSize(LCTreeRef tree);
 void serializeChildTrees(LCDictionaryRef childTrees, char buffer[]);
@@ -23,6 +25,14 @@ struct LCTree {
 LCType typeTree = {
   .dealloc = LCTreeDealloc
 };
+
+static LCTreeRef treeCreate() {
+  LCTreeRef newTree = malloc(sizeof(struct LCTree));
+  if (newTree) {
+    newTree->info.type = &typeTree;
+  }
+  return newTree;
+}
 
 static LCDataStoreRef treeStore(LCTreeRef tree) {
   return tree->store;
@@ -55,7 +65,11 @@ static void treeSetChildTrees(LCTreeRef tree, LCDictionaryRef childTrees) {
 
 static LCDictionaryRef treeChildTrees(LCTreeRef tree) {
   if(tree->childTrees == NULL) {
-    tree->childTrees = LCDictionaryCreate(NULL, 0);
+    if (treeSHA(tree)) {
+      treeDeserialize(tree);
+    } else {
+      tree->childTrees = LCDictionaryCreate(NULL, 0);
+    }
   }
   return tree->childTrees;
 }
@@ -69,19 +83,64 @@ static void treeSetChildData(LCTreeRef tree, LCDictionaryRef childData) {
 
 static LCDictionaryRef treeChildData(LCTreeRef tree) {
   if (tree->childData == NULL) {
-    tree->childData = LCDictionaryCreate(NULL, 0);
+    if (treeSHA(tree)) {
+      treeDeserialize(tree);
+    } else {
+      tree->childData = LCDictionaryCreate(NULL, 0);    
+    }
   }
   return tree->childData;
 }
 
-LCTreeRef LCTreeCreate(LCDataStoreRef store, LCDictionaryRef childTrees, LCDictionaryRef childDataSHAs) {
-  LCTreeRef newTree = malloc(sizeof(struct LCTree));
-  if (newTree != NULL) {
-    newTree->info.type = &typeTree;
-    treeSetStore(newTree, store);
-    treeSetChildTrees(newTree, childTrees);
-    treeSetChildData(newTree, childDataSHAs);
+static void treeDeserialize(LCTreeRef tree) {
+  LCStringRef data = LCDataStoreGetTreeData(treeStore(tree), treeSHA(tree));
+  LCArrayRef lines = LCStringCreateTokens(data, '\n');
+  LCRelease(data);
+  LCStringRef currentLine;
+  LCStringRef key;
+  LCStringRef sha;
+  LCDictionaryRef childTrees;
+  LCDictionaryRef childData;
+  LCMutableArrayRef keyValues = LCMutableArrayCreate(NULL, 0);
+  LCInteger i;
+  for (i=0; i<LCArrayLength(lines); i++) {
+    currentLine = (LCStringRef)LCArrayObjectAtIndex(lines, i);
+    if (LCStringEqualCString(currentLine, "")) {
+      childTrees = LCDictionaryCreate((LCKeyValueRef*)LCMutableArrayObjects(keyValues), LCMutableArrayLength(keyValues));
+      LCRelease(keyValues);
+      keyValues = LCMutableArrayCreate(NULL, 0);
+      continue;
+    } else {
+      char keyBuffer[LCStringLength(currentLine)-LC_SHA1_HEX_Length];
+      char shaBuffer[LC_SHA1_HEX_Length];
+      sscanf(LCStringStringRef(currentLine), "%s %s", keyBuffer, shaBuffer);
+      key = LCStringCreate(keyBuffer);
+      sha = LCStringCreate(shaBuffer);
+      LCKeyValueRef keyValue = LCKeyValueCreate(key, sha);
+      LCMutableArrayAddObject(keyValues, keyValue);
+      LCRelease(key);
+      LCRelease(sha);
+      LCRelease(keyValue);
+    }
   }
+  childData = LCDictionaryCreate((LCKeyValueRef*)LCMutableArrayObjects(keyValues), LCMutableArrayLength(keyValues));
+  LCRelease(lines);
+  LCRelease(keyValues);
+  treeSetChildTrees(tree, childTrees);
+  treeSetChildData(tree, childData);
+}
+
+LCTreeRef LCTreeCreateFromSHA(LCDataStoreRef store, LCStringRef sha) {
+  LCTreeRef newTree = treeCreate();
+  treeSetSHA(newTree, sha);
+  return newTree;
+}
+
+LCTreeRef LCTreeCreate(LCDataStoreRef store, LCDictionaryRef childTrees, LCDictionaryRef childDataSHAs) {
+  LCTreeRef newTree = treeCreate();
+  treeSetStore(newTree, store);
+  treeSetChildTrees(newTree, childTrees);
+  treeSetChildData(newTree, childDataSHAs);
   return newTree;
 };
 
