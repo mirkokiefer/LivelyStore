@@ -43,9 +43,10 @@ typedef enum {
 } LCCompare;
 
 
-typedef void(*LCStoreDataCb)(LCDataType type, char* sha, unsigned char* data, size_t length);
+typedef void(*LCStoreDataCb)(LCDataType type, char* sha, unsigned char data[], size_t length);
 typedef void(*LCDeleteDataCb)(LCDataType type, char* sha);
-typedef void(*LCGetDataCb)(LCDataType type, char* sha);
+typedef size_t(*LCGetDataLengthCb)(LCDataType type, char* sha);
+typedef void(*LCGetDataCb)(LCDataType type, char* sha, unsigned char buffer[]);
 
 // internal types
 typedef struct LCType LCType;

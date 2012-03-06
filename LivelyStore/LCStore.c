@@ -41,6 +41,10 @@ void LCStoreSetGetDataCallback(LCStoreRef store, LCGetDataCb callback) {
   LCDataStoreSetGetDataCallback(store->dataStore, callback);
 }
 
+void LCStoreSetGetDataLengthCallback(LCStoreRef store, LCGetDataLengthCb callback) {
+  LCDataStoreSetGetDataLengthCallback(store->dataStore, callback);
+}
+
 void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
   LCKeyValueRef* addPaths = LCStagePathsToAdd(stage);
   size_t addPathsLength = LCStageAddPathsCount(stage);
