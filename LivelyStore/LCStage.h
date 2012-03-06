@@ -8,7 +8,6 @@
 LCStageRef LCStageCreate();
 void LCStageAddEntry(LCStageRef stage, char* path, unsigned char data[], size_t length);
 void LCStageDeletePath(LCStageRef stage, char* path);
-void LCStageCommitToStore(LCStoreRef store);
 
 // private
 LCKeyValueRef* LCStagePathsToAdd(LCStageRef stage);
