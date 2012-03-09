@@ -18,13 +18,11 @@ LCType typeStore = {
   .dealloc = LCStoreDealloc
 };
 
-LCStoreRef LCStoreCreate(struct LCStoreBackend* backend, char headCommit[LC_SHA1_HEX_Length]) {
+LCStoreRef LCStoreCreate(struct LCStoreBackend* backend, LCCommitRef head) {
   LCStoreRef newStore = LCNewObject(&typeStore, sizeof(struct LCStore));
   newStore->dataStore = LCDataStoreCreate(backend);
-  if (headCommit) {
-    LCStringRef headCommitObj = LCStringCreate(headCommit);
-    newStore->head = LCCommitCreateFromSHA(newStore->dataStore, headCommitObj);
-    LCRelease(headCommitObj);
+  if (head) {
+    newStore->head = LCRetain(head);
   } else {
     newStore->head = LCCommitCreate(newStore->dataStore, NULL, NULL, 0);
   }
@@ -46,45 +44,24 @@ void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
   setStoreHead(store, newHead);
 }
 
-void LCStoreHead(LCStoreRef store, char* buffer) {
-  strcpy(buffer, LCStringStringRef(LCCommitSHA(store->head)));
+LCCommitRef LCStoreHead(LCStoreRef store) {
+  return store->head;
 }
 
-LCSuccess LCStoreDataSHA(LCStoreRef store, char* commit, char* path, char dataSHABuffer[LC_SHA1_HEX_Length]) {
-  LCCommitRef commitObj;
-  if (commit) {
-    LCStringRef commitSHAObj = LCStringCreate(commit);
-    commitObj = findCommit(&(store->head), 1, commitSHAObj); 
-    LCRelease(commitSHAObj);
-  } else {
-    commitObj = store->head;
+LCStringRef LCStoreDataSHA(LCStoreRef store, LCCommitRef commit, char* path) {
+  if (!commit) {
+    commit = store->head;
   }
   LCStringRef pathObj = LCStringCreate(path);
   LCArrayRef pathArray = createPathArray(pathObj);
-  LCStringRef dataSHA = LCTreeChildDataAtPath(LCCommitTree(commitObj), pathArray);
-  if (dataSHA) {
-    strcpy(dataSHABuffer, LCStringStringRef(dataSHA));
-  } else {
-    return LCSuccessFalse;
-  }
-  LCRelease(pathObj);
+  LCStringRef dataSHA = LCTreeChildDataAtPath(LCCommitTree(commit), pathArray);
   LCRelease(pathArray);
-  return LCSuccessTrue;
+  LCRelease(pathObj);
+  return dataSHA;
 }
 
-size_t LCStoreDataLength(LCStoreRef store, char sha[LC_SHA1_HEX_Length]) {
-  return LCDataStoreGetDataLength(store->dataStore, sha);
-}
-
-LCSuccess LCStoreData(LCStoreRef store, char sha[LC_SHA1_HEX_Length], unsigned char dataBuffer[]) {
-  LCStringRef shaObj = LCStringCreate(sha);
-  LCDataRef data = LCDataStoreGetData(store->dataStore, shaObj);
-  if (data) {
-    memcpy(dataBuffer, LCDataDataRef(data), LCDataLength(data)*sizeof(LCByte));    
-  } else {
-    return LCSuccessFalse;
-  }
-  return LCSuccessTrue;
+LCDataRef LCStoreData(LCStoreRef store, LCStringRef sha) {
+  return LCDataStoreGetData(store->dataStore, sha);
 }
 
 void LCStoreDealloc(void* object) {
@@ -122,6 +99,7 @@ void setStoreHead(LCStoreRef store, LCCommitRef newHead) {
   if (newHead != store->head) {
     LCRelease(store->head);
   }
+  LCCommitSHA(newHead);
   store->head = newHead;
 }
 

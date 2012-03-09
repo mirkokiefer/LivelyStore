@@ -272,19 +272,14 @@ static char* test_library_interface_with_backend(struct LCStoreBackend* backend)
   LCStageAddEntry(stage1, "tree1/tree1_1/value3", (LCByte*)"1234568", 8);
   
   LCStoreCommit(store, stage1);
-  char head1[LC_SHA1_HEX_Length];
-  LCStoreHead(store, head1);
+  LCCommitRef head1 = LCStoreHead(store);
+  LCStringRef dataSHA1 = LCStoreDataSHA(store, head1, "tree1/value1");
+  LCStringRef dataSHA2 = LCStoreDataSHA(store, head1, "value2");
+  LCStringRef dataSHA3 = LCStoreDataSHA(store, head1, "tree1/tree1_1/value3");
   
-  char dataSHA1[LC_SHA1_HEX_Length];
-  char dataSHA2[LC_SHA1_HEX_Length];
-  char dataSHA3[LC_SHA1_HEX_Length];
-  LCStoreDataSHA(store, head1, "tree1/value1", dataSHA1);
-  LCStoreDataSHA(store, head1, "value2", dataSHA2);
-  LCStoreDataSHA(store, head1, "tree1/tree1_1/value3", dataSHA3);
-  
-  mu_assert("commited objects and verify", (strcmp(dataSHA1, "7c4a8d09ca3762af61e59520943dc26494f8941b")==0) &&
-            (strcmp(dataSHA2, "20eabe5d64b0e216796e834f52d61fd0b70332fc")==0) &&
-            (strcmp(dataSHA3, "caaf32408c386c8d6db5112225e5faf59efa88e2")==0));
+  mu_assert("commited objects and verify", LCStringEqualCString(dataSHA1, "7c4a8d09ca3762af61e59520943dc26494f8941b") &&
+            LCStringEqualCString(dataSHA2, "20eabe5d64b0e216796e834f52d61fd0b70332fc") &&
+            LCStringEqualCString(dataSHA3, "caaf32408c386c8d6db5112225e5faf59efa88e2"));
   
   // another commit
   LCStageRef stage2 = LCStageCreate();
@@ -292,29 +287,23 @@ static char* test_library_interface_with_backend(struct LCStoreBackend* backend)
   LCStageDeletePath(stage2, "tree1/tree1_1/value3");
   LCStoreCommit(store, stage2);
   
-  char dataSHA4[LC_SHA1_HEX_Length];
-  char dataSHA5[LC_SHA1_HEX_Length];
-  LCStoreDataSHA(store, NULL, "tree1/value1", dataSHA4);
-  LCSuccess succ5 = LCStoreDataSHA(store, NULL, "tree1/tree1_1/value3", dataSHA5);
-  mu_assert("perform subsequent commit", (strcmp(dataSHA4, "f7c3bc1d808e04732adf679965ccc34ca7ae3441")==0) &&
-            succ5 == LCSuccessFalse);
+  LCStringRef dataSHA4 = LCStoreDataSHA(store, NULL, "tree1/value1");
+  LCStringRef dataSHA5 = LCStoreDataSHA(store, NULL, "tree1/tree1_1/value3");
+  mu_assert("perform subsequent commit", LCStringEqualCString(dataSHA4, "f7c3bc1d808e04732adf679965ccc34ca7ae3441") &&
+            dataSHA5 == NULL);
   
   
-  char dataSHA6[LC_SHA1_HEX_Length];
-  LCStoreDataSHA(store, head1, "tree1/value1", dataSHA6);
-  mu_assert("retrieving previous commit data", strcmp(dataSHA6, dataSHA1)==0);
+  LCStringRef dataSHA6 = LCStoreDataSHA(store, head1, "tree1/value1");
+  mu_assert("retrieving previous commit data", LCStringEqual(dataSHA6, dataSHA1));
   
   // get actual data
-  size_t dataLength1 = LCStoreDataLength(store, dataSHA1);
-  char data1Buffer[dataLength1];
-  LCStoreData(store, dataSHA1, (LCByte*)data1Buffer);
-  mu_assert("get actual data", strcmp(data1Buffer, data1)==0);
+  LCDataRef retrievedData1 = LCStoreData(store, dataSHA1);
+  mu_assert("get actual data", strcmp((char*)LCDataDataRef(retrievedData1), data1)==0);
     
   // create new store from commit SHA
   LCStoreRef store2 = LCStoreCreate(backend, head1);
-  char dataSHA7[LC_SHA1_HEX_Length];
-  LCStoreDataSHA(store2, NULL, "tree1/value1", dataSHA7);
-  mu_assert("create store from commit SHA", strcmp(dataSHA7, dataSHA1)==0);
+  LCStringRef dataSHA7 = LCStoreDataSHA(store2, NULL, "tree1/value1");
+  mu_assert("create store from commit SHA", LCStringEqual(dataSHA7, dataSHA1));
   
   return 0;
 }
@@ -332,7 +321,7 @@ static char* test_library_interface() {
   char* testPathRef = LCStringStringRef(testPath);
   struct LCStoreBackend* fileBackend = createLCFileStoreBackend(testPathRef);
   char* fileTest = test_library_interface_with_backend(fileBackend);
-  deleteDirectory(testPathRef);
+  //deleteDirectory(testPathRef);
   return fileTest;
 }
 

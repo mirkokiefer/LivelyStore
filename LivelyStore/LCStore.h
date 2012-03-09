@@ -5,12 +5,11 @@
 
 #include "LivelyStore.h"
 
-LCStoreRef LCStoreCreate(struct LCStoreBackend* backend, char headCommit[LC_SHA1_HEX_Length]);
+LCStoreRef LCStoreCreate(struct LCStoreBackend* backend, LCCommitRef head);
 void LCStorePull(LCStoreRef target, LCStoreRef source);
 void LCStorePush(LCStoreRef source, LCStoreRef target);
 void LCStoreCommit(LCStoreRef store, LCStageRef stage);
-void LCStoreHead(LCStoreRef store, char* headShaBuffer);
-LCSuccess LCStoreDataSHA(LCStoreRef store, char* commit, char* path, char dataSHABuffer[LC_SHA1_HEX_Length]);
-size_t LCStoreDataLength(LCStoreRef store, char sha[LC_SHA1_HEX_Length]);
-LCSuccess LCStoreData(LCStoreRef store, char sha[LC_SHA1_HEX_Length], unsigned char dataBuffer[]);
+LCCommitRef LCStoreHead(LCStoreRef store);
+LCStringRef LCStoreDataSHA(LCStoreRef store, LCCommitRef commit, char* path);
+LCDataRef LCStoreData(LCStoreRef store, LCStringRef dataSHA);
 #endif

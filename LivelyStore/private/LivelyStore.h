@@ -32,6 +32,7 @@ typedef struct LCDataStore* LCDataStoreRef;
 typedef struct LCCommit* LCCommitRef;
 typedef struct LCMutableArray* LCMutableArrayRef;
 typedef struct LCDictionary* LCDictionaryRef;
+typedef struct LCStoreInterface* LCStoreInterfaceRef;
 
 typedef enum {
   LCData,
@@ -105,4 +106,4 @@ struct LCStoreBackend {
 #include "LCDictionary.h"
 #include "LCMemoryStoreBackend.h"
 #include "LCFileStoreBackend.h"
-
+#include "LCStoreInterface.h"
