@@ -4,32 +4,40 @@
 struct LCCommit {
   LCObjectInfo info;
   LCDataStoreRef store;
-  LCCommitRef parent;
+  LCArrayRef parents;
   LCTreeRef tree;
   LCStringRef sha;
 };
 
 void LCCommitDealloc(void* object);
 void commitDeserialize(LCCommitRef commit);
+static LCArrayRef commitParents(LCCommitRef commit);
 
 LCType typeCommit = {
   .dealloc = LCCommitDealloc
 };
 
+static LCArrayRef commitParents(LCCommitRef commit) {
+  if((commit->parents == NULL) && commit->sha) {
+    commitDeserialize(commit);
+  }
+  return commit->parents;
+}
+
 LCCommitRef LCCommitCreateFromSHA(LCDataStoreRef store, LCStringRef sha) {
   LCCommitRef newCommit = LCNewObject(&typeCommit, sizeof(struct LCCommit));
   newCommit->sha = LCRetain(sha);
   newCommit->store = LCRetain(store);
-  newCommit->parent = NULL;
+  newCommit->parents = NULL;
   newCommit->tree = NULL;
   return newCommit;
 }
 
-LCCommitRef LCCommitCreate(LCDataStoreRef store, LCCommitRef parent, LCTreeRef tree) {
+LCCommitRef LCCommitCreate(LCDataStoreRef store, LCTreeRef tree, LCCommitRef parents[], size_t parentsLength) {
   LCCommitRef newCommit = LCNewObject(&typeCommit, sizeof(struct LCCommit));
   newCommit->sha = NULL;
   newCommit->store = LCRetain(store);
-  newCommit->parent = LCRetain(parent);
+  newCommit->parents = LCArrayCreate((void**)parents, parentsLength);
   newCommit->tree = LCRetain(tree);
   return newCommit;
 };
@@ -41,11 +49,12 @@ LCTreeRef LCCommitTree(LCCommitRef commit) {
   return commit->tree;
 }
 
-LCCommitRef LCCommitParent(LCCommitRef commit) {
-  if((commit->parent == NULL) && commit->sha) {
-    commitDeserialize(commit);
-  }
-  return commit->parent;
+LCCommitRef* LCCommitParents(LCCommitRef commit) {
+  return (LCCommitRef*)LCArrayObjects(commitParents(commit));
+}
+
+size_t LCCommitParentsLength(LCCommitRef commit) {
+  return LCArrayLength(commitParents(commit));
 }
 
 LCStringRef LCCommitSHA(LCCommitRef commit) {
@@ -59,24 +68,35 @@ LCStringRef LCCommitSHA(LCCommitRef commit) {
 }
 
 LCStringRef LCCommitCreateSerializedString(LCCommitRef commit) {
-  char* parentSHA = "";
-  if (commit->parent) {
-    parentSHA = LCStringStringRef(LCCommitSHA(commit->parent));
-  }
+  size_t parentsLength = LCArrayLength(commitParents(commit));
+  
   char* treeSHA = "";
   if (commit->tree) {
     treeSHA = LCStringStringRef(LCTreeSHA(commit->tree));
   }
-  char string[LC_SHA1_HEX_Length + 1 + LC_SHA1_HEX_Length];
-  sprintf(string, "%s\n%s", parentSHA, treeSHA);
+  
+  char string[(LC_SHA1_HEX_Length + 1) * (1+parentsLength)];
+  strcpy(string, treeSHA);
+  strcat(string, "\n");
+  
+  for (LCInteger i=0; i<parentsLength; i++) {
+    LCCommitRef parent = LCArrayObjectAtIndex(commitParents(commit), i);
+    LCStringRef parentSHA = LCCommitSHA(parent);
+    strcat(string, LCStringStringRef(parentSHA));
+    strcat(string, "\n");
+  }
   return LCStringCreate(string);
 }
 
 void LCCommitDealloc(void* object) {
   LCCommitRef commit = (LCCommitRef)object;
-  LCRelease(commit->parent);
+  LCRelease(commit->parents);
   LCRelease(commit->tree);
   LCRelease(commit->sha);
+}
+
+static void* shaStringToCommit(LCInteger i, void* info, void* shaString) {
+  return LCCommitCreateFromSHA(info, shaString);
 }
 
 void commitDeserialize(LCCommitRef commit) {
@@ -84,13 +104,13 @@ void commitDeserialize(LCCommitRef commit) {
   if ((data == NULL) || ((LCStringStringRef(data))[0] == '\n')) {
     return;
   }
-  char parentSHA[LC_SHA1_HEX_Length];
-  char treeSHA[LC_SHA1_HEX_Length];
-  sscanf(LCStringStringRef(data), "%s\n%s", parentSHA, treeSHA);
-  LCStringRef parentSHAObj = LCStringCreate(parentSHA);
-  LCStringRef treeSHAObj = LCStringCreate(treeSHA);
-  commit->parent = LCCommitCreateFromSHA(commit->store, parentSHAObj);
-  commit->tree = LCTreeCreateFromSHA(commit->store, treeSHAObj);
-  LCRelease(parentSHAObj);
-  LCRelease(treeSHAObj);
+  LCArrayRef tokens = LCStringCreateTokens(data, '\n');
+  LCArrayRef lines = LCArrayCreateSubArray(tokens, 0, LCArrayLength(tokens)-1);
+  LCRelease(tokens);
+  LCStringRef treeSHA = LCArrayObjectAtIndex(lines, 0);
+  LCArrayRef parentSHAs = LCArrayCreateSubArray(lines, 1, -1);
+  commit->tree = LCTreeCreateFromSHA(commit->store, treeSHA);
+  commit->parents = LCArrayCreateArrayWithMap(parentSHAs, commit->store, shaStringToCommit);
+  LCRelease(lines);
+  LCRelease(parentSHAs);
 }
