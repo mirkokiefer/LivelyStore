@@ -9,9 +9,11 @@ struct LCCommit {
   LCStringRef sha;
 };
 
+static LCArrayRef commitParents(LCCommitRef commit);
+
 void LCCommitDealloc(void* object);
 void commitDeserialize(LCCommitRef commit);
-static LCArrayRef commitParents(LCCommitRef commit);
+LCCommitRef findCommit(LCCommitRef commits[], size_t length, LCStringRef sha);
 
 LCType typeCommit = {
   .dealloc = LCCommitDealloc
@@ -88,6 +90,10 @@ LCStringRef LCCommitCreateSerializedString(LCCommitRef commit) {
   return LCStringCreate(string);
 }
 
+LCCommitRef LCCommitFindParent(LCCommitRef commit, LCStringRef sha) {
+  return findCommit(&commit, 1, sha);
+}
+
 void LCCommitDealloc(void* object) {
   LCCommitRef commit = (LCCommitRef)object;
   LCRelease(commit->parents);
@@ -114,4 +120,22 @@ void commitDeserialize(LCCommitRef commit) {
   LCRelease(tokens);
   LCRelease(lines);
   LCRelease(parentSHAs);
+}
+
+LCCommitRef findCommit(LCCommitRef commits[], size_t length, LCStringRef sha) {
+  if (length == 0) {
+    return NULL;
+  }
+  for (LCInteger i=0; i<length; i++) {
+    if(LCStringEqual(LCCommitSHA(commits[i]), sha)) {
+      return commits[i];
+    }
+  }
+  LCMutableArrayRef parents = LCMutableArrayCreate(NULL, 0);
+  for (LCInteger i=0; i<length; i++) {
+    LCMutableArrayAddObjects(parents, (void**)LCCommitParents(commits[i]), LCCommitParentsLength(commits[i]));
+  }
+  LCCommitRef result = findCommit((LCCommitRef*)LCMutableArrayObjects(parents), LCMutableArrayLength(parents), sha);
+  LCRelease(parents);
+  return result;
 }

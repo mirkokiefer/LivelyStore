@@ -264,7 +264,7 @@ static char* test_tree_operations() {
 
 static char* test_library_interface_with_backend(struct LCStoreBackend* backend) {  
   LCStoreRef store = LCStoreCreate(backend, NULL);
-  
+  LCCommitRef head0 = LCStoreHead(store);
   LCStageRef stage1 = LCStageCreate();
   char* data1 = "123456";
   LCStageAddEntry(stage1, "tree1/value1", (LCByte*)data1, 6);
@@ -286,7 +286,8 @@ static char* test_library_interface_with_backend(struct LCStoreBackend* backend)
   LCStageAddEntry(stage2, "tree1/value1", (LCByte*)"123456789", 9);
   LCStageDeletePath(stage2, "tree1/tree1_1/value3");
   LCStoreCommit(store, stage2);
-  
+  LCCommitRef head2 = LCStoreHead(store);
+
   LCStringRef dataSHA4 = LCStoreDataSHA(store, NULL, "tree1/value1");
   LCStringRef dataSHA5 = LCStoreDataSHA(store, NULL, "tree1/tree1_1/value3");
   mu_assert("perform subsequent commit", LCStringEqualCString(dataSHA4, "f7c3bc1d808e04732adf679965ccc34ca7ae3441") &&
@@ -299,11 +300,16 @@ static char* test_library_interface_with_backend(struct LCStoreBackend* backend)
   // get actual data
   LCDataRef retrievedData1 = LCStoreData(store, dataSHA1);
   mu_assert("get actual data", strcmp((char*)LCDataDataRef(retrievedData1), data1)==0);
-    
+  
+  // find parent commit
+  LCCommitRef foundHead = LCCommitFindParent(head2, LCCommitSHA(head0));
+  mu_assert("LCCommitFindParent", LCCompareObjects(foundHead, head0) == LCEqual);
+  
   // create new store from commit SHA
   LCStoreRef store2 = LCStoreCreate(backend, head1);
   LCStringRef dataSHA7 = LCStoreDataSHA(store2, NULL, "tree1/value1");
   mu_assert("create store from commit SHA", LCStringEqual(dataSHA7, dataSHA1));
+  
   
   return 0;
 }

@@ -102,21 +102,3 @@ void setStoreHead(LCStoreRef store, LCCommitRef newHead) {
   LCCommitSHA(newHead);
   store->head = newHead;
 }
-
-LCCommitRef findCommit(LCCommitRef commits[], size_t length, LCStringRef sha) {
-  if (length == 0) {
-    return NULL;
-  }
-  for (LCInteger i=0; i<length; i++) {
-    if(LCStringEqual(LCCommitSHA(commits[i]), sha)) {
-      return commits[i];
-    }
-  }
-  LCMutableArrayRef parents = LCMutableArrayCreate(NULL, 0);
-  for (LCInteger i=0; i<length; i++) {
-    LCMutableArrayAddObjects(parents, (void**)LCCommitParents(commits[i]), LCCommitParentsLength(commits[i]));
-  }
-  LCCommitRef result = findCommit((LCCommitRef*)LCMutableArrayObjects(parents), LCMutableArrayLength(parents), sha);
-  LCRelease(parents);
-  return result;
-}

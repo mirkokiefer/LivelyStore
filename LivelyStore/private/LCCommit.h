@@ -11,4 +11,5 @@ size_t LCCommitParentsLength(LCCommitRef commit);
 LCTreeRef LCCommitTree(LCCommitRef commit);
 LCStringRef LCCommitCreateSerializedString(LCCommitRef commit);
 LCStringRef LCCommitSHA(LCCommitRef commit);
+LCCommitRef LCCommitFindParent(LCCommitRef commit, LCStringRef sha);
 #endif
