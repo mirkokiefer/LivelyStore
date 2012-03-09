@@ -99,6 +99,7 @@ void setStoreHead(LCStoreRef store, LCCommitRef newHead) {
   if (newHead != store->head) {
     LCRelease(store->head);
   }
+  // retrieve SHA to force persisting all commits and trees
   LCCommitSHA(newHead);
   store->head = newHead;
 }
