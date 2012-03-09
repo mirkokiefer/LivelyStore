@@ -317,8 +317,10 @@ static char* test_library_interface() {
   if (memoryTest) {
     return memoryTest;
   }
-  struct LCStoreBackend* fileBackend = createLCFileStoreBackend("/Users/mirko/Desktop/testing/");
+  char* fileStorePath = "/Users/mirko/Desktop/testing/";
+  struct LCStoreBackend* fileBackend = createLCFileStoreBackend(fileStorePath);
   char* fileTest = test_library_interface_with_backend(fileBackend);
+  deleteDirectory(fileStorePath);
   return fileTest;
 }
 

@@ -1,5 +1,7 @@
 
 #include "LivelyStoreTests.h"
+#include <ftw.h>
+#include <unistd.h>
 
 int objectCompare(const void * elem1, const void * elem2);
 LCObjectInfo* LCGetObjectInfo(void* object);
@@ -144,4 +146,18 @@ void writeToFile(LCByte data[], size_t length, char* filePath) {
 
 int makeDirectory(char* path) {
   return mkdir(path, S_IRWXU);
+}
+
+static int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
+{
+  int rv = remove(fpath);
+  
+  if (rv)
+    perror(fpath);
+  
+  return rv;
+}
+
+int deleteDirectory(char *path) {
+  return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
 }
