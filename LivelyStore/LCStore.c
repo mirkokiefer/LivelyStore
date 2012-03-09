@@ -12,7 +12,6 @@ void storeDataWithSHAs(LCStoreRef store, LCKeyValueRef addPaths[], size_t length
 LCTreeRef buildTree(LCStoreRef store, LCTreeRef current, LCKeyValueRef* addPathSHAs, size_t newLength,
                     LCStringRef* delete, size_t deleteLength);
 void setStoreHead(LCStoreRef store, LCCommitRef newHead);
-LCCommitRef findCommit(LCCommitRef start[], size_t length, LCStringRef sha);
 
 LCType typeStore = {
   .dealloc = LCStoreDealloc
