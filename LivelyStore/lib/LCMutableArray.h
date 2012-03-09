@@ -14,6 +14,7 @@ LCArrayRef LCMutableArrayCreateSubArray(LCMutableArrayRef array, LCInteger start
 LCArrayRef LCMutableArrayCreateArray(LCMutableArrayRef array);
 LCMutableArrayRef LCMutableArrayCopy(LCMutableArrayRef array);
 void LCMutableArrayAddObject(LCMutableArrayRef array, void* object);
+void LCMutableArrayAddObjects(LCMutableArrayRef array, void* objects[], size_t length);
 void LCMutableArrayRemoveIndex(LCMutableArrayRef array, LCInteger index);
 void LCMutableArrayRemoveObject(LCMutableArrayRef array, void* object);
 void LCMutableArraySort(LCMutableArrayRef array);

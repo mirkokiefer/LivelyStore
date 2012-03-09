@@ -67,6 +67,12 @@ void LCMutableArrayAddObject(LCMutableArrayRef array, void* object) {
   array->length = array->length + 1;
 }
 
+void LCMutableArrayAddObjects(LCMutableArrayRef array, void* objects[], size_t length) {
+  for (LCInteger i=0; i<length; i++) {
+    LCMutableArrayAddObject(array, objects[i]);
+  }
+}
+
 void LCMutableArrayRemoveIndex(LCMutableArrayRef array, LCInteger index) {
   LCRelease(array->objects[index]);
   if (index < (array->length-1)) {
