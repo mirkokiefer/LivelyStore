@@ -5,7 +5,7 @@
 
 #include "LivelyStore.h"
 
-LCStoreRef LCStoreCreate(struct LCStoreBackend* backend, LCCommitRef head);
+LCStoreRef LCStoreCreate(struct LCStoreBackend* backend, char* headSHA);
 void LCStorePull(LCStoreRef target, LCStoreRef source);
 void LCStorePush(LCStoreRef source, LCStoreRef target);
 void LCStoreCommit(LCStoreRef store, LCStageRef stage);

@@ -17,11 +17,13 @@ LCType typeStore = {
   .dealloc = LCStoreDealloc
 };
 
-LCStoreRef LCStoreCreate(struct LCStoreBackend* backend, LCCommitRef head) {
+LCStoreRef LCStoreCreate(struct LCStoreBackend* backend, char* headSHA) {
   LCStoreRef newStore = LCNewObject(&typeStore, sizeof(struct LCStore));
   newStore->dataStore = LCDataStoreCreate(backend);
-  if (head) {
-    newStore->head = LCRetain(head);
+  if (headSHA) {
+    LCStringRef shaObj = LCStringCreate(headSHA);
+    newStore->head = LCCommitCreateFromSHA(newStore->dataStore, shaObj);
+    LCRelease(shaObj);
   } else {
     newStore->head = LCCommitCreate(newStore->dataStore, NULL, NULL, 0);
   }
