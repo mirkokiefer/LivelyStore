@@ -50,7 +50,7 @@ typedef enum {
   LCSuccessFalse
 } LCSuccess;
 
-typedef void*(*LCEachCb)(LCInteger i, void* info, void* each);
+typedef void*(*LCCreateEachCb)(LCInteger i, void* info, void* each);
 
 typedef void(*LCStoreDataCb)(void* storeObj, LCDataType type, char* sha, unsigned char data[], size_t length);
 typedef void(*LCDeleteDataCb)(void* storeObj, LCDataType type, char* sha);

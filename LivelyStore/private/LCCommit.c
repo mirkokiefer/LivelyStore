@@ -106,11 +106,12 @@ void commitDeserialize(LCCommitRef commit) {
   }
   LCArrayRef tokens = LCStringCreateTokens(data, '\n');
   LCArrayRef lines = LCArrayCreateSubArray(tokens, 0, LCArrayLength(tokens)-1);
-  LCRelease(tokens);
   LCStringRef treeSHA = LCArrayObjectAtIndex(lines, 0);
   LCArrayRef parentSHAs = LCArrayCreateSubArray(lines, 1, -1);
   commit->tree = LCTreeCreateFromSHA(commit->store, treeSHA);
   commit->parents = LCArrayCreateArrayWithMap(parentSHAs, commit->store, shaStringToCommit);
+  
+  LCRelease(tokens);
   LCRelease(lines);
   LCRelease(parentSHAs);
 }

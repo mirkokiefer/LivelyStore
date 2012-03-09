@@ -72,7 +72,7 @@ LCMutableArrayRef LCArrayCreateMutableArray(LCArrayRef array) {
   return LCMutableArrayCreate(array->objects, array->length);
 }
 
-LCArrayRef LCArrayCreateArrayWithMap(LCArrayRef array, void* info, LCEachCb each) {
+LCArrayRef LCArrayCreateArrayWithMap(LCArrayRef array, void* info, LCCreateEachCb each) {
   void* newObjects[array->length];
   for (LCInteger i=0; i<array->length; i++) {
     newObjects[i] = each(i, info, array->objects[i]);

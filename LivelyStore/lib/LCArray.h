@@ -12,6 +12,6 @@ void* LCArrayObjectAtIndex(LCArrayRef array, LCInteger index);
 size_t LCArrayLength(LCArrayRef array);
 LCArrayRef LCArrayCreateSubArray(LCArrayRef array, LCInteger start, size_t length);
 LCMutableArrayRef LCArrayCreateMutableArray(LCArrayRef array);
-LCArrayRef LCArrayCreateArrayWithMap(LCArrayRef array, void* info, LCEachCb each);
+LCArrayRef LCArrayCreateArrayWithMap(LCArrayRef array, void* info, LCCreateEachCb each);
 
 #endif
