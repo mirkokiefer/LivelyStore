@@ -317,10 +317,14 @@ static char* test_library_interface() {
   if (memoryTest) {
     return memoryTest;
   }
-  char* fileStorePath = "/Users/mirko/Desktop/testing/";
-  struct LCStoreBackend* fileBackend = createLCFileStoreBackend(fileStorePath);
+  LCStringRef homeFolder = getHomeFolder();
+  LCStringRef testFolder = LCStringCreate("/testing/");
+  LCStringRef paths[] = {homeFolder, testFolder};
+  LCStringRef testPath = LCStringCreateFromStrings(paths, 2);
+  char* testPathRef = LCStringStringRef(testPath);
+  struct LCStoreBackend* fileBackend = createLCFileStoreBackend(testPathRef);
   char* fileTest = test_library_interface_with_backend(fileBackend);
-  deleteDirectory(fileStorePath);
+  deleteDirectory(testPathRef);
   return fileTest;
 }
 

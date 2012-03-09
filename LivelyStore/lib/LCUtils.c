@@ -161,3 +161,8 @@ static int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, str
 int deleteDirectory(char *path) {
   return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
 }
+
+LCStringRef getHomeFolder() {
+  struct passwd *passwdEnt = getpwuid(getuid());
+  return LCStringCreate(passwdEnt->pw_dir);
+}

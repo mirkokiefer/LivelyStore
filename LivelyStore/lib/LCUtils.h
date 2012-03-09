@@ -20,4 +20,5 @@ LCArrayRef createPathArray(LCStringRef path);
 void writeToFile(LCByte data[], size_t length, char* filePath);
 int makeDirectory(char* path);
 int deleteDirectory(char *path);
+LCStringRef getHomeFolder();
 #endif

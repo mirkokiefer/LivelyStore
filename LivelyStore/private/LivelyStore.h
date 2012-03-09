@@ -8,6 +8,8 @@
 #include <openssl/sha.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <pwd.h>
+
 
 #ifndef __LC_TYPES__
 #define __LC_TYPES__
