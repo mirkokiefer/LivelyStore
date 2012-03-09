@@ -2,6 +2,8 @@
 #include "LivelyStoreTests.h"
 #include "minuit.h"
 
+void* arrayMap(LCInteger i, void* info, void* each);
+
 int tests_run = 0;
 
 LCDataStoreRef testStore;
@@ -74,6 +76,11 @@ static char* test_string() {
   return 0;
 }
 
+void* arrayMap(LCInteger i, void* info, void* each) {
+  LCStringRef string = (LCStringRef)each;
+  return LCStringCreateSHAString(string);
+}
+
 static char* test_array() {
   LCStringRef string1 = LCStringCreate("abc");
   LCStringRef string2 = LCStringCreate("def");
@@ -121,7 +128,14 @@ static char* test_array() {
   LCMutableArraySort(sortArray);
   void** sorted = LCMutableArrayObjects(sortArray);
   mu_assert("LCMutableArraySort", (sorted[0] == string1) && (sorted[1] == string2) && (sorted[2] == string3));
+  
+  LCArrayRef arrays[] = {array, array};
+  LCArrayRef mergedArray = LCArrayCreateFromArrays(arrays, 2);
+  mu_assert("LCArrayCreateFromArrays", LCArrayLength(mergedArray)==2*LCArrayLength(array));
   return 0;
+  
+  LCArrayRef mappedArray = LCArrayCreateArrayWithMap(array, NULL, arrayMap);
+  mu_assert("LCArrayCreateArrayWithMap", LCStringEqual(LCArrayObjectAtIndex(mappedArray, 0), LCStringCreateSHAString(string1)));
 }
 
 static char* test_dictionary() {
