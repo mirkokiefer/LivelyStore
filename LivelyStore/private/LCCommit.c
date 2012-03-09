@@ -81,7 +81,7 @@ void LCCommitDealloc(void* object) {
 
 void commitDeserialize(LCCommitRef commit) {
   LCStringRef data = LCDataStoreGetCommitData(commit->store, commit->sha);
-  if (data == NULL) {
+  if ((data == NULL) || ((LCStringStringRef(data))[0] == '\n')) {
     return;
   }
   char parentSHA[LC_SHA1_HEX_Length];

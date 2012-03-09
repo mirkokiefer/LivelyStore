@@ -135,3 +135,13 @@ LCDataRef createDataFromHexString(LCStringRef hexString) {
 LCArrayRef createPathArray(LCStringRef path) {
   return LCStringCreateTokens(path, '/');
 }
+
+void writeToFile(LCByte data[], size_t length, char* filePath) {
+  FILE *fp = fopen(filePath, "w");
+  fwrite(data, sizeof(unsigned char), length, fp);
+  fclose(fp);
+}
+
+int makeDirectory(char* path) {
+  return mkdir(path, S_IRWXU);
+}
