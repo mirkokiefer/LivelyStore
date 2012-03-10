@@ -334,7 +334,7 @@ static char* test_library_interface() {
   char* testPathRef = LCStringStringRef(testPath);
   struct LCStoreBackend* fileBackend = createLCFileStoreBackend(testPathRef);
   char* fileTest = test_library_interface_with_backend(fileBackend);
-  //deleteDirectory(testPathRef);
+  deleteDirectory(testPathRef);
   return fileTest;
 }
 
