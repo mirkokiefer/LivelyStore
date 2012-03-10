@@ -6,6 +6,8 @@ void* LCNewObject(LCType* type, size_t size);
 void LCFree(void* memory);
 void* LCRetain(void* object);
 void* LCRelease(void* object);
+void LCPrintf(void* object);
+void LCPrint(void* object, FILE* fd);
 LCInteger LCRetainCount(void* object);
 LCCompare LCCompareObjects(void* object1, void* object2);
 void LCSortObjects(void* objects[], size_t length);

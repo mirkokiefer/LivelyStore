@@ -3,6 +3,7 @@
 
 LCCompare LCArrayCompare(void* object1, void* object2);
 void LCArrayDealloc(void* object);
+void arrayPrint(void* object, FILE* fd);
 
 struct LCArray {
   LCObjectInfo info;
@@ -12,7 +13,8 @@ struct LCArray {
 
 LCType typeArray = {
   .dealloc = LCArrayDealloc,
-  .compare = LCArrayCompare
+  .compare = LCArrayCompare,
+  .print = arrayPrint
 };
 
 LCArrayRef LCArrayCreate(void** objects, size_t length) {
@@ -95,4 +97,16 @@ void LCArrayDealloc(void* object) {
   for (LCInteger i=0; i<array->length; i++) {
     LCRelease(array->objects[i]);
   }
+}
+
+void arrayPrint(void* object, FILE* fd) {
+  LCArrayRef array = (LCArrayRef)object;
+  fprintf(fd, "{");
+  for (LCInteger i=0; i<array->length; i++) {
+    LCPrint(array->objects[i], fd);
+    if (i<array->length-1) {
+      fprintf(fd, ", ");
+    }
+  }
+  fprintf(fd, "}");
 }

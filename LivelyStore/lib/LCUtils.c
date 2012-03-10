@@ -48,7 +48,29 @@ void* LCRelease(void* object) {
   return object;
 }
 
+void LCPrintf(void* object) {
+  LCPrint(object, stdout);
+}
+
+void LCPrint(void* object, FILE* fd) {
+  if (object) {
+    LCObjectInfo* info = LCGetObjectInfo(object);
+    if (info->type->print) {
+      info->type->print(object, fd);
+    } else {
+      fprintf(fd, "%p", object);
+    }
+  } else {
+    fprintf(fd, "%p", object);
+  }
+}
+
 LCCompare LCCompareObjects(void* object1, void* object2) {
+  if (object1 == NULL) {
+    return LCSmaller;
+  } else if (object2 == NULL) {
+    return LCGreater;
+  }
   LCType* type1 = LCGetObjectInfo(object1)->type;
   if(type1->compare == NULL) {
     if(object1 == object2) {

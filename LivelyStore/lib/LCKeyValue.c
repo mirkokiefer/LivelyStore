@@ -9,10 +9,12 @@ struct LCKeyValue {
 
 void LCKeyValueDealloc(void* object);
 LCCompare LCKeyValueCompare(void* object1, void* object2);
+void keyValuePrint(void* object, FILE* fd);
 
 LCType typeKeyValue = {
   .dealloc = LCKeyValueDealloc,
-  .compare = LCKeyValueCompare
+  .compare = LCKeyValueCompare,
+  .print = keyValuePrint
 };
 
 LCKeyValueRef LCKeyValueCreate(void* key, void* value) {
@@ -40,4 +42,11 @@ void LCKeyValueDealloc(void* object) {
   LCKeyValueRef keyValue = (LCKeyValueRef)object;
   LCRelease(keyValue->key);
   LCRelease(keyValue->value);
+}
+
+void keyValuePrint(void* object, FILE* fd) {
+  LCKeyValueRef kv = (LCKeyValueRef)object;
+  LCPrint(LCKeyValueKey(kv), fd);
+  fprintf(fd, " ");
+  LCPrint(LCKeyValueValue(kv), fd);
 }

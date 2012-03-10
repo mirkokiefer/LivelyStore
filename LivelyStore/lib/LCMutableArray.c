@@ -3,6 +3,7 @@
 
 void LCMutableArrayDealloc(void* object);
 LCBool resizeBuffer(LCMutableArrayRef array, size_t size);
+void mutableArrayPrint(void* object, FILE* fd);
 
 struct LCMutableArray {
   LCObjectInfo info;
@@ -12,7 +13,8 @@ struct LCMutableArray {
 };
 
 LCType typeMutableArray = {
-  .dealloc = LCMutableArrayDealloc
+  .dealloc = LCMutableArrayDealloc,
+  .print = mutableArrayPrint
 };
 
 LCMutableArrayRef LCMutableArrayCreate(void* objects[], size_t length) {
@@ -111,4 +113,16 @@ LCBool resizeBuffer(LCMutableArrayRef array, size_t length) {
   } else {
     return false;
   }
+}
+
+void mutableArrayPrint(void* object, FILE* fd) {
+  LCMutableArrayRef array = (LCMutableArrayRef)object;
+  fprintf(fd, "{");
+  for (LCInteger i=0; i<array->length; i++) {
+    LCPrint(array->objects[i], fd);
+    if (i<array->length-1) {
+      fprintf(fd, ", ");
+    }
+  }
+  fprintf(fd, "}");
 }

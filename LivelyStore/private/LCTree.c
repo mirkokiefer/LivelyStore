@@ -13,6 +13,7 @@ LCTreeRef LCTreeChildTreeAtPath(LCTreeRef tree, LCArrayRef pathArray);
 void updateChildData(LCTreeRef tree, LCMutableArrayRef dataPaths);
 void updateChildTrees(LCTreeRef parent, LCMutableArrayRef childTreeDataDeletes);
 void processUpdatesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCMutableArrayRef deletePathArrays);
+void printTree(void* object, FILE* fd);
 
 struct LCTree {
   LCObjectInfo info;
@@ -23,7 +24,9 @@ struct LCTree {
 };
 
 LCType typeTree = {
-  .dealloc = LCTreeDealloc
+  .dealloc = LCTreeDealloc,
+  .compare = LCTreeCompare,
+  .print = printTree
 };
 
 static LCTreeRef treeCreate() {
@@ -359,4 +362,9 @@ void processUpdatesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCMutableA
   LCTreeRef newChildTree = LCTreeCreateTreeUpdatingData(currentChildTree, treeStore(parent), updatePathArrays);
   LCDictionarySetValueForKey(treeChildTrees(parent), key, newChildTree);
   LCRelease(newChildTree);
+}
+
+void printTree(void* object, FILE* fd) {
+  LCTreeRef tree = (LCTreeRef)object;
+  LCPrint(LCTreeSHA(tree), fd);
 }

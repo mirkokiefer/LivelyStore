@@ -2,6 +2,7 @@
 #include "LCString.h"
 
 LCCompare LCStringCompare(void* object1, void* object2);
+void stringPrint(void* object, FILE* fd);
 
 struct LCString {
   LCObjectInfo info;
@@ -10,7 +11,8 @@ struct LCString {
 
 LCType typeString = {
   .dealloc = NULL,
-  .compare = LCStringCompare
+  .compare = LCStringCompare,
+  .print = stringPrint
 };
 
 LCStringRef LCStringCreate(char* string) {
@@ -60,9 +62,7 @@ LCDataRef LCStringCreateData(LCStringRef string) {
 }
 
 void LCStringPrint(LCStringRef string) {
-  char content[LCStringLength(string)];
-  LCStringString(string, content);
-  printf("%s\n", content);
+  LCPrintf(string);
 }
 
 LCBool LCStringEqual(LCStringRef string, LCStringRef otherString) {
@@ -124,4 +124,9 @@ LCArrayRef LCStringCreateTokens(LCStringRef string, char delimiter) {
 
 LCStringRef LCStringCreateSHAString(LCStringRef string) {
   return LCCreateSHAString((LCByte*)string->content, LCStringLength(string));
+}
+
+void stringPrint(void* object, FILE* fd) {
+  LCStringRef string = (LCStringRef)object;
+  fprintf(fd, "%s", string->content);
 }
