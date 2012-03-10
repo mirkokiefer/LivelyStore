@@ -28,7 +28,7 @@ typedef struct LCData* LCDataRef;
 typedef struct LCKeyValue* LCKeyValueRef;
 typedef struct LCArray* LCArrayRef;
 typedef struct LCTree* LCTreeRef;
-typedef struct LCDataStore* LCDataStoreRef;
+typedef struct LCBackendWrapper* LCBackendWrapperRef;
 typedef struct LCCommit* LCCommitRef;
 typedef struct LCMutableArray* LCMutableArrayRef;
 typedef struct LCDictionary* LCDictionaryRef;
@@ -99,7 +99,7 @@ struct LCStoreBackend {
 #include "LCData.h"
 #include "LCSHA.h"
 #include "LCUtils.h"
-#include "LCDataStore.h"
+#include "LCBackendWrapper.h"
 #include "LCCommit.h"
 #include "LCArray.h"
 #include "LCMutableArray.h"

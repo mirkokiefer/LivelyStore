@@ -4,8 +4,8 @@
 
 #include "LivelyStore.h"
 
-LCCommitRef LCCommitCreateFromSHA(LCDataStoreRef store, LCStringRef sha);
-LCCommitRef LCCommitCreate(LCDataStoreRef store, LCTreeRef tree, LCCommitRef parents[], size_t parentsLength);
+LCCommitRef LCCommitCreateFromSHA(LCBackendWrapperRef store, LCStringRef sha);
+LCCommitRef LCCommitCreate(LCBackendWrapperRef store, LCTreeRef tree, LCCommitRef parents[], size_t parentsLength);
 LCCommitRef* LCCommitParents(LCCommitRef commit);
 size_t LCCommitParentsLength(LCCommitRef commit);
 LCTreeRef LCCommitTree(LCCommitRef commit);

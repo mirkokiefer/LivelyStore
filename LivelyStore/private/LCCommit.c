@@ -3,7 +3,7 @@
 
 struct LCCommit {
   LCObjectInfo info;
-  LCDataStoreRef store;
+  LCBackendWrapperRef store;
   LCArrayRef parents;
   LCTreeRef tree;
   LCStringRef sha;
@@ -26,7 +26,7 @@ static LCArrayRef commitParents(LCCommitRef commit) {
   return commit->parents;
 }
 
-LCCommitRef LCCommitCreateFromSHA(LCDataStoreRef store, LCStringRef sha) {
+LCCommitRef LCCommitCreateFromSHA(LCBackendWrapperRef store, LCStringRef sha) {
   LCCommitRef newCommit = LCNewObject(&typeCommit, sizeof(struct LCCommit));
   newCommit->sha = LCRetain(sha);
   newCommit->store = LCRetain(store);
@@ -35,7 +35,7 @@ LCCommitRef LCCommitCreateFromSHA(LCDataStoreRef store, LCStringRef sha) {
   return newCommit;
 }
 
-LCCommitRef LCCommitCreate(LCDataStoreRef store, LCTreeRef tree, LCCommitRef parents[], size_t parentsLength) {
+LCCommitRef LCCommitCreate(LCBackendWrapperRef store, LCTreeRef tree, LCCommitRef parents[], size_t parentsLength) {
   LCCommitRef newCommit = LCNewObject(&typeCommit, sizeof(struct LCCommit));
   newCommit->sha = NULL;
   newCommit->store = LCRetain(store);
@@ -63,7 +63,7 @@ LCStringRef LCCommitSHA(LCCommitRef commit) {
   if(commit->sha == NULL) {
     LCStringRef serialized = LCCommitCreateSerializedString(commit);
     commit->sha = LCStringCreateSHAString(serialized);
-    LCDataStorePutCommitData(commit->store, commit->sha, serialized);
+    LCBackendWrapperPutCommitData(commit->store, commit->sha, serialized);
     LCRelease(serialized);
   }
   return commit->sha;
@@ -106,7 +106,7 @@ static void* shaStringToCommit(LCInteger i, void* info, void* shaString) {
 }
 
 void commitDeserialize(LCCommitRef commit) {
-  LCStringRef data = LCDataStoreGetCommitData(commit->store, commit->sha);
+  LCStringRef data = LCBackendWrapperGetCommitData(commit->store, commit->sha);
   if ((data == NULL) || ((LCStringStringRef(data))[0] == '\n')) {
     return;
   }

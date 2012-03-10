@@ -1,18 +1,18 @@
 
-#ifndef LivelyStore_LCDataStore_h
-#define LivelyStore_LCDataStore_h
+#ifndef LivelyStore_LCBackendWrapper_h
+#define LivelyStore_LCBackendWrapper_h
 
 #include "LivelyStore.h"
 
-LCDataStoreRef LCDataStoreCreate(struct LCStoreBackend* backend);
-void LCDataStorePutData(LCDataStoreRef store, LCStringRef sha, LCDataRef data);
-void LCDataStoreDeleteData(LCDataStoreRef store, LCStringRef sha);
-void LCDataStorePutTreeData(LCDataStoreRef store, LCStringRef sha, LCStringRef data);
-void LCDataStorePutCommitData(LCDataStoreRef store, LCStringRef sha, LCStringRef data);
-void LCDataStorePutTagData(LCDataStoreRef store, LCStringRef tag, LCStringRef data);
-size_t LCDataStoreGetDataLength(LCDataStoreRef store, char* sha);
-LCDataRef LCDataStoreGetData(LCDataStoreRef store, LCStringRef sha);
-LCStringRef LCDataStoreGetTreeData(LCDataStoreRef store, LCStringRef sha);
-LCStringRef LCDataStoreGetCommitData(LCDataStoreRef store, LCStringRef sha);
+LCBackendWrapperRef LCBackendWrapperCreate(struct LCStoreBackend* backend);
+void LCBackendWrapperPutData(LCBackendWrapperRef store, LCStringRef sha, LCDataRef data);
+void LCBackendWrapperDeleteData(LCBackendWrapperRef store, LCStringRef sha);
+void LCBackendWrapperPutTreeData(LCBackendWrapperRef store, LCStringRef sha, LCStringRef data);
+void LCBackendWrapperPutCommitData(LCBackendWrapperRef store, LCStringRef sha, LCStringRef data);
+void LCBackendWrapperPutTagData(LCBackendWrapperRef store, LCStringRef tag, LCStringRef data);
+size_t LCBackendWrapperGetDataLength(LCBackendWrapperRef store, char* sha);
+LCDataRef LCBackendWrapperGetData(LCBackendWrapperRef store, LCStringRef sha);
+LCStringRef LCBackendWrapperGetTreeData(LCBackendWrapperRef store, LCStringRef sha);
+LCStringRef LCBackendWrapperGetCommitData(LCBackendWrapperRef store, LCStringRef sha);
 
 #endif

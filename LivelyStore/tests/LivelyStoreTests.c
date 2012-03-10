@@ -6,7 +6,7 @@ void* arrayMap(LCInteger i, void* info, void* each);
 
 int tests_run = 0;
 
-LCDataStoreRef testStore;
+LCBackendWrapperRef testStore;
 
 static LCTreeRef testdata_tree() {
   LCStringRef key1 = LCStringCreate("path1");
@@ -333,7 +333,7 @@ static char* test_library_interface() {
 
 static char* all_tests() {
   struct LCStoreBackend* memoryBackend = createLCMemoryStoreBackend("testing");
-  testStore = LCDataStoreCreate(memoryBackend);
+  testStore = LCBackendWrapperCreate(memoryBackend);
   mu_run_test(test_retain_counting);
   mu_run_test(test_string);
   mu_run_test(test_array);

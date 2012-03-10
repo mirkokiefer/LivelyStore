@@ -16,7 +16,7 @@ void processUpdatesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCMutableA
 
 struct LCTree {
   LCObjectInfo info;
-  LCDataStoreRef store;
+  LCBackendWrapperRef store;
   LCStringRef sha;
   LCDictionaryRef childTrees;
   LCDictionaryRef childData;
@@ -35,11 +35,11 @@ static LCTreeRef treeCreate() {
   return newTree;
 }
 
-static LCDataStoreRef treeStore(LCTreeRef tree) {
+static LCBackendWrapperRef treeStore(LCTreeRef tree) {
   return tree->store;
 }
 
-static void treeSetStore(LCTreeRef tree, LCDataStoreRef store) {
+static void treeSetStore(LCTreeRef tree, LCBackendWrapperRef store) {
   if (store != tree->store) {
     LCRelease(tree->store);
   }
@@ -56,7 +56,7 @@ static void treeSetSHA(LCTreeRef tree, LCStringRef sha) {
   }
   if (sha) {
     tree->sha = LCRetain(sha);
-    LCDataStorePutTreeData(treeStore(tree), sha, LCTreeCreateSerializedString(tree));
+    LCBackendWrapperPutTreeData(treeStore(tree), sha, LCTreeCreateSerializedString(tree));
   }
 }
 
@@ -131,7 +131,7 @@ static void treeDeserializeLines(LCTreeRef tree, LCArrayRef lines, LCDictionaryR
 }
 
 static void treeDeserialize(LCTreeRef tree) {
-  LCStringRef data = LCDataStoreGetTreeData(treeStore(tree), treeSHA(tree));
+  LCStringRef data = LCBackendWrapperGetTreeData(treeStore(tree), treeSHA(tree));
   LCArrayRef tokens = LCStringCreateTokens(data, '\n');
   LCArrayRef lines = LCArrayCreateSubArray(tokens, 0, LCArrayLength(tokens)-1);
   LCRelease(data);
@@ -146,14 +146,14 @@ static void treeDeserialize(LCTreeRef tree) {
   treeSetChildData(tree, childData);
 }
 
-LCTreeRef LCTreeCreateFromSHA(LCDataStoreRef store, LCStringRef sha) {
+LCTreeRef LCTreeCreateFromSHA(LCBackendWrapperRef store, LCStringRef sha) {
   LCTreeRef newTree = treeCreate();
   newTree->sha = LCRetain(sha);
   newTree->store = LCRetain(store);
   return newTree;
 }
 
-LCTreeRef LCTreeCreate(LCDataStoreRef store, LCDictionaryRef childTrees, LCDictionaryRef childDataSHAs) {
+LCTreeRef LCTreeCreate(LCBackendWrapperRef store, LCDictionaryRef childTrees, LCDictionaryRef childDataSHAs) {
   LCTreeRef newTree = treeCreate();
   newTree->store = LCRetain(store);
   newTree->childTrees = LCRetain(childTrees);
@@ -240,7 +240,7 @@ LCStringRef LCTreeChildDataAtPath(LCTreeRef tree, LCArrayRef path) {
   }
 }
 
-LCTreeRef LCTreeCreateTreeUpdatingData(LCTreeRef oldTree, LCDataStoreRef store, LCMutableArrayRef updatePathValues) {
+LCTreeRef LCTreeCreateTreeUpdatingData(LCTreeRef oldTree, LCBackendWrapperRef store, LCMutableArrayRef updatePathValues) {
   LCTreeRef newTree;
   if (oldTree) {
     newTree = LCTreeCopy(oldTree);    

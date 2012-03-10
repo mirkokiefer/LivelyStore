@@ -3,7 +3,7 @@
 
 struct LCStore {
   LCObjectInfo info;
-  LCDataStoreRef dataStore;
+  LCBackendWrapperRef dataStore;
   LCCommitRef head;
 };
 
@@ -19,7 +19,7 @@ LCType typeStore = {
 
 LCStoreRef LCStoreCreate(struct LCStoreBackend* backend, char* headSHA) {
   LCStoreRef newStore = LCNewObject(&typeStore, sizeof(struct LCStore));
-  newStore->dataStore = LCDataStoreCreate(backend);
+  newStore->dataStore = LCBackendWrapperCreate(backend);
   if (headSHA) {
     LCStringRef shaObj = LCStringCreate(headSHA);
     newStore->head = LCCommitCreateFromSHA(newStore->dataStore, shaObj);
@@ -62,7 +62,7 @@ LCStringRef LCStoreDataSHA(LCStoreRef store, LCCommitRef commit, char* path) {
 }
 
 LCDataRef LCStoreData(LCStoreRef store, LCStringRef sha) {
-  return LCDataStoreGetData(store->dataStore, sha);
+  return LCBackendWrapperGetData(store->dataStore, sha);
 }
 
 void LCStoreDealloc(void* object) {
@@ -77,7 +77,7 @@ void storeDataWithSHAs(LCStoreRef store, LCKeyValueRef addPaths[], size_t length
   for (LCInteger i=0; i<length; i++) {
     value = LCKeyValueValue(addPaths[i]);
     sha = LCDataSHA1(value);
-    LCDataStorePutData(store->dataStore, sha, value);
+    LCBackendWrapperPutData(store->dataStore, sha, value);
     pathSHABuffer[i] = LCKeyValueCreate(LCKeyValueKey(addPaths[i]), sha);
   }
 }
