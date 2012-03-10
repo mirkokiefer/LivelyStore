@@ -306,7 +306,7 @@ static char* test_library_interface_with_backend(struct LCStoreBackend* backend)
   mu_assert("LCCommitFindParent", LCCompareObjects(foundHead, head0) == LCEqual);
   
   // create new store from commit SHA
-  LCStoreRef store2 = LCStoreCreate(backend, LCStringStringRef(LCCommitSHA(head1)));
+  LCStoreRef store2 = LCStoreCreate(backend, LCCommitSHA(head1));
   LCStringRef dataSHA7 = LCStoreDataSHA(store2, NULL, "tree1/value1");
   mu_assert("create store from commit SHA", LCStringEqual(dataSHA7, dataSHA1));
   
