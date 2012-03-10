@@ -27,6 +27,22 @@ LCArrayRef LCArrayCreate(void** objects, size_t length) {
   return newArray;
 };
 
+LCArrayRef LCArrayCreateAppendingObject(LCArrayRef array, void* object) {
+  return LCArrayCreateAppendingObjects(array, &object, 1);
+}
+
+LCArrayRef LCArrayCreateAppendingObjects(LCArrayRef array, void** objects, size_t length) {
+  size_t totalLength = array->length + length;
+  LCArrayRef newArray = LCNewObject(&typeArray, sizeof(struct LCArray) + totalLength * sizeof(void*));
+  newArray->length = totalLength;
+  memcpy(newArray->objects, array->objects, array->length * sizeof(void*));
+  memcpy(&(newArray->objects[array->length]), objects, length * sizeof(void*));
+  for (LCInteger i=0; i<totalLength; i++) {
+    LCRetain(newArray->objects[i]);
+  }
+  return newArray;
+}
+
 LCArrayRef LCArrayCreateFromArrays(LCArrayRef arrays[], size_t length) {
   size_t totalLength = 0;
   for (LCInteger i=0; i<length; i++) {

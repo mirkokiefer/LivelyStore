@@ -17,4 +17,5 @@ LCTreeRef LCTreeChildTreeAtPath(LCTreeRef tree, LCArrayRef path);
 LCStringRef LCTreeChildDataAtPath(LCTreeRef tree, LCArrayRef path);
 LCTreeRef LCTreeCreateTreeUpdatingData(LCTreeRef oldTree, LCBackendWrapperRef store, LCMutableArrayRef updatePathValues);
 LCTreeRef LCTreeCopy(LCTreeRef tree);
+void LCTreeChangedPathValues(LCTreeRef originalTree, LCTreeRef newTree, LCMutableArrayRef changedData, LCMutableArrayRef changedTrees);
 #endif

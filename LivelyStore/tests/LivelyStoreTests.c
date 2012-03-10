@@ -259,6 +259,13 @@ static char* test_tree_operations() {
             (LCTreeChildDataAtPath(newTree, path2Array)==NULL) &&
             (LCTreeChildDataAtPath(newTree, path3Array)==sha1) &&
             (LCTreeChildDataAtPath(newTree, path4Array)==sha2));
+  
+  LCMutableArrayRef changedData = LCMutableArrayCreate(NULL, 0);
+  LCMutableArrayRef changedTrees = LCMutableArrayCreate(NULL, 0);
+  LCTreeChangedPathValues(tree, newTree, changedData, changedTrees);
+  LCPrintf(changedData);
+  printf("\n");
+  LCPrintf(changedTrees);
   return 0;
 }
 

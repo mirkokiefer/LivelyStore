@@ -5,6 +5,7 @@
 #include "LivelyStore.h"
 
 LCDictionaryRef LCDictionaryCreate(LCKeyValueRef keyValues[], size_t length);
+LCKeyValueRef LCDictionaryEntryForKey(LCDictionaryRef dict, void* key);
 void* LCDictionaryValueForKey(LCDictionaryRef dict, void* key);
 void LCDictionarySetValueForKey(LCDictionaryRef dict, void* key, void* value);
 void LCDictionaryDeleteKey(LCDictionaryRef dict, void* key);
@@ -13,5 +14,9 @@ void LCDictionaryAddEntries(LCDictionaryRef dict, LCKeyValueRef keyValues[], siz
 LCDictionaryRef LCDictionaryCopy(LCDictionaryRef dict);
 size_t LCDictionaryLength(LCDictionaryRef dict);
 LCKeyValueRef* LCDictionaryEntries(LCDictionaryRef dict);
+LCMutableArrayRef LCDictionaryCreateChangesArray(LCDictionaryRef original, LCDictionaryRef new);
+LCMutableArrayRef LCDictionaryCreateAddedArray(LCDictionaryRef original, LCDictionaryRef new);
+LCMutableArrayRef LCDictionaryCreateUpdatedArray(LCDictionaryRef original, LCDictionaryRef new);
+LCMutableArrayRef LCDictionaryCreateDeletedArray(LCDictionaryRef original, LCDictionaryRef new);
 
 #endif

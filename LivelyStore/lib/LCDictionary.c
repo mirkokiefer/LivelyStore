@@ -18,15 +18,24 @@ LCDictionaryRef LCDictionaryCreate(LCKeyValueRef keyValues[], size_t length) {
   return newDict;
 };
 
-void* LCDictionaryValueForKey(LCDictionaryRef dict, void* key) {
+LCKeyValueRef LCDictionaryEntryForKey(LCDictionaryRef dict, void* key) {
   LCKeyValueRef currKeyValue;
   for (LCInteger i=0; i<LCMutableArrayLength(dict->keyValues); i++) {
     currKeyValue = LCMutableArrayObjectAtIndex(dict->keyValues, i);
     if(LCCompareObjects(key, LCKeyValueKey(currKeyValue)) == LCEqual) {
-      return LCKeyValueValue(currKeyValue);
+      return currKeyValue;
     }
   }
   return NULL;
+}
+
+void* LCDictionaryValueForKey(LCDictionaryRef dict, void* key) {
+  LCKeyValueRef entry = LCDictionaryEntryForKey(dict, key);
+  if (entry) {
+    return LCKeyValueValue(entry);
+  } else {
+    return NULL;
+  }
 }
 
 void LCDictionaryDeleteKey(LCDictionaryRef dict, void* key) {
@@ -69,6 +78,74 @@ size_t LCDictionaryLength(LCDictionaryRef dict) {
 LCKeyValueRef* LCDictionaryEntries(LCDictionaryRef dict) {
   return (LCKeyValueRef*)LCMutableArrayObjects(dict->keyValues);
 }
+
+LCMutableArrayRef LCDictionaryCreateChangesArray(LCDictionaryRef original, LCDictionaryRef new) {
+  LCDictionaryRef changes = LCDictionaryCreate(NULL, 0);
+  LCKeyValueRef* originalKeyValues = (LCKeyValueRef*)LCMutableArrayObjects(original->keyValues);
+  LCKeyValueRef* newKeyValues = (LCKeyValueRef*)LCMutableArrayObjects(new->keyValues);
+
+  for (LCInteger i=0; i<LCMutableArrayLength(original->keyValues); i++) {
+    void* key = LCKeyValueKey(originalKeyValues[i]);
+    void* value = LCKeyValueValue(originalKeyValues[i]);
+    void* newValue = LCDictionaryValueForKey(new, key);
+    if (LCCompareObjects(value, newValue) != LCEqual) {
+      LCDictionarySetValueForKey(changes, key, newValue);
+    }
+  }
+  for (LCInteger i=0; i<LCMutableArrayLength(new->keyValues); i++) {
+    void* key = LCKeyValueKey(newKeyValues[i]);
+    void* newValue = LCKeyValueValue(newKeyValues[i]);
+    void* originalValue = LCDictionaryValueForKey(original, key);
+    if (LCCompareObjects(originalValue, newValue) != LCEqual) {
+      LCDictionarySetValueForKey(changes, key, newValue);
+    }
+  }
+  LCMutableArrayRef result = LCRetain(changes->keyValues);
+  LCRelease(changes);
+  return result;
+}
+
+LCMutableArrayRef LCDictionaryCreateAddedArray(LCDictionaryRef original, LCDictionaryRef new) {
+  LCMutableArrayRef changes = LCMutableArrayCreate(NULL, 0);
+  LCKeyValueRef* newKeyValues = (LCKeyValueRef*)LCMutableArrayObjects(new->keyValues);
+  for (LCInteger i=0; i<LCMutableArrayLength(new->keyValues); i++) {
+    void* key = LCKeyValueKey(newKeyValues[i]);
+    void* originalValue = LCDictionaryValueForKey(original, key);
+    if (originalValue == NULL) {
+      LCMutableArrayAddObject(changes, newKeyValues[i]);
+    }
+  }
+  return changes;
+}
+
+LCMutableArrayRef LCDictionaryCreateUpdatedArray(LCDictionaryRef original, LCDictionaryRef new) {
+  LCMutableArrayRef changes = LCMutableArrayCreate(NULL, 0);
+  LCKeyValueRef* originalKeyValues = (LCKeyValueRef*)LCMutableArrayObjects(original->keyValues);
+  for (LCInteger i=0; i<LCMutableArrayLength(original->keyValues); i++) {
+    void* key = LCKeyValueKey(originalKeyValues[i]);
+    void* value = LCKeyValueValue(originalKeyValues[i]);
+    LCKeyValueRef newEntry = LCDictionaryEntryForKey(new, key);
+    void* newValue = LCKeyValueValue(newEntry);
+    if ((LCCompareObjects(value, newValue) != LCEqual) && (newValue != NULL)) {
+      LCMutableArrayAddObject(changes, newEntry);
+    }
+  }
+  return changes;
+}
+
+LCMutableArrayRef LCDictionaryCreateDeletedArray(LCDictionaryRef original, LCDictionaryRef new) {
+  LCMutableArrayRef changes = LCMutableArrayCreate(NULL, 0);
+  LCKeyValueRef* originalKeyValues = (LCKeyValueRef*)LCMutableArrayObjects(original->keyValues);
+  for (LCInteger i=0; i<LCMutableArrayLength(original->keyValues); i++) {
+    void* key = LCKeyValueKey(originalKeyValues[i]);
+    void* newValue = LCDictionaryValueForKey(new, key);
+    if (newValue == NULL) {
+      LCMutableArrayAddObject(changes, key);
+    }
+  }
+  return changes;
+}
+
 
 void LCDictionaryDealloc(void* object) {
   LCDictionaryRef dict = (LCDictionaryRef)object;

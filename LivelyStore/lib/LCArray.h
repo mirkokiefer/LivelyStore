@@ -6,6 +6,8 @@
 #include "LivelyStore.h"
 
 LCArrayRef LCArrayCreate(void** objects, size_t length);
+LCArrayRef LCArrayCreateAppendingObject(LCArrayRef array, void* object);
+LCArrayRef LCArrayCreateAppendingObjects(LCArrayRef array, void** objects, size_t length);
 LCArrayRef LCArrayCreateFromArrays(LCArrayRef arrays[], size_t length);
 void** LCArrayObjects(LCArrayRef array);
 void* LCArrayObjectAtIndex(LCArrayRef array, LCInteger index);

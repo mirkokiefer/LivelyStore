@@ -9,6 +9,7 @@ void serializeChildTrees(LCDictionaryRef childTrees, char buffer[]);
 void serializeChildData(LCDictionaryRef childData, char buffer[]);
 void serializePathSHA(LCStringRef path, LCStringRef sha, char buffer[]);
 LCTreeRef LCTreeChildTreeAtPath(LCTreeRef tree, LCArrayRef pathArray);
+LCCompare LCTreeCompare(void* object1, void* object2);
 
 void updateChildData(LCTreeRef tree, LCMutableArrayRef dataPaths);
 void updateChildTrees(LCTreeRef parent, LCMutableArrayRef childTreeDataDeletes);
@@ -275,6 +276,54 @@ LCTreeRef LCTreeCreateTreeUpdatingData(LCTreeRef oldTree, LCBackendWrapperRef st
   LCRelease(childTreeDataUpdates);
   
   return newTree;
+}
+
+static void treeAddKeyValuesToPathValues(LCArrayRef pathArray, LCMutableArrayRef keyValues, LCMutableArrayRef pathValues) {
+  for (LCInteger i=0; i<LCMutableArrayLength(keyValues); i++) {
+    LCKeyValueRef keyValue = (LCKeyValueRef)LCMutableArrayObjectAtIndex(keyValues, i);
+    LCArrayRef newPathArray = LCArrayCreateAppendingObject(pathArray, LCKeyValueKey(keyValue));
+    LCKeyValueRef pathValue = LCKeyValueCreate(newPathArray, LCKeyValueValue(keyValue));
+    LCMutableArrayAddObject(pathValues, pathValue);
+    LCRelease(pathValue);
+    LCRelease(newPathArray);
+  }
+}
+
+static void treeFindChangedPathValues(LCArrayRef pathArray, LCTreeRef original, LCTreeRef new,
+                                      LCMutableArrayRef changedData, LCMutableArrayRef changedTrees) {
+  LCMutableArrayRef changedKeyValues = LCDictionaryCreateChangesArray(original->childData, new->childData);
+  treeAddKeyValuesToPathValues(pathArray, changedKeyValues, changedData);
+  
+  LCMutableArrayRef addedChildTrees = LCDictionaryCreateAddedArray(original->childTrees, new->childTrees);
+  LCMutableArrayRef deletedChildTrees = LCDictionaryCreateDeletedArray(original->childTrees, new->childTrees);
+  treeAddKeyValuesToPathValues(pathArray, addedChildTrees, changedTrees);
+  treeAddKeyValuesToPathValues(pathArray, deletedChildTrees, changedTrees);
+
+  LCMutableArrayRef updatedChildTrees = LCDictionaryCreateUpdatedArray(original->childTrees, new->childTrees);
+  for (LCInteger i=0; i<LCMutableArrayLength(updatedChildTrees); i++) {
+    LCKeyValueRef keyChildTree = LCMutableArrayObjectAtIndex(updatedChildTrees, i);
+    LCArrayRef newPathArray = LCArrayCreateAppendingObject(pathArray, LCKeyValueKey(keyChildTree));
+    LCTreeRef originalChildTree = LCTreeChildTreeAtKey(original, LCKeyValueKey(keyChildTree));
+    LCTreeRef newChildTree = LCKeyValueValue(keyChildTree);
+    treeFindChangedPathValues(newPathArray, originalChildTree, newChildTree, changedData, changedTrees);
+    LCRelease(newPathArray);
+  }
+  LCRelease(changedKeyValues);
+  LCRelease(addedChildTrees);
+  LCRelease(deletedChildTrees);
+  LCRelease(updatedChildTrees);
+}
+
+void LCTreeChangedPathValues(LCTreeRef originalTree, LCTreeRef newTree, LCMutableArrayRef changedData, LCMutableArrayRef changedTrees) {
+  LCArrayRef pathArray = LCArrayCreate(NULL, 0);
+  treeFindChangedPathValues(pathArray, originalTree, newTree, changedData, changedTrees);
+  LCRelease(pathArray);
+}
+
+LCCompare LCTreeCompare(void* object1, void* object2) {
+  LCTreeRef tree1 = (LCTreeRef)object1;
+  LCTreeRef tree2 = (LCTreeRef)object2;
+  return LCCompareObjects(LCTreeSHA(tree1), LCTreeSHA(tree2));
 }
 
 void LCTreeDealloc(void* object) {
