@@ -108,3 +108,4 @@ struct LCStoreBackend {
 #include "LCMemoryStoreBackend.h"
 #include "LCFileStoreBackend.h"
 #include "LCStoreInterface.h"
+#include "LCMemoryStream.h"

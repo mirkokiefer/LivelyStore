@@ -41,6 +41,26 @@ static char* test_retain_counting() {
   return 0;
 }
 
+static char* test_memory_stream() {
+  LCMemoryStreamRef stream = LCMemoryStreamCreate();
+  FILE* fd = LCMemoryStreamFile(stream);
+  fprintf(fd, "123");
+  fprintf(fd, "456789");
+  fclose(fd);
+  FILE* fd2 = LCMemoryStreamFile(stream);
+  char buffer[10];
+  fscanf(fd2, "%s", buffer);
+  mu_assert("LCMemoryStream read/write", strcmp("123456789", buffer)==0);
+  
+  fseek(fd2, -4, SEEK_END);
+  char buffer1[5];
+  fscanf(fd2, "%s", buffer1);
+  fclose(fd2);
+  mu_assert("LCMemoryStream seek", strcmp("6789", buffer1)==0);
+
+  return 0;
+}
+
 static char* test_string() {
   char* aCString = "abcd";
   char* anIdenticalCString = "abcd";
@@ -263,9 +283,7 @@ static char* test_tree_operations() {
   LCMutableArrayRef changedData = LCMutableArrayCreate(NULL, 0);
   LCMutableArrayRef changedTrees = LCMutableArrayCreate(NULL, 0);
   LCTreeChangedPathValues(tree, newTree, changedData, changedTrees);
-  LCPrintf(changedData);
-  printf("\n");
-  LCPrintf(changedTrees);
+  // add assert here
   return 0;
 }
 
@@ -342,6 +360,7 @@ static char* all_tests() {
   struct LCStoreBackend* memoryBackend = createLCMemoryStoreBackend("testing");
   testStore = LCBackendWrapperCreate(memoryBackend);
   mu_run_test(test_retain_counting);
+  mu_run_test(test_memory_stream);
   mu_run_test(test_string);
   mu_run_test(test_array);
   mu_run_test(test_data);
