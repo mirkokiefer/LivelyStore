@@ -33,8 +33,8 @@ static void LCMemoryStoreDealloc(void* object) {
   LCRelease(store->dict);
 }
 
-struct LCStoreBackend* createLCMemoryStoreBackend(char* location) {
-  struct LCStoreBackend* backend = malloc(sizeof(struct LCStoreBackend));
+struct LCRepositoryBackend* createLCMemoryStoreBackend(char* location) {
+  struct LCRepositoryBackend* backend = malloc(sizeof(struct LCRepositoryBackend));
   if (backend != NULL) {
     LCStringRef locationObj = LCStringCreate(location);
     backend->storeObject = LCMemoryStoreCreate(locationObj);
@@ -47,7 +47,7 @@ struct LCStoreBackend* createLCMemoryStoreBackend(char* location) {
   return backend;
 }
 
-void freeLCMemoryStoreBackend(struct LCStoreBackend* backend) {
+void freeLCMemoryStoreBackend(struct LCRepositoryBackend* backend) {
   LCRelease(backend->storeObject);
   free(backend);
 }

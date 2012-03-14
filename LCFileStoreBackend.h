@@ -4,7 +4,7 @@
 
 #include "LivelyStore.h"
 
-struct LCStoreBackend* createLCFileStoreBackend(char* location);
-void freeLCFileStoreBackend(struct LCStoreBackend* backend);
+struct LCRepositoryBackend* createLCFileStoreBackend(char* location);
+void freeLCFileStoreBackend(struct LCRepositoryBackend* backend);
 
 #endif

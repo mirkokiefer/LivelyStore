@@ -287,20 +287,20 @@ static char* test_tree_operations() {
   return 0;
 }
 
-static char* test_library_interface_with_backend(struct LCStoreBackend* backend) {  
-  LCStoreRef store = LCStoreCreate(backend, NULL);
-  LCCommitRef head0 = LCStoreHead(store);
+static char* test_library_interface_with_backend(struct LCRepositoryBackend* backend) {  
+  LCRepositoryRef store = LCRepositoryCreate(backend, NULL);
+  LCCommitRef head0 = LCRepositoryHead(store);
   LCStageRef stage1 = LCStageCreate();
   char* data1 = "123456";
   LCStageAddEntry(stage1, "tree1/value1", (LCByte*)data1, 6);
   LCStageAddEntry(stage1, "value2", (LCByte*)"1234567", 7);
   LCStageAddEntry(stage1, "tree1/tree1_1/value3", (LCByte*)"1234568", 8);
   
-  LCStoreCommit(store, stage1);
-  LCCommitRef head1 = LCStoreHead(store);
-  LCStringRef dataSHA1 = LCStoreDataSHA(store, head1, "tree1/value1");
-  LCStringRef dataSHA2 = LCStoreDataSHA(store, head1, "value2");
-  LCStringRef dataSHA3 = LCStoreDataSHA(store, head1, "tree1/tree1_1/value3");
+  LCRepositoryCommit(store, stage1);
+  LCCommitRef head1 = LCRepositoryHead(store);
+  LCStringRef dataSHA1 = LCRepositoryDataSHA(store, head1, "tree1/value1");
+  LCStringRef dataSHA2 = LCRepositoryDataSHA(store, head1, "value2");
+  LCStringRef dataSHA3 = LCRepositoryDataSHA(store, head1, "tree1/tree1_1/value3");
   
   mu_assert("commited objects and verify", LCStringEqualCString(dataSHA1, "7c4a8d09ca3762af61e59520943dc26494f8941b") &&
             LCStringEqualCString(dataSHA2, "20eabe5d64b0e216796e834f52d61fd0b70332fc") &&
@@ -310,20 +310,20 @@ static char* test_library_interface_with_backend(struct LCStoreBackend* backend)
   LCStageRef stage2 = LCStageCreate();
   LCStageAddEntry(stage2, "tree1/value1", (LCByte*)"123456789", 9);
   LCStageDeletePath(stage2, "tree1/tree1_1/value3");
-  LCStoreCommit(store, stage2);
-  LCCommitRef head2 = LCStoreHead(store);
+  LCRepositoryCommit(store, stage2);
+  LCCommitRef head2 = LCRepositoryHead(store);
 
-  LCStringRef dataSHA4 = LCStoreDataSHA(store, NULL, "tree1/value1");
-  LCStringRef dataSHA5 = LCStoreDataSHA(store, NULL, "tree1/tree1_1/value3");
+  LCStringRef dataSHA4 = LCRepositoryDataSHA(store, NULL, "tree1/value1");
+  LCStringRef dataSHA5 = LCRepositoryDataSHA(store, NULL, "tree1/tree1_1/value3");
   mu_assert("perform subsequent commit", LCStringEqualCString(dataSHA4, "f7c3bc1d808e04732adf679965ccc34ca7ae3441") &&
             dataSHA5 == NULL);
   
   
-  LCStringRef dataSHA6 = LCStoreDataSHA(store, head1, "tree1/value1");
+  LCStringRef dataSHA6 = LCRepositoryDataSHA(store, head1, "tree1/value1");
   mu_assert("retrieving previous commit data", LCStringEqual(dataSHA6, dataSHA1));
   
   // get actual data
-  LCDataRef retrievedData1 = LCStoreData(store, dataSHA1);
+  LCDataRef retrievedData1 = LCRepositoryData(store, dataSHA1);
   mu_assert("get actual data", strcmp((char*)LCDataDataRef(retrievedData1), data1)==0);
   
   // find parent commit
@@ -331,8 +331,8 @@ static char* test_library_interface_with_backend(struct LCStoreBackend* backend)
   mu_assert("LCCommitFindParent", LCCompareObjects(foundHead, head0) == LCEqual);
   
   // create new store from commit SHA
-  LCStoreRef store2 = LCStoreCreate(backend, LCCommitSHA(head1));
-  LCStringRef dataSHA7 = LCStoreDataSHA(store2, NULL, "tree1/value1");
+  LCRepositoryRef store2 = LCRepositoryCreate(backend, LCCommitSHA(head1));
+  LCStringRef dataSHA7 = LCRepositoryDataSHA(store2, NULL, "tree1/value1");
   mu_assert("create store from commit SHA", LCStringEqual(dataSHA7, dataSHA1));
   
   
@@ -340,7 +340,7 @@ static char* test_library_interface_with_backend(struct LCStoreBackend* backend)
 }
 
 static char* test_library_interface() {
-  struct LCStoreBackend* memoryBackend = createLCMemoryStoreBackend("test_interface");
+  struct LCRepositoryBackend* memoryBackend = createLCMemoryStoreBackend("test_interface");
   char* memoryTest = test_library_interface_with_backend(memoryBackend);
   if (memoryTest) {
     return memoryTest;
@@ -350,14 +350,14 @@ static char* test_library_interface() {
   LCStringRef paths[] = {homeFolder, testFolder};
   LCStringRef testPath = LCStringCreateFromStrings(paths, 2);
   char* testPathRef = LCStringStringRef(testPath);
-  struct LCStoreBackend* fileBackend = createLCFileStoreBackend(testPathRef);
+  struct LCRepositoryBackend* fileBackend = createLCFileStoreBackend(testPathRef);
   char* fileTest = test_library_interface_with_backend(fileBackend);
   deleteDirectory(testPathRef);
   return fileTest;
 }
 
 static char* all_tests() {
-  struct LCStoreBackend* memoryBackend = createLCMemoryStoreBackend("testing");
+  struct LCRepositoryBackend* memoryBackend = createLCMemoryStoreBackend("testing");
   testStore = LCBackendWrapperCreate(memoryBackend);
   mu_run_test(test_retain_counting);
   mu_run_test(test_memory_stream);

@@ -66,8 +66,8 @@ static void LCFileStoreDealloc(void* object) {
   LCRelease(store->dataLocation);
 }
 
-struct LCStoreBackend* createLCFileStoreBackend(char* location) {
-  struct LCStoreBackend* backend = malloc(sizeof(struct LCStoreBackend));
+struct LCRepositoryBackend* createLCFileStoreBackend(char* location) {
+  struct LCRepositoryBackend* backend = malloc(sizeof(struct LCRepositoryBackend));
   if (backend != NULL) {
     LCStringRef locationObj = LCStringCreate(location);
     backend->storeObject = LCFileStoreCreate(locationObj);
@@ -80,7 +80,7 @@ struct LCStoreBackend* createLCFileStoreBackend(char* location) {
   return backend;
 }
 
-void freeLCFileStoreBackend(struct LCStoreBackend* backend) {
+void freeLCFileStoreBackend(struct LCRepositoryBackend* backend) {
   LCRelease(backend->storeObject);
   free(backend);
 }

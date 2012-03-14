@@ -1,24 +1,24 @@
 
-#include "LCStore.h"
+#include "LCRepository.h"
 
-struct LCStore {
+struct LCRepository {
   LCObjectInfo info;
   LCBackendWrapperRef dataStore;
   LCCommitRef head;
 };
 
-void LCStoreDealloc(void* object);
-void storeDataWithSHAs(LCStoreRef store, LCKeyValueRef addPaths[], size_t length, LCKeyValueRef pathSHABuffer[]);
-LCTreeRef buildTree(LCStoreRef store, LCTreeRef current, LCKeyValueRef* addPathSHAs, size_t newLength,
+void LCRepositoryDealloc(void* object);
+void storeDataWithSHAs(LCRepositoryRef store, LCKeyValueRef addPaths[], size_t length, LCKeyValueRef pathSHABuffer[]);
+LCTreeRef buildTree(LCRepositoryRef store, LCTreeRef current, LCKeyValueRef* addPathSHAs, size_t newLength,
                     LCStringRef* delete, size_t deleteLength);
-void setStoreHead(LCStoreRef store, LCCommitRef newHead);
+void setStoreHead(LCRepositoryRef store, LCCommitRef newHead);
 
 LCType typeStore = {
-  .dealloc = LCStoreDealloc
+  .dealloc = LCRepositoryDealloc
 };
 
-LCStoreRef LCStoreCreate(struct LCStoreBackend* backend, LCStringRef headSHA) {
-  LCStoreRef newStore = LCNewObject(&typeStore, sizeof(struct LCStore));
+LCRepositoryRef LCRepositoryCreate(struct LCRepositoryBackend* backend, LCStringRef headSHA) {
+  LCRepositoryRef newStore = LCNewObject(&typeStore, sizeof(struct LCRepository));
   newStore->dataStore = LCBackendWrapperCreate(backend);
   if (headSHA) {
     newStore->head = LCCommitCreateFromSHA(newStore->dataStore, headSHA);
@@ -28,7 +28,7 @@ LCStoreRef LCStoreCreate(struct LCStoreBackend* backend, LCStringRef headSHA) {
   return newStore;
 };
 
-void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
+void LCRepositoryCommit(LCRepositoryRef store, LCStageRef stage) {
   LCKeyValueRef* addPaths = LCStagePathsToAdd(stage);
   size_t addPathsLength = LCStageAddPathsCount(stage);
   LCStringRef* deletePaths = LCStagePathsToDelete(stage);
@@ -43,11 +43,11 @@ void LCStoreCommit(LCStoreRef store, LCStageRef stage) {
   setStoreHead(store, newHead);
 }
 
-LCCommitRef LCStoreHead(LCStoreRef store) {
+LCCommitRef LCRepositoryHead(LCRepositoryRef store) {
   return store->head;
 }
 
-LCStringRef LCStoreDataSHA(LCStoreRef store, LCCommitRef commit, char* path) {
+LCStringRef LCRepositoryDataSHA(LCRepositoryRef store, LCCommitRef commit, char* path) {
   if (!commit) {
     commit = store->head;
   }
@@ -59,17 +59,17 @@ LCStringRef LCStoreDataSHA(LCStoreRef store, LCCommitRef commit, char* path) {
   return dataSHA;
 }
 
-LCDataRef LCStoreData(LCStoreRef store, LCStringRef sha) {
+LCDataRef LCRepositoryData(LCRepositoryRef store, LCStringRef sha) {
   return LCBackendWrapperGetData(store->dataStore, sha);
 }
 
-void LCStoreDealloc(void* object) {
-  LCStoreRef store = (LCStoreRef)object;
+void LCRepositoryDealloc(void* object) {
+  LCRepositoryRef store = (LCRepositoryRef)object;
   LCRelease(store->dataStore);
   LCRelease(store->head);
 }
 
-void storeDataWithSHAs(LCStoreRef store, LCKeyValueRef addPaths[], size_t length, LCKeyValueRef pathSHABuffer[]) {
+void storeDataWithSHAs(LCRepositoryRef store, LCKeyValueRef addPaths[], size_t length, LCKeyValueRef pathSHABuffer[]) {
   LCDataRef value;
   LCStringRef sha;
   for (LCInteger i=0; i<length; i++) {
@@ -80,7 +80,7 @@ void storeDataWithSHAs(LCStoreRef store, LCKeyValueRef addPaths[], size_t length
   }
 }
 
-LCTreeRef buildTree(LCStoreRef store, LCTreeRef current, LCKeyValueRef addPathSHAs[], size_t addPathSHAsLength,
+LCTreeRef buildTree(LCRepositoryRef store, LCTreeRef current, LCKeyValueRef addPathSHAs[], size_t addPathSHAsLength,
                     LCStringRef* delete, size_t deleteLength) {
   LCMutableArrayRef updates = LCMutableArrayCreate((void**)addPathSHAs, addPathSHAsLength);
   LCKeyValueRef deleteUpdate;
@@ -94,7 +94,7 @@ LCTreeRef buildTree(LCStoreRef store, LCTreeRef current, LCKeyValueRef addPathSH
   return newTree;
 }
 
-void setStoreHead(LCStoreRef store, LCCommitRef newHead) {
+void setStoreHead(LCRepositoryRef store, LCCommitRef newHead) {
   if (newHead != store->head) {
     LCRelease(store->head);
   }

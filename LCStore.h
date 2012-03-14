@@ -1,15 +1,15 @@
 
 
-#ifndef LivelyStore_LCStore_h
-#define LivelyStore_LCStore_h
+#ifndef LivelyStore_LCRepository_h
+#define LivelyStore_LCRepository_h
 
 #include "LivelyStore.h"
 
-LCStoreRef LCStoreCreate(struct LCStoreBackend* backend, LCStringRef headSHA);
-void LCStorePull(LCStoreRef target, LCStoreRef source);
-void LCStorePush(LCStoreRef source, LCStoreRef target);
-void LCStoreCommit(LCStoreRef store, LCStageRef stage);
-LCCommitRef LCStoreHead(LCStoreRef store);
-LCStringRef LCStoreDataSHA(LCStoreRef store, LCCommitRef commit, char* path);
-LCDataRef LCStoreData(LCStoreRef store, LCStringRef dataSHA);
+LCRepositoryRef LCRepositoryCreate(struct LCRepositoryBackend* backend, LCStringRef headSHA);
+void LCRepositoryPull(LCRepositoryRef target, LCRepositoryRef source);
+void LCRepositoryPush(LCRepositoryRef source, LCRepositoryRef target);
+void LCRepositoryCommit(LCRepositoryRef store, LCStageRef stage);
+LCCommitRef LCRepositoryHead(LCRepositoryRef store);
+LCStringRef LCRepositoryDataSHA(LCRepositoryRef store, LCCommitRef commit, char* path);
+LCDataRef LCRepositoryData(LCRepositoryRef store, LCStringRef dataSHA);
 #endif

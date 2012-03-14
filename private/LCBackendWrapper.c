@@ -8,7 +8,7 @@ LCDataRef getData(LCBackendWrapperRef store, LCDataType type, LCStringRef key);
 struct LCBackendWrapper {
   LCObjectInfo info;
   LCStringRef location;
-  struct LCStoreBackend* backend;
+  struct LCRepositoryBackend* backend;
 };
 
 void LCBackendWrapperDealloc(void* object);
@@ -17,7 +17,7 @@ LCType typeBackendWrapper = {
   .dealloc = LCBackendWrapperDealloc
 };
 
-LCBackendWrapperRef LCBackendWrapperCreate(struct LCStoreBackend* backend) {
+LCBackendWrapperRef LCBackendWrapperCreate(struct LCRepositoryBackend* backend) {
   LCBackendWrapperRef newStore = LCNewObject(&typeBackendWrapper, sizeof(struct LCBackendWrapper));
   newStore->backend = backend;
   return newStore;
@@ -74,7 +74,7 @@ void LCBackendWrapperDealloc(void* object) {
 }
 
 void putData(LCBackendWrapperRef store, LCDataType type, LCStringRef key, LCByte data[], size_t length) {
-  LCStoreDataCb cb = store->backend->storeCb;
+  LCRepositoryDataCb cb = store->backend->storeCb;
   cb(store->backend->storeObject, type, LCStringStringRef(key), (unsigned char*)data, length);
 }
 

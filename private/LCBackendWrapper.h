@@ -4,7 +4,7 @@
 
 #include "LivelyStore.h"
 
-LCBackendWrapperRef LCBackendWrapperCreate(struct LCStoreBackend* backend);
+LCBackendWrapperRef LCBackendWrapperCreate(struct LCRepositoryBackend* backend);
 void LCBackendWrapperPutData(LCBackendWrapperRef store, LCStringRef sha, LCDataRef data);
 void LCBackendWrapperDeleteData(LCBackendWrapperRef store, LCStringRef sha);
 void LCBackendWrapperPutTreeData(LCBackendWrapperRef store, LCStringRef sha, LCStringRef data);
