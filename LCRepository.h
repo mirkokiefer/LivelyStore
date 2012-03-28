@@ -3,13 +3,18 @@
 #ifndef LivelyStore_LCRepository_h
 #define LivelyStore_LCRepository_h
 
-#include "LivelyStore.h"
+#include "LivelyStoreInternal.h"
+#include "LCStage.h"
+#include "LCCommit.h"
 
-LCRepositoryRef LCRepositoryCreate(struct LCRepositoryBackend* backend, LCStringRef headSHA);
+typedef LCObjectRef LCRepositoryRef;
+extern LCTypeRef LCTypeRepository;
+
+LCRepositoryRef LCRepositoryCreate(LCCommitRef head);
 void LCRepositoryPull(LCRepositoryRef target, LCRepositoryRef source);
 void LCRepositoryPush(LCRepositoryRef source, LCRepositoryRef target);
 void LCRepositoryCommit(LCRepositoryRef store, LCStageRef stage);
 LCCommitRef LCRepositoryHead(LCRepositoryRef store);
-LCStringRef LCRepositoryDataSHA(LCRepositoryRef store, LCCommitRef commit, char* path);
-LCDataRef LCRepositoryData(LCRepositoryRef store, LCStringRef dataSHA);
+LCDataRef LCRepositoryData(LCRepositoryRef store, LCCommitRef commit, char* path);
+void LCRepositoryPersist(LCRepositoryRef repo, LCContextRef context);
 #endif

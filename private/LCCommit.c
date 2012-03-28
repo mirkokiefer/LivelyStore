@@ -1,54 +1,55 @@
 
 #include "LCCommit.h"
 
-struct LCCommit {
-  LCObjectInfo info;
-  LCBackendWrapperRef store;
+typedef struct commitData* commitDataRef;
+static void* commitInitData();
+void commitWalkChildren(LCObjectRef object, void *cookie, childCallback cb);
+void commitStoreChildren(LCObjectRef object, char *key, LCObjectRef objects[], size_t length);
+
+struct commitData {
   LCArrayRef parents;
   LCTreeRef tree;
-  LCStringRef sha;
 };
 
 static LCArrayRef commitParents(LCCommitRef commit);
 
-void LCCommitDealloc(void* object);
+void commitDealloc(LCCommitRef object);
 void commitDeserialize(LCCommitRef commit);
-LCCommitRef findCommit(LCCommitRef commits[], size_t length, LCStringRef sha);
+LCCommitRef findCommit(LCCommitRef commits[], size_t length, char hash[HASH_LENGTH]);
 
-LCType typeCommit = {
-  .dealloc = LCCommitDealloc
+struct LCType typeCommit = {
+  .name = "LCCommit",
+  .immutable = true,
+  .dealloc = commitDealloc,
+  .initData = commitInitData
 };
 
+LCTypeRef LCTypeCommit = &typeCommit;
+
 static LCArrayRef commitParents(LCCommitRef commit) {
-  if((commit->parents == NULL) && commit->sha) {
-    commitDeserialize(commit);
+  commitDataRef data = objectData(commit);
+  return data->parents;
+}
+
+static void* commitInitData() {
+  commitDataRef data = malloc(sizeof(struct commitData));
+  if (data) {
+    data->parents = NULL;
+    data->tree = NULL;
   }
-  return commit->parents;
+  return data;
 }
 
-LCCommitRef LCCommitCreateFromSHA(LCBackendWrapperRef store, LCStringRef sha) {
-  LCCommitRef newCommit = LCNewObject(&typeCommit, sizeof(struct LCCommit));
-  newCommit->sha = LCRetain(sha);
-  newCommit->store = LCRetain(store);
-  newCommit->parents = NULL;
-  newCommit->tree = NULL;
-  return newCommit;
-}
-
-LCCommitRef LCCommitCreate(LCBackendWrapperRef store, LCTreeRef tree, LCCommitRef parents[], size_t parentsLength) {
-  LCCommitRef newCommit = LCNewObject(&typeCommit, sizeof(struct LCCommit));
-  newCommit->sha = NULL;
-  newCommit->store = LCRetain(store);
-  newCommit->parents = LCArrayCreate((void**)parents, parentsLength);
-  newCommit->tree = LCRetain(tree);
-  return newCommit;
+LCCommitRef LCCommitCreate(LCTreeRef tree, LCCommitRef parents[], size_t parentsLength) {
+  commitDataRef data = commitInitData();
+  data->parents = LCArrayCreate(parents, parentsLength);
+  data->tree = objectRetain(tree);
+  return objectCreate(LCTypeCommit, data);
 };
 
 LCTreeRef LCCommitTree(LCCommitRef commit) {
-  if((commit->tree == NULL) && commit->sha) {
-    commitDeserialize(commit);
-  }
-  return commit->tree;
+  commitDataRef data = objectData(commit);
+  return data->tree;
 }
 
 LCCommitRef* LCCommitParents(LCCommitRef commit) {
@@ -59,83 +60,47 @@ size_t LCCommitParentsLength(LCCommitRef commit) {
   return LCArrayLength(commitParents(commit));
 }
 
-LCStringRef LCCommitSHA(LCCommitRef commit) {
-  if(commit->sha == NULL) {
-    LCStringRef serialized = LCCommitCreateSerializedString(commit);
-    commit->sha = LCStringCreateSHAString(serialized);
-    LCBackendWrapperPutCommitData(commit->store, commit->sha, serialized);
-    LCRelease(serialized);
+LCCommitRef LCCommitFindParent(LCCommitRef commit, char hash[HASH_LENGTH]) {
+  return findCommit(&commit, 1, hash);
+}
+
+void commitDealloc(LCCommitRef object) {
+  commitDataRef data = objectData(object);
+  objectRelease(data->parents);
+  objectRelease(data->tree);
+}
+
+void commitWalkChildren(LCCommitRef commit, void *cookie, childCallback cb) {
+  cb(cookie, "parents", LCCommitParents(commit), LCCommitParentsLength(commit), false);
+  LCTreeRef tree = LCCommitTree(commit);
+  cb(cookie, "tree", &tree, 1, false);
+}
+
+void commitStoreChildren(LCObjectRef object, char *key, LCObjectRef objects[], size_t length) {
+  commitDataRef data = objectData(object);
+  if (strcmp(key, "parents") == 0) {
+    data->parents = LCArrayCreate(objects, length);
+  } else if(strcmp(key, "tree") == 0) {
+    data->tree = objectRetain(*objects);
   }
-  return commit->sha;
 }
 
-LCStringRef LCCommitCreateSerializedString(LCCommitRef commit) {
-  size_t parentsLength = LCArrayLength(commitParents(commit));
-  
-  char* treeSHA = "";
-  if (commit->tree) {
-    treeSHA = LCStringStringRef(LCTreeSHA(commit->tree));
-  }
-  
-  char string[(LC_SHA1_HEX_Length + 1) * (1+parentsLength)];
-  strcpy(string, treeSHA);
-  strcat(string, "\n");
-  
-  for (LCInteger i=0; i<parentsLength; i++) {
-    LCCommitRef parent = LCArrayObjectAtIndex(commitParents(commit), i);
-    LCStringRef parentSHA = LCCommitSHA(parent);
-    strcat(string, LCStringStringRef(parentSHA));
-    strcat(string, "\n");
-  }
-  return LCStringCreate(string);
-}
-
-LCCommitRef LCCommitFindParent(LCCommitRef commit, LCStringRef sha) {
-  return findCommit(&commit, 1, sha);
-}
-
-void LCCommitDealloc(void* object) {
-  LCCommitRef commit = (LCCommitRef)object;
-  LCRelease(commit->parents);
-  LCRelease(commit->tree);
-  LCRelease(commit->sha);
-}
-
-static void* shaStringToCommit(LCInteger i, void* info, void* shaString) {
-  return LCCommitCreateFromSHA(info, shaString);
-}
-
-void commitDeserialize(LCCommitRef commit) {
-  LCStringRef data = LCBackendWrapperGetCommitData(commit->store, commit->sha);
-  if ((data == NULL) || ((LCStringStringRef(data))[0] == '\n')) {
-    return;
-  }
-  LCArrayRef tokens = LCStringCreateTokens(data, '\n');
-  LCArrayRef lines = LCArrayCreateSubArray(tokens, 0, LCArrayLength(tokens)-1);
-  LCStringRef treeSHA = LCArrayObjectAtIndex(lines, 0);
-  LCArrayRef parentSHAs = LCArrayCreateSubArray(lines, 1, -1);
-  commit->tree = LCTreeCreateFromSHA(commit->store, treeSHA);
-  commit->parents = LCArrayCreateArrayWithMap(parentSHAs, commit->store, shaStringToCommit);
-  
-  LCRelease(tokens);
-  LCRelease(lines);
-  LCRelease(parentSHAs);
-}
-
-LCCommitRef findCommit(LCCommitRef commits[], size_t length, LCStringRef sha) {
+LCCommitRef findCommit(LCCommitRef commits[], size_t length, char hash[HASH_LENGTH]) {
   if (length == 0) {
     return NULL;
   }
   for (LCInteger i=0; i<length; i++) {
-    if(LCStringEqual(LCCommitSHA(commits[i]), sha)) {
+    char eachHash[HASH_LENGTH];
+    objectHash(commits[i], eachHash);
+    if(strcmp(hash, eachHash)==0) {
       return commits[i];
     }
   }
   LCMutableArrayRef parents = LCMutableArrayCreate(NULL, 0);
   for (LCInteger i=0; i<length; i++) {
-    LCMutableArrayAddObjects(parents, (void**)LCCommitParents(commits[i]), LCCommitParentsLength(commits[i]));
+    LCMutableArrayAddObjects(parents, LCCommitParents(commits[i]), LCCommitParentsLength(commits[i]));
   }
-  LCCommitRef result = findCommit((LCCommitRef*)LCMutableArrayObjects(parents), LCMutableArrayLength(parents), sha);
-  LCRelease(parents);
+  LCCommitRef result = findCommit((LCCommitRef*)LCMutableArrayObjects(parents), LCMutableArrayLength(parents), hash);
+  objectRelease(parents);
   return result;
 }

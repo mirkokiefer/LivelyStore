@@ -4,6 +4,6 @@
 
 #include "LivelyStore.h"
 
-LCBool testsRun();
+bool testsRun(void);
 
 #endif
