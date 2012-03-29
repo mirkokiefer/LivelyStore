@@ -66,6 +66,23 @@ LCCommitRef LCCommitFindParent(LCCommitRef commit, char hash[HASH_LENGTH]) {
   return findCommit(&commit, 1, hash);
 }
 
+static void* pathArrayToPathString(LCInteger i, void* info, void* each) {
+  LCKeyValueRef keyValue = (LCKeyValueRef)each;
+  LCArrayRef pathArray = LCKeyValueKey(keyValue);
+  LCStringRef path = LCStringCreateFromStringsWithDelim(LCArrayObjects(pathArray), LCArrayLength(pathArray), "/");
+  LCKeyValueRef pathValue = LCKeyValueCreate(path, LCKeyValueValue(keyValue));
+  objectRelease(path);
+  return pathValue;
+}
+
+
+LCArrayRef LCCommitDiff(LCCommitRef oldCommit, LCCommitRef newCommit) {
+  LCArrayRef treeDiff = LCTreeChangedPathValues(LCCommitTree(oldCommit), LCCommitTree(newCommit));
+  LCArrayRef diff = LCArrayCreateMutableArrayWithMap(treeDiff, NULL, pathArrayToPathString);
+  objectRelease(treeDiff);
+  return diff;
+}
+
 void commitDealloc(LCCommitRef object) {
   commitDataRef data = objectData(object);
   objectRelease(data->parents);

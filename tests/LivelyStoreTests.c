@@ -123,6 +123,8 @@ static char* test_library_interface() {
   
   LCRepositoryCommit(store, stage1);
   LCCommitRef head1 = LCRepositoryHead(store);
+  char head1Hash[HASH_LENGTH];
+  objectHash(head1, head1Hash);
   LCDataRef data1Retrieved = LCRepositoryData(store, head1, path1);
   LCDataRef data2Retrieved = LCRepositoryData(store, head1, path2);
   LCDataRef data3Retrieved = LCRepositoryData(store, head1, path3);
@@ -138,6 +140,8 @@ static char* test_library_interface() {
   LCStageDeletePath(stage2, path3);
   LCRepositoryCommit(store, stage2);
   LCCommitRef head2 = LCRepositoryHead(store);
+  char head2Hash[HASH_LENGTH];
+  objectHash(head2, head2Hash);
 
   LCDataRef data4Retrieved = LCRepositoryData(store, NULL, path1);
   LCDataRef data5Retrieved = LCRepositoryData(store, NULL, path3);
@@ -165,8 +169,13 @@ static char* test_library_interface() {
   LCDataRef lazyData1 = LCRepositoryData(store, NULL, path1);
   char *lazyData1Chars = (char*)LCDataDataRef(lazyData1);
   mu_assert("persisting LCRepository", memcmp(lazyData1Chars, data4, sizeof(LCByte)*strlen(data4))==0);
-  deleteDirectory(LCStringChars(testPath));
   
+  LCCommitRef commit1 = objectCreateFromContext(context, LCTypeCommit, head1Hash);
+  LCCommitRef commit2 = objectCreateFromContext(context, LCTypeCommit, head2Hash);
+  LCArrayRef diff = LCCommitDiff(commit1, commit2);
+  LCKeyValueRef* changes = LCArrayObjects(diff);
+  mu_assert("LCCommitDiff", memcmp(LCDataDataRef(LCKeyValueValue(changes[0])), data2, sizeof(LCByte)*strlen(data2))==0);
+  deleteDirectory(LCStringChars(testPath));
   return 0;
 }
 
