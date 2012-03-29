@@ -74,7 +74,11 @@ LCDataRef LCRepositoryData(LCRepositoryRef store, LCCommitRef commit, char* path
 }
 
 void LCRepositoryPersist(LCRepositoryRef repo, LCContextRef context) {
-  objectStore(repo, context);
+  objectStore(LCRepositoryHead(repo), context);
+}
+
+void LCRepositoryDeleteCache(LCRepositoryRef repo) {
+  objectDeleteCache(LCRepositoryHead(repo));
 }
 
 void repositoryDealloc(LCObjectRef object) {
@@ -101,4 +105,19 @@ void repositorySetHead(LCRepositoryRef store, LCCommitRef newHead) {
     objectRelease(data->head);
   }
   data->head = objectRetain(newHead);
+}
+
+static LCTypeRef livelyStoreStringToType(char *typeString) {
+  LCTypeRef types[] = {LCTypeRepository, LCTypeStage, LCTypeCommit, LCTypeTree};
+  for (LCInteger i=0; i<4; i++) {
+    if (strcmp(typeString, typeName(types[i]))==0) {
+      return types[i]; 
+    }
+  }
+  return NULL;
+}
+
+LCContextRef createRepositoryContext(LCStoreRef store) {
+  stringToType funs[] = {livelyStoreStringToType, coreStringToType};
+  return contextCreate(store, funs, 2);
 }

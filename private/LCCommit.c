@@ -21,7 +21,9 @@ struct LCType typeCommit = {
   .name = "LCCommit",
   .immutable = true,
   .dealloc = commitDealloc,
-  .initData = commitInitData
+  .initData = commitInitData,
+  .walkChildren = commitWalkChildren,
+  .storeChildren = commitStoreChildren
 };
 
 LCTypeRef LCTypeCommit = &typeCommit;
@@ -73,7 +75,9 @@ void commitDealloc(LCCommitRef object) {
 void commitWalkChildren(LCCommitRef commit, void *cookie, childCallback cb) {
   cb(cookie, "parents", LCCommitParents(commit), LCCommitParentsLength(commit), false);
   LCTreeRef tree = LCCommitTree(commit);
-  cb(cookie, "tree", &tree, 1, false);
+  if(tree) {
+    cb(cookie, "tree", &tree, 1, false);
+  }
 }
 
 void commitStoreChildren(LCObjectRef object, char *key, LCObjectRef objects[], size_t length) {

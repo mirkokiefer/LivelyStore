@@ -17,4 +17,6 @@ void LCRepositoryCommit(LCRepositoryRef store, LCStageRef stage);
 LCCommitRef LCRepositoryHead(LCRepositoryRef store);
 LCDataRef LCRepositoryData(LCRepositoryRef store, LCCommitRef commit, char* path);
 void LCRepositoryPersist(LCRepositoryRef repo, LCContextRef context);
+void LCRepositoryDeleteCache(LCRepositoryRef repo);
+LCContextRef createRepositoryContext(LCStoreRef store);
 #endif
