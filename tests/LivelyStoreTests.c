@@ -78,29 +78,32 @@ static char* test_tree() {
 
 static char* test_tree_operations() {
   LCTreeRef tree = testdata_tree();
-  LCObjectRef path1[] = {LCStringCreate("tree1"), LCStringCreate("path1")};
-  LCObjectRef path2[] = {LCStringCreate("path2")};
-  LCObjectRef path3[] = {LCStringCreate("path3")};
-  LCObjectRef path4[] = {LCStringCreate("tree1"), LCStringCreate("tree2"), LCStringCreate("path4")};
-  LCArrayRef path1Array = LCArrayCreate(path1, 2);
-  LCArrayRef path2Array = LCArrayCreate(path2, 1);
-  LCArrayRef path3Array = LCArrayCreate(path3, 1);
-  LCArrayRef path4Array = LCArrayCreate(path4, 3);
+  LCStringRef path1 = LCStringCreate("path2");
+  LCStringRef path2 = LCStringCreate("tree1/path1");
+  LCStringRef path3 = LCStringCreate("tree1/tree2/path3");
+  LCArrayRef path1Array = createPathArray(path1);
+  LCArrayRef path2Array = createPathArray(path2);
+  LCArrayRef path3Array = createPathArray(path3);
   LCStringRef value1 = LCStringCreate("test1");
-  LCStringRef value2 = LCStringCreate("test2");
-  LCObjectRef updates[] = {LCKeyValueCreate(path1Array, NULL), LCKeyValueCreate(path2Array, NULL),
-    LCKeyValueCreate(path3Array, value1), LCKeyValueCreate(path4Array, value2)};
-  LCTreeRef newTree = LCTreeCreateTreeUpdatingData(tree, updates, 4);
+  LCKeyValueRef update1 = LCKeyValueCreate(path1Array, NULL);
+  LCKeyValueRef update2 = LCKeyValueCreate(path2Array, NULL);
+  LCKeyValueRef update3 = LCKeyValueCreate(path3Array, value1);
+  LCObjectRef updates[] = {update1, update2, update3};
+  LCTreeRef newTree = LCTreeCreateTreeUpdatingData(tree, updates, 3);
   
   mu_assert("LCTreeCreateTreeDeletingData", (LCTreeChildAtPath(newTree, path1Array)==NULL) &&
             (LCTreeChildAtPath(newTree, path2Array)==NULL) &&
-            (LCTreeChildAtPath(newTree, path3Array)==value1) &&
-            (LCTreeChildAtPath(newTree, path4Array)==value2));
+            (LCTreeChildAtPath(newTree, path3Array)==value1));
   
-  LCMutableArrayRef changedData = LCMutableArrayCreate(NULL, 0);
-  LCMutableArrayRef changedTrees = LCMutableArrayCreate(NULL, 0);
-  //LCTreeChangedPathValues(tree, newTree, changedData, changedTrees);
-  // add assert here
+  
+  LCArrayRef changesArray = LCTreeChangedPathValues(tree, newTree);
+  LCKeyValueRef* changes = LCArrayObjects(changesArray);
+  
+  LCArrayRef pathTree2Array = createPathArray(LCStringCreate("tree1/tree2"));
+  LCTreeRef tree2 = LCTreeChildAtPath(newTree, pathTree2Array);
+  LCKeyValueRef update3Test = LCKeyValueCreate(pathTree2Array, tree2);
+  mu_assert("LCTreeChangedPathValues", objectHashEqual(changes[0], update1) && objectHashEqual(changes[1], update2) && 
+            objectHashEqual(changes[2], update3Test));
   return 0;
 }
 

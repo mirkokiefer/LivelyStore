@@ -125,36 +125,35 @@ static void treeAddKeyValuesToPathValues(LCArrayRef pathArray, LCMutableArrayRef
   }
 }
 
-/*static void treeFindChangedPathValues(LCArrayRef pathArray, LCTreeRef original, LCTreeRef new,
-                                      LCMutableArrayRef changedData, LCMutableArrayRef changedTrees) {
-  LCMutableArrayRef changedKeyValues = LCMutableDictionaryCreateChangesArray(treeChildData(original), treeChildData(new));
-  treeAddKeyValuesToPathValues(pathArray, changedKeyValues, changedData);
-  
-  LCMutableArrayRef addedChildTrees = LCMutableDictionaryCreateAddedArray(treeChildTrees(original), treeChildTrees(new));
-  LCMutableArrayRef deletedChildTrees = LCMutableDictionaryCreateDeletedArray(treeChildTrees(original), treeChildTrees(new));
-  treeAddKeyValuesToPathValues(pathArray, addedChildTrees, changedTrees);
-  treeAddKeyValuesToPathValues(pathArray, deletedChildTrees, changedTrees);
-
-  LCMutableArrayRef updatedChildTrees = LCMutableDictionaryCreateUpdatedArray(treeChildTrees(original), treeChildTrees(new));
-  for (LCInteger i=0; i<LCMutableArrayLength(updatedChildTrees); i++) {
-    LCKeyValueRef keyChildTree = LCMutableArrayObjectAtIndex(updatedChildTrees, i);
-    LCArrayRef newPathArray = LCArrayCreateAppendingObject(pathArray, LCKeyValueKey(keyChildTree));
-    LCTreeRef originalChildTree = LCTreeChildTreeAtKey(original, LCKeyValueKey(keyChildTree));
-    LCTreeRef newChildTree = LCKeyValueValue(keyChildTree);
-    treeFindChangedPathValues(newPathArray, originalChildTree, newChildTree, changedData, changedTrees);
-    objectRelease(newPathArray);
+static LCArrayRef treeCreateChangedPathValuesArray(LCArrayRef pathArray, LCObjectRef original, LCObjectRef new) {
+  LCArrayRef changedKeyValues = LCMutableDictionaryCreateChangesArray(treeChildren(original), treeChildren(new));
+  LCMutableArrayRef result = LCMutableArrayCreate(NULL, 0);
+  for (LCInteger i=0; i<LCArrayLength(changedKeyValues); i++) {
+    LCKeyValueRef keyValue = LCArrayObjectAtIndex(changedKeyValues, i);
+    LCStringRef key = LCKeyValueKey(keyValue);
+    LCObjectRef newValue = LCKeyValueValue(keyValue);
+    LCObjectRef oldValue = LCTreeChildAtKey(original, key);
+    LCArrayRef newPathArray = LCArrayCreateAppendingObject(pathArray, key);
+    if (objectType(newValue) != LCTypeTree || !newValue || !oldValue) {
+      LCKeyValueRef pathValue = LCKeyValueCreate(newPathArray, newValue);
+      LCMutableArrayAddObject(result, pathValue);
+      objectRelease(pathValue);
+    } else {
+      LCArrayRef childResult = treeCreateChangedPathValuesArray(newPathArray, oldValue, LCKeyValueValue(keyValue));
+      LCMutableArrayAddObjects(result, LCArrayObjects(childResult), LCArrayLength(childResult));
+      objectRelease(childResult);
+    }
   }
   objectRelease(changedKeyValues);
-  objectRelease(addedChildTrees);
-  objectRelease(deletedChildTrees);
-  objectRelease(updatedChildTrees);
+  return result;
 }
 
-void LCTreeChangedPathValues(LCTreeRef originalTree, LCTreeRef newTree, LCMutableArrayRef changedData, LCMutableArrayRef changedTrees) {
+LCArrayRef LCTreeChangedPathValues(LCTreeRef originalTree, LCTreeRef newTree) {
   LCArrayRef pathArray = LCArrayCreate(NULL, 0);
-  treeFindChangedPathValues(pathArray, originalTree, newTree, changedData, changedTrees);
+  LCArrayRef array = treeCreateChangedPathValuesArray(pathArray, originalTree, newTree);
   objectRelease(pathArray);
-}*/
+  return array;
+}
 
 void treeDealloc(LCTreeRef tree) {
   objectRelease(treeChildren(tree));
