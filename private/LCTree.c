@@ -16,8 +16,7 @@ void updateChildTrees(LCTreeRef parent, LCMutableArrayRef childTreeDataDeletes);
 void processUpdatesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCMutableArrayRef deletePathArrays);
 
 struct treeData {
-  LCMutableDictionaryRef childTrees;
-  LCMutableDictionaryRef childData;
+  LCMutableDictionaryRef children;
 };
 
 struct LCType typeTree = {
@@ -34,8 +33,7 @@ LCTypeRef LCTypeTree = &typeTree;
 void* treeInitData() {
   treeDataRef data = malloc(sizeof(struct treeData));
   if (data) {
-    data->childData = LCMutableDictionaryCreate(NULL, 0);
-    data->childTrees = LCMutableDictionaryCreate(NULL, 0);
+    data->children = LCMutableDictionaryCreate(NULL, 0);
   }
   return data;
 }
@@ -44,74 +42,39 @@ static treeDataRef treeData(LCTreeRef tree) {
   return objectData(tree);
 }
 
-static LCMutableDictionaryRef treeChildTrees(LCTreeRef tree) {
-  return treeData(tree)->childTrees;
+static LCMutableDictionaryRef treeChildren(LCTreeRef tree) {
+  return treeData(tree)->children;
 }
 
-static LCMutableDictionaryRef treeChildData(LCTreeRef tree) {
-  return treeData(tree)->childData;
-}
-
-LCTreeRef LCTreeCreate(LCKeyValueRef childTrees[], size_t childTreesLength, LCKeyValueRef childData[], size_t childDataLength) {
+LCTreeRef LCTreeCreate(LCKeyValueRef children[], size_t childrenLength) {
   treeDataRef data = treeInitData();
-  LCMutableDictionaryAddEntries(data->childTrees, childTrees, childTreesLength);
-  LCMutableDictionaryAddEntries(data->childData, childData, childDataLength);
+  LCMutableDictionaryAddEntries(data->children, children, childrenLength);
   return objectCreate(LCTypeTree, data);
 };
 
-size_t LCTreeChildTreesLength(LCTreeRef tree) {
-  return LCMutableDictionaryLength(treeData(tree)->childTrees);
+size_t LCTreeChildrenLength(LCTreeRef tree) {
+  return LCMutableDictionaryLength(treeChildren(tree));
 }
 
-LCKeyValueRef* LCTreeChildTrees(LCTreeRef tree) {
-  return LCMutableDictionaryEntries(treeData(tree)->childTrees);
-}
-
-size_t LCTreeChildDataLength(LCTreeRef tree) {
-  return LCMutableDictionaryLength(treeData(tree)->childData);
-}
-
-LCKeyValueRef* LCTreeChildData(LCTreeRef tree) {
-  return LCMutableDictionaryEntries(treeData(tree)->childData);
+LCKeyValueRef* LCTreeChildren(LCTreeRef tree) {
+  return LCMutableDictionaryEntries(treeChildren(tree));
 }
 
 LCTreeRef LCTreeCopy(LCTreeRef tree) {
-  return LCTreeCreate(LCTreeChildTrees(tree), LCTreeChildTreesLength(tree), LCTreeChildData(tree), LCTreeChildDataLength(tree));
+  return LCTreeCreate(LCTreeChildren(tree), LCTreeChildrenLength(tree));
 }
 
-LCTreeRef LCTreeChildTreeAtKey(LCTreeRef tree, LCStringRef key) {
-  return LCMutableDictionaryValueForKey(treeChildTrees(tree), key);
+LCObjectRef LCTreeChildAtKey(LCTreeRef tree, LCStringRef key) {
+  return LCMutableDictionaryValueForKey(treeChildren(tree), key);
 }
 
-LCStringRef LCTreeChildDataAtKey(LCTreeRef tree, LCStringRef key) {
-  return LCMutableDictionaryValueForKey(treeChildData(tree), key);
-}
-
-LCTreeRef LCTreeChildTreeAtPath(LCTreeRef tree, LCArrayRef path) {
+LCObjectRef LCTreeChildAtPath(LCTreeRef tree, LCArrayRef path) {
   LCStringRef first = LCArrayObjectAtIndex(path, 0);
   if (LCArrayLength(path)==1) {
-    return LCTreeChildTreeAtKey(tree, first);
+    return LCTreeChildAtKey(tree, first);
   } else {
     LCArrayRef rest = LCArrayCreateSubArray(path, 1, -1);
-    LCTreeRef result = LCTreeChildTreeAtPath(tree, rest);
-    objectRelease(rest);
-    return result;
-  }
-}
-
-LCObjectRef LCTreeChildDataAtPath(LCTreeRef tree, LCArrayRef path) {
-  LCStringRef first = LCArrayObjectAtIndex(path, 0);
-  if (LCArrayLength(path)==1) {
-    return LCTreeChildDataAtKey(tree, first);
-  } else {
-    LCArrayRef rest = LCArrayCreateSubArray(path, 1, -1);
-    LCTreeRef childTree = LCTreeChildTreeAtKey(tree, first);
-    LCObjectRef result;
-    if (childTree) {
-      result = LCTreeChildDataAtPath(childTree, rest);
-    } else {
-      result = NULL;
-    }
+    LCTreeRef result = LCTreeChildAtPath(LCTreeChildAtKey(tree, first), rest);
     objectRelease(rest);
     return result;
   }
@@ -122,7 +85,7 @@ LCTreeRef LCTreeCreateTreeUpdatingData(LCTreeRef oldTree, LCMutableArrayRef upda
   if (oldTree) {
     newTree = LCTreeCopy(oldTree);    
   } else {
-    newTree = LCTreeCreate(NULL, 0, NULL, 0);
+    newTree = LCTreeCreate(NULL, 0);
   }
   
   LCMutableArrayRef directDataUpdates = LCMutableArrayCreate(NULL, 0);
@@ -162,7 +125,7 @@ static void treeAddKeyValuesToPathValues(LCArrayRef pathArray, LCMutableArrayRef
   }
 }
 
-static void treeFindChangedPathValues(LCArrayRef pathArray, LCTreeRef original, LCTreeRef new,
+/*static void treeFindChangedPathValues(LCArrayRef pathArray, LCTreeRef original, LCTreeRef new,
                                       LCMutableArrayRef changedData, LCMutableArrayRef changedTrees) {
   LCMutableArrayRef changedKeyValues = LCMutableDictionaryCreateChangesArray(treeChildData(original), treeChildData(new));
   treeAddKeyValuesToPathValues(pathArray, changedKeyValues, changedData);
@@ -191,15 +154,14 @@ void LCTreeChangedPathValues(LCTreeRef originalTree, LCTreeRef newTree, LCMutabl
   LCArrayRef pathArray = LCArrayCreate(NULL, 0);
   treeFindChangedPathValues(pathArray, originalTree, newTree, changedData, changedTrees);
   objectRelease(pathArray);
-}
+}*/
 
 void treeDealloc(LCTreeRef tree) {
-  objectRelease(treeChildData(tree));
-  objectRelease(treeChildTrees(tree));
+  objectRelease(treeChildren(tree));
 }
 
 void updateChildData(LCTreeRef tree, LCMutableArrayRef dataPathValues) {
-  LCMutableDictionaryAddEntries(treeChildData(tree), (LCKeyValueRef*)LCMutableArrayObjects(dataPathValues), LCMutableArrayLength(dataPathValues));
+  LCMutableDictionaryAddEntries(treeChildren(tree), LCMutableArrayObjects(dataPathValues), LCMutableArrayLength(dataPathValues));
 }
 
 void updateChildTrees(LCTreeRef parent, LCMutableArrayRef childTreeDataUpdates) {
@@ -233,23 +195,17 @@ void updateChildTrees(LCTreeRef parent, LCMutableArrayRef childTreeDataUpdates) 
 }
 
 void processUpdatesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCMutableArrayRef updatePathArrays) {
-  LCTreeRef currentChildTree = LCTreeChildTreeAtKey(parent, key);
+  LCTreeRef currentChildTree = LCTreeChildAtKey(parent, key);
   LCTreeRef newChildTree = LCTreeCreateTreeUpdatingData(currentChildTree, updatePathArrays);
-  LCMutableDictionarySetValueForKey(treeChildTrees(parent), key, newChildTree);
+  LCMutableDictionarySetValueForKey(treeChildren(parent), key, newChildTree);
   objectRelease(newChildTree);
 }
 
 void treeWalkChildren(LCObjectRef object, void *cookie, childCallback cb) {
-  LCKeyValueRef *childTrees = LCTreeChildTrees(object);
-  for (LCInteger i=0; i<LCTreeChildTreesLength(object); i++) {
-    char *key = LCStringChars(LCKeyValueKey(childTrees[i]));
-    LCTreeRef value = LCKeyValueValue(childTrees[i]);
-    cb(cookie, key, &value, 1, false);
-  }
-  LCKeyValueRef *childData = LCTreeChildData(object);
-  for (LCInteger i=0; i<LCTreeChildDataLength(object); i++) {
-    char *key = LCStringChars(LCKeyValueKey(childData[i]));
-    LCDataRef value = LCKeyValueValue(childData[i]);
+  LCKeyValueRef *children = LCTreeChildren(object);
+  for (LCInteger i=0; i<LCTreeChildrenLength(object); i++) {
+    char *key = LCStringChars(LCKeyValueKey(children[i]));
+    LCTreeRef value = LCKeyValueValue(children[i]);
     cb(cookie, key, &value, 1, false);
   }
 }
@@ -257,10 +213,6 @@ void treeWalkChildren(LCObjectRef object, void *cookie, childCallback cb) {
 void treeStoreChildren(LCObjectRef tree, char *key, LCObjectRef objects[], size_t length) {
   LCObjectRef value = objects[0];
   LCStringRef keyObj = LCStringCreate(key);
-  if (objectType(value)==LCTypeTree) {
-    LCMutableDictionarySetValueForKey(treeChildTrees(tree), keyObj, value);
-  } else {
-    LCMutableDictionarySetValueForKey(treeChildData(tree), keyObj, value);
-  }
+  LCMutableDictionarySetValueForKey(treeChildren(tree), keyObj, value);
   objectRelease(keyObj);
 }

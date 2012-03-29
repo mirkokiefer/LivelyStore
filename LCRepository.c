@@ -67,7 +67,7 @@ LCDataRef LCRepositoryData(LCRepositoryRef store, LCCommitRef commit, char* path
   }
   LCStringRef pathObj = LCStringCreate(path);
   LCArrayRef pathArray = createPathArray(pathObj);
-  LCDataRef data = LCTreeChildDataAtPath(LCCommitTree(commit), pathArray);
+  LCObjectRef data = LCTreeChildAtPath(LCCommitTree(commit), pathArray);
   objectRelease(pathArray);
   objectRelease(pathObj);
   return data;
