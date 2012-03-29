@@ -12,6 +12,5 @@ LCCommitRef LCCommitCreate(LCTreeRef tree, LCCommitRef parents[], size_t parents
 LCCommitRef* LCCommitParents(LCCommitRef commit);
 size_t LCCommitParentsLength(LCCommitRef commit);
 LCTreeRef LCCommitTree(LCCommitRef commit);
-LCStringRef LCCommitCreateSerializedString(LCCommitRef commit);
 LCCommitRef LCCommitFindParent(LCCommitRef commit, char hash[HASH_LENGTH]);
 #endif
