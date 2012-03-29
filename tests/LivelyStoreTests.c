@@ -167,7 +167,7 @@ static char* test_library_interface() {
   LCStoreRef storeRef = LCFileStoreStoreObject(fileStore);
   LCContextRef context = createRepositoryContext(storeRef);
   LCRepositoryPersist(store, context);
-  LCRepositoryDeleteCache(store);
+  LCRepositoryDeleteCache(store, context);
   LCDataRef lazyData1 = LCRepositoryData(store, NULL, path1);
   char *lazyData1Chars = (char*)LCDataDataRef(lazyData1);
   mu_assert("persisting LCRepository", memcmp(lazyData1Chars, data4, sizeof(LCByte)*strlen(data4))==0);

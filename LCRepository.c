@@ -77,8 +77,8 @@ void LCRepositoryPersist(LCRepositoryRef repo, LCContextRef context) {
   objectStore(LCRepositoryHead(repo), context);
 }
 
-void LCRepositoryDeleteCache(LCRepositoryRef repo) {
-  objectDeleteCache(LCRepositoryHead(repo));
+void LCRepositoryDeleteCache(LCRepositoryRef repo, LCContextRef context) {
+  objectDeleteCache(LCRepositoryHead(repo), context);
 }
 
 void repositoryDealloc(LCObjectRef object) {
