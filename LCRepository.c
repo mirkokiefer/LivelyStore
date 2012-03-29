@@ -94,7 +94,7 @@ LCTreeRef repositoryBuildTree(LCRepositoryRef store, LCTreeRef current, LCKeyVal
     LCMutableArrayAddObject(updates, deleteUpdate);
     objectRelease(deleteUpdate);
   }
-  LCTreeRef newTree = LCTreeCreateTreeUpdatingData(current, updates);
+  LCTreeRef newTree = LCTreeCreateTreeUpdatingData(current, LCMutableArrayObjects(updates), LCMutableArrayLength(updates));
   objectRelease(updates);
   return newTree;
 }

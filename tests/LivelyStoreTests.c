@@ -90,7 +90,7 @@ static char* test_tree_operations() {
   LCStringRef value2 = LCStringCreate("test2");
   LCObjectRef updates[] = {LCKeyValueCreate(path1Array, NULL), LCKeyValueCreate(path2Array, NULL),
     LCKeyValueCreate(path3Array, value1), LCKeyValueCreate(path4Array, value2)};
-  LCTreeRef newTree = LCTreeCreateTreeUpdatingData(tree, LCMutableArrayCreate(updates, 4));
+  LCTreeRef newTree = LCTreeCreateTreeUpdatingData(tree, updates, 4);
   
   mu_assert("LCTreeCreateTreeDeletingData", (LCTreeChildAtPath(newTree, path1Array)==NULL) &&
             (LCTreeChildAtPath(newTree, path2Array)==NULL) &&

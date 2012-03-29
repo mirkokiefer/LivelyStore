@@ -13,7 +13,7 @@ LCTreeRef LCTreeChildTreeAtPath(LCTreeRef tree, LCArrayRef pathArray);
 
 void updateChildData(LCTreeRef tree, LCMutableArrayRef dataPaths);
 void updateChildTrees(LCTreeRef parent, LCMutableArrayRef childTreeDataDeletes);
-void processUpdatesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCMutableArrayRef deletePathArrays);
+void processUpdatesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCKeyValueRef updatePathArrays[], size_t length);
 
 struct treeData {
   LCMutableDictionaryRef children;
@@ -80,7 +80,7 @@ LCObjectRef LCTreeChildAtPath(LCTreeRef tree, LCArrayRef path) {
   }
 }
 
-LCTreeRef LCTreeCreateTreeUpdatingData(LCTreeRef oldTree, LCMutableArrayRef updatePathValues) {
+LCTreeRef LCTreeCreateTreeUpdatingData(LCTreeRef oldTree, LCKeyValueRef updatePathValues[], size_t updatePathValuesLength) {
   LCTreeRef newTree;
   if (oldTree) {
     newTree = LCTreeCopy(oldTree);    
@@ -93,8 +93,8 @@ LCTreeRef LCTreeCreateTreeUpdatingData(LCTreeRef oldTree, LCMutableArrayRef upda
   LCKeyValueRef currentPathValue;
   LCArrayRef currentPath;
   LCKeyValueRef directKeyValue;
-  for (LCInteger i=0; i<LCMutableArrayLength(updatePathValues); i++) {
-    currentPathValue = LCMutableArrayObjectAtIndex(updatePathValues, i);
+  for (LCInteger i=0; i<updatePathValuesLength; i++) {
+    currentPathValue = updatePathValues[i];
     currentPath = LCKeyValueKey(currentPathValue);
     if (LCArrayLength(currentPath)==1) {
       directKeyValue = LCKeyValueCreate(LCArrayObjectAtIndex(currentPath, 0), LCKeyValueValue(currentPathValue));
@@ -185,18 +185,19 @@ void updateChildTrees(LCTreeRef parent, LCMutableArrayRef childTreeDataUpdates) 
       if (LCStringEqual(currentKey, previousKey)) {
         LCMutableArrayAddObject(currentUpdatePaths, newChildPathValue);
       } else {
-        processUpdatesForChildTreeKey(parent, currentKey, currentUpdatePaths);
+        processUpdatesForChildTreeKey(parent, currentKey, LCMutableArrayObjects(currentUpdatePaths),
+                                      LCMutableArrayLength(currentUpdatePaths));
         objectRelease(currentUpdatePaths);
         currentUpdatePaths = LCMutableArrayCreate(&newChildPathValue, 1);
       }
     }
-    processUpdatesForChildTreeKey(parent, currentKey, currentUpdatePaths);
+    processUpdatesForChildTreeKey(parent, currentKey, LCMutableArrayObjects(currentUpdatePaths), LCMutableArrayLength(currentUpdatePaths));
   }
 }
 
-void processUpdatesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCMutableArrayRef updatePathArrays) {
+void processUpdatesForChildTreeKey(LCTreeRef parent, LCStringRef key, LCKeyValueRef updatePathArrays[], size_t length) {
   LCTreeRef currentChildTree = LCTreeChildAtKey(parent, key);
-  LCTreeRef newChildTree = LCTreeCreateTreeUpdatingData(currentChildTree, updatePathArrays);
+  LCTreeRef newChildTree = LCTreeCreateTreeUpdatingData(currentChildTree, updatePathArrays, length);
   LCMutableDictionarySetValueForKey(treeChildren(parent), key, newChildTree);
   objectRelease(newChildTree);
 }

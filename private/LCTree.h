@@ -13,7 +13,7 @@ size_t LCTreeChildrenLength(LCTreeRef tree);
 LCKeyValueRef* LCTreeChildren(LCTreeRef tree);
 LCObjectRef LCTreeChildAtKey(LCTreeRef tree, LCStringRef key);
 LCObjectRef LCTreeChildAtPath(LCTreeRef tree, LCArrayRef path);
-LCTreeRef LCTreeCreateTreeUpdatingData(LCTreeRef oldTree, LCMutableArrayRef updatePathValues);
+LCTreeRef LCTreeCreateTreeUpdatingData(LCTreeRef oldTree, LCKeyValueRef updatePathValues[], size_t updatePathValuesLength);
 LCTreeRef LCTreeCopy(LCTreeRef tree);
-void LCTreeChangedPathValues(LCTreeRef originalTree, LCTreeRef newTree, LCMutableArrayRef changedData, LCMutableArrayRef changedTrees);
+LCArrayRef LCTreeChangedPathValues(LCTreeRef originalTree, LCTreeRef newTree);
 #endif
