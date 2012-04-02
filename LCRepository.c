@@ -37,7 +37,9 @@ LCRepositoryRef LCRepositoryCreate(LCCommitRef head) {
   if (head) {
     data->head = objectRetain(head);
   } else {
-    data->head = LCCommitCreate(NULL, NULL, 0);
+    LCTreeRef emptyTree = LCTreeCreate(NULL, 0);
+    data->head = LCCommitCreate(emptyTree, NULL, 0);
+    objectRelease(emptyTree);
   }
   return objectCreate(LCTypeRepository, data);
 };
