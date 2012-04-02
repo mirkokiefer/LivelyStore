@@ -25,6 +25,24 @@ static LCTreeRef testdata_tree() {
   return tree2;
 }
 
+static LCStringRef create_test_path() {
+  LCStringRef homeFolder = getHomeFolder();
+  char *strings[] = {LCStringChars(homeFolder), "/testing/"};
+  return LCStringCreateFromStringArray(strings, 2);
+}
+
+static LCContextRef create_test_context() {
+  LCStringRef testPath = create_test_path();
+  LCFileStoreRef fileStore = LCFileStoreCreate(LCStringChars(testPath));
+  LCStoreRef storeRef = LCFileStoreStoreObject(fileStore);
+  return createRepositoryContext(storeRef);
+}
+
+static void delete_test_context() {
+  LCStringRef testPath = create_test_path();
+  deleteDirectory(LCStringChars(testPath));
+}
+
 static char* test_tree() {
   LCStringRef key1 = LCStringCreate("path1");
   LCStringRef key2 = LCStringCreate("path2");
@@ -108,77 +126,92 @@ static char* test_tree_operations() {
 }
 
 static char* test_library_interface() {  
+  LCContextRef context = create_test_context();
   LCRepositoryRef store = LCRepositoryCreate(NULL);
-  LCCommitRef head0 = LCRepositoryHead(store);
-  LCStageRef stage1 = LCStageCreate();
   char *data1 = "123456";
   char *data2 = "1234567";
   char *data3 = "12345678";
+  char *data4 = "123456789";
   char *path1 = "tree1/value1";
   char *path2 = "value2";
   char *path3 = "tree1/tree1_1/value3";
-  LCStageAddEntry(stage1, path1, (LCByte*)data1, strlen(data1));
-  LCStageAddEntry(stage1, path2, (LCByte*)data2, strlen(data2));
-  LCStageAddEntry(stage1, path3, (LCByte*)data3, strlen(data3));
   
-  LCRepositoryCommit(store, stage1);
+  LCCommitRef head0 = LCRepositoryHead(store);
+  char head0Hash[HASH_LENGTH];
+  objectHash(head0, head0Hash);
+  
+  {
+    // commit data
+    LCStageRef stage1 = LCStageCreate();
+    LCStageAddEntry(stage1, path1, (LCByte*)data1, strlen(data1));
+    LCStageAddEntry(stage1, path2, (LCByte*)data2, strlen(data2));
+    LCStageAddEntry(stage1, path3, (LCByte*)data3, strlen(data3));
+    
+    LCRepositoryCommit(store, stage1);
+    LCDataRef data1Retrieved = LCRepositoryData(store, NULL, path1);
+    LCDataRef data2Retrieved = LCRepositoryData(store, NULL, path2);
+    LCDataRef data3Retrieved = LCRepositoryData(store, NULL, path3);
+    
+    mu_assert("commited objects and verify", (memcmp(LCDataDataRef(data1Retrieved), data1, sizeof(LCByte)*strlen(data1))==0) &&
+              (memcmp(LCDataDataRef(data2Retrieved), data2, sizeof(LCByte)*strlen(data2))==0) &&
+              (memcmp(LCDataDataRef(data3Retrieved), data3, sizeof(LCByte)*strlen(data3))==0));
+  }
+  
   LCCommitRef head1 = LCRepositoryHead(store);
   char head1Hash[HASH_LENGTH];
   objectHash(head1, head1Hash);
-  LCDataRef data1Retrieved = LCRepositoryData(store, head1, path1);
-  LCDataRef data2Retrieved = LCRepositoryData(store, head1, path2);
-  LCDataRef data3Retrieved = LCRepositoryData(store, head1, path3);
 
-  mu_assert("commited objects and verify", (memcmp(LCDataDataRef(data1Retrieved), data1, sizeof(LCByte)*strlen(data1))==0) &&
-            (memcmp(LCDataDataRef(data2Retrieved), data2, sizeof(LCByte)*strlen(data2))==0) &&
-            (memcmp(LCDataDataRef(data3Retrieved), data3, sizeof(LCByte)*strlen(data3))==0));
-  
-  // another commit
-  LCStageRef stage2 = LCStageCreate();
-  char *data4 = "123456789";
-  LCStageAddEntry(stage2, path1, (LCByte*)data4, strlen(data4));
-  LCStageDeletePath(stage2, path3);
-  LCRepositoryCommit(store, stage2);
+  {
+    // another commit
+    LCStageRef stage2 = LCStageCreate();
+    LCStageAddEntry(stage2, path1, (LCByte*)data4, strlen(data4));
+    LCStageDeletePath(stage2, path3);
+    LCRepositoryCommit(store, stage2);
+    
+    LCDataRef data4Retrieved = LCRepositoryData(store, NULL, path1);
+    LCDataRef data5Retrieved = LCRepositoryData(store, NULL, path3);
+    mu_assert("perform subsequent commit", (memcmp(LCDataDataRef(data4Retrieved), data4, sizeof(LCByte)*strlen(data4))==0) &&
+              data5Retrieved == NULL);
+    
+    
+    LCDataRef data6Retrieved = LCRepositoryData(store, head1, path1);
+    mu_assert("retrieving previous commit data", memcmp(LCDataDataRef(data6Retrieved), data1, sizeof(LCByte)*strlen(data1))==0);
+  }
+
   LCCommitRef head2 = LCRepositoryHead(store);
   char head2Hash[HASH_LENGTH];
   objectHash(head2, head2Hash);
-
-  LCDataRef data4Retrieved = LCRepositoryData(store, NULL, path1);
-  LCDataRef data5Retrieved = LCRepositoryData(store, NULL, path3);
-  mu_assert("perform subsequent commit", (memcmp(LCDataDataRef(data4Retrieved), data4, sizeof(LCByte)*strlen(data4))==0) &&
-            data5Retrieved == NULL);
+  
+  {
+    // find parent commit
+    char head0Hash[HASH_LENGTH];
+    objectHash(head0, head0Hash);
+    LCCommitRef foundHead = LCCommitFindParent(head2, head0Hash);
+    mu_assert("LCCommitFindParent", objectHashEqual(foundHead, head0));
+  }
+  
+  {
+    // test persistence
+    LCRepositoryPersist(store, context);
+    LCRepositoryDeleteCache(store, context);
+    LCDataRef lazyData1 = LCRepositoryData(store, NULL, path1);
+    char *lazyData1Chars = (char*)LCDataDataRef(lazyData1);
+    mu_assert("persisting LCRepository", memcmp(lazyData1Chars, data4, sizeof(LCByte)*strlen(data4))==0);
+  }
+  
+  {
+    LCCommitRef commit1 = objectCreateFromContext(context, LCTypeCommit, head1Hash);
+    LCCommitRef commit2 = objectCreateFromContext(context, LCTypeCommit, head2Hash);
+    LCArrayRef diff = LCCommitDiff(commit1, commit2);
+    LCKeyValueRef* changes = LCArrayObjects(diff);
+    mu_assert("LCCommitDiff", memcmp(LCDataDataRef(LCKeyValueValue(changes[0])), data2, sizeof(LCByte)*strlen(data2))==0);
+    
+    LCCommitRef commonCommit = LCCommitFindCommonParent(commit1, commit2);
+    mu_assert("LCCommitFindCommonParent direct descendant", objectHashEqual(commit1, commonCommit));
+  }
   
   
-  LCDataRef data6Retrieved = LCRepositoryData(store, head1, path1);
-  mu_assert("retrieving previous commit data", memcmp(LCDataDataRef(data6Retrieved), data1, sizeof(LCByte)*strlen(data1))==0);
-  
-  // find parent commit
-  char head0Hash[HASH_LENGTH];
-  objectHash(head0, head0Hash);
-  LCCommitRef foundHead = LCCommitFindParent(head2, head0Hash);
-  mu_assert("LCCommitFindParent", objectHashEqual(foundHead, head0));
-  
-  LCStringRef homeFolder = getHomeFolder();
-  char *strings[] = {LCStringChars(homeFolder), "/testing/"};
-  LCStringRef testPath = LCStringCreateFromStringArray(strings, 2);
-  LCFileStoreRef fileStore = LCFileStoreCreate(LCStringChars(testPath));
-  LCStoreRef storeRef = LCFileStoreStoreObject(fileStore);
-  LCContextRef context = createRepositoryContext(storeRef);
-  LCRepositoryPersist(store, context);
-  LCRepositoryDeleteCache(store, context);
-  LCDataRef lazyData1 = LCRepositoryData(store, NULL, path1);
-  char *lazyData1Chars = (char*)LCDataDataRef(lazyData1);
-  mu_assert("persisting LCRepository", memcmp(lazyData1Chars, data4, sizeof(LCByte)*strlen(data4))==0);
-  
-  LCCommitRef commit1 = objectCreateFromContext(context, LCTypeCommit, head1Hash);
-  LCCommitRef commit2 = objectCreateFromContext(context, LCTypeCommit, head2Hash);
-  LCArrayRef diff = LCCommitDiff(commit1, commit2);
-  LCKeyValueRef* changes = LCArrayObjects(diff);
-  mu_assert("LCCommitDiff", memcmp(LCDataDataRef(LCKeyValueValue(changes[0])), data2, sizeof(LCByte)*strlen(data2))==0);
-  
-  LCCommitRef commonCommit = LCCommitFindCommonParent(commit1, commit2);
-  mu_assert("LCCommitFindCommonParent direct descendant", objectHashEqual(commit1, commonCommit));
-  deleteDirectory(LCStringChars(testPath));
+  delete_test_context();
   return 0;
 }
 
