@@ -183,6 +183,21 @@ static char* test_library_interface() {
   objectHash(head2, head2Hash);
   
   {
+    LCArrayRef diff = LCCommitDiff(head1, head2);
+    LCKeyValueRef* changes = LCArrayObjects(diff);
+    objectSerializeAsComposite(diff, stdout);
+    LCStringRef change1Path = LCKeyValueKey(changes[0]);
+    LCDataRef change1Value = LCKeyValueValue(changes[0]);
+    LCStringRef change2Path = LCKeyValueKey(changes[1]);
+    LCDataRef change2Value = LCKeyValueValue(changes[1]);
+    bool checkPath1 = LCStringEqualCString(change1Path, path1);
+    bool checkValue1 = memcmp(LCDataDataRef(change1Value), data4, sizeof(LCByte)*strlen(data4))==0;
+    bool checkPath2 = LCStringEqualCString(change2Path, path3);
+    bool checkValue2 = change2Value == NULL;
+    mu_assert("LCCommitDiff", checkPath1 && checkValue1 && checkPath2 && checkValue2);
+  }
+  
+  {
     // find parent commit
     char head0Hash[HASH_LENGTH];
     objectHash(head0, head0Hash);
@@ -190,13 +205,23 @@ static char* test_library_interface() {
     mu_assert("LCCommitFindParent", objectHashEqual(foundHead, head0));
   }
   
+  LCRepositoryRef repo2 = LCRepositoryCreate(head1);
   {
-    LCArrayRef diff = LCCommitDiff(head1, head2);
-    LCKeyValueRef* changes = LCArrayObjects(diff);
-    mu_assert("LCCommitDiff", memcmp(LCDataDataRef(LCKeyValueValue(changes[0])), data2, sizeof(LCByte)*strlen(data2))==0);
+    // branch repo1
+    LCStageRef stage = LCStageCreate();
+    LCStageAddEntry(stage, path1, (LCByte*)data2, strlen(data2));
+    LCStageDeletePath(stage, path2);
+    LCRepositoryCommit(repo2, stage);
     
-    LCCommitRef commonCommit = LCCommitFindCommonParent(head1, head2);
-    mu_assert("LCCommitFindCommonParent direct descendant", objectHashEqual(head1, commonCommit));
+  }
+  LCCommitRef repo2_head1 = LCRepositoryHead(repo2);
+  
+  {
+    LCCommitRef commonCommit1 = LCCommitFindCommonParent(head1, head2);
+    mu_assert("LCCommitFindCommonParent direct descendant", objectHashEqual(head1, commonCommit1));
+    
+    LCCommitRef commonCommit2 = LCCommitFindCommonParent(repo2_head1, head2);
+    mu_assert("LCCommitFindCommonParent two branches", objectHashEqual(head1, commonCommit2));
   }
   
   {
