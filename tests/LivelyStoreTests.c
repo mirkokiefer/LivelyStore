@@ -175,6 +175,9 @@ static char* test_library_interface() {
   LCArrayRef diff = LCCommitDiff(commit1, commit2);
   LCKeyValueRef* changes = LCArrayObjects(diff);
   mu_assert("LCCommitDiff", memcmp(LCDataDataRef(LCKeyValueValue(changes[0])), data2, sizeof(LCByte)*strlen(data2))==0);
+  
+  LCCommitRef commonCommit = LCCommitFindCommonParent(commit1, commit2);
+  mu_assert("LCCommitFindCommonParent direct descendant", objectHashEqual(commit1, commonCommit));
   deleteDirectory(LCStringChars(testPath));
   return 0;
 }
