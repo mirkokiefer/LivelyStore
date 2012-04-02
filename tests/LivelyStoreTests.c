@@ -135,11 +135,7 @@ static char* test_library_interface() {
   char *path1 = "tree1/value1";
   char *path2 = "value2";
   char *path3 = "tree1/tree1_1/value3";
-  
-  LCCommitRef head0 = LCRepositoryHead(store);
-  char head0Hash[HASH_LENGTH];
-  objectHash(head0, head0Hash);
-  
+    
   {
     // commit data
     LCStageRef stage1 = LCStageCreate();
@@ -185,7 +181,6 @@ static char* test_library_interface() {
   {
     LCArrayRef diff = LCCommitDiff(head1, head2);
     LCKeyValueRef* changes = LCArrayObjects(diff);
-    objectSerializeAsComposite(diff, stdout);
     LCStringRef change1Path = LCKeyValueKey(changes[0]);
     LCDataRef change1Value = LCKeyValueValue(changes[0]);
     LCStringRef change2Path = LCKeyValueKey(changes[1]);
@@ -199,10 +194,10 @@ static char* test_library_interface() {
   
   {
     // find parent commit
-    char head0Hash[HASH_LENGTH];
-    objectHash(head0, head0Hash);
-    LCCommitRef foundHead = LCCommitFindParent(head2, head0Hash);
-    mu_assert("LCCommitFindParent", objectHashEqual(foundHead, head0));
+    char head1Hash[HASH_LENGTH];
+    objectHash(head1, head1Hash);
+    LCCommitRef foundHead = LCCommitFindParent(head2, head1Hash);
+    mu_assert("LCCommitFindParent", objectHashEqual(foundHead, head1));
   }
   
   LCRepositoryRef repo2 = LCRepositoryCreate(head1);

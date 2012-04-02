@@ -36,10 +36,6 @@ LCRepositoryRef LCRepositoryCreate(LCCommitRef head) {
   repositoryDataRef data = repositoryInitData();
   if (head) {
     data->head = objectRetain(head);
-  } else {
-    LCTreeRef emptyTree = LCTreeCreate(NULL, 0);
-    data->head = LCCommitCreate(emptyTree, NULL, 0);
-    objectRelease(emptyTree);
   }
   return objectCreate(LCTypeRepository, data);
 };
@@ -50,10 +46,19 @@ void LCRepositoryCommit(LCRepositoryRef store, LCStageRef stage) {
   LCArrayRef* deletePaths = LCStagePathsToDelete(stage);
   size_t deletePathsLength = LCStageDeletePathsCount(stage);
   
-  LCTreeRef newTree = repositoryBuildTree(store, LCCommitTree(LCRepositoryHead(store)), addPaths, addPathsLength, deletePaths, deletePathsLength);
-  
   LCCommitRef head = LCRepositoryHead(store);
-  LCCommitRef newHead = LCCommitCreate(newTree, &head, 1);
+  LCTreeRef oldTree = NULL;
+  if (head) {
+    oldTree = LCCommitTree(head);
+  }
+  LCTreeRef newTree = repositoryBuildTree(store, oldTree, addPaths, addPathsLength, deletePaths, deletePathsLength);
+  
+  LCCommitRef newHead;
+  if (head) {
+    newHead = LCCommitCreate(newTree, &head, 1);
+  } else {
+    newHead = LCCommitCreate(newTree, NULL, 0);
+  }
   repositorySetHead(store, newHead);
   objectRelease(newHead);
 }
