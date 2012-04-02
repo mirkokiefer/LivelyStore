@@ -191,6 +191,15 @@ static char* test_library_interface() {
   }
   
   {
+    LCArrayRef diff = LCCommitDiff(head1, head2);
+    LCKeyValueRef* changes = LCArrayObjects(diff);
+    mu_assert("LCCommitDiff", memcmp(LCDataDataRef(LCKeyValueValue(changes[0])), data2, sizeof(LCByte)*strlen(data2))==0);
+    
+    LCCommitRef commonCommit = LCCommitFindCommonParent(head1, head2);
+    mu_assert("LCCommitFindCommonParent direct descendant", objectHashEqual(head1, commonCommit));
+  }
+  
+  {
     // test persistence
     LCRepositoryPersist(store, context);
     LCRepositoryDeleteCache(store, context);
@@ -198,18 +207,6 @@ static char* test_library_interface() {
     char *lazyData1Chars = (char*)LCDataDataRef(lazyData1);
     mu_assert("persisting LCRepository", memcmp(lazyData1Chars, data4, sizeof(LCByte)*strlen(data4))==0);
   }
-  
-  {
-    LCCommitRef commit1 = objectCreateFromContext(context, LCTypeCommit, head1Hash);
-    LCCommitRef commit2 = objectCreateFromContext(context, LCTypeCommit, head2Hash);
-    LCArrayRef diff = LCCommitDiff(commit1, commit2);
-    LCKeyValueRef* changes = LCArrayObjects(diff);
-    mu_assert("LCCommitDiff", memcmp(LCDataDataRef(LCKeyValueValue(changes[0])), data2, sizeof(LCByte)*strlen(data2))==0);
-    
-    LCCommitRef commonCommit = LCCommitFindCommonParent(commit1, commit2);
-    mu_assert("LCCommitFindCommonParent direct descendant", objectHashEqual(commit1, commonCommit));
-  }
-  
   
   delete_test_context();
   return 0;
