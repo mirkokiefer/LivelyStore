@@ -101,7 +101,17 @@ static LCCommitRef commitFindCommonParent(LCArrayRef commits1, LCArrayRef commit
     if (result) {
       return result;
     }
-    LCMutableDictionarySetValueForKey(passed1, hashString, commits2Ref[i]);
+    LCMutableDictionarySetValueForKey(passed2, hashString, commits2Ref[i]);
+    objectRelease(hashString);
+  }
+  for (LCInteger i=0; i<LCArrayLength(commits1); i++) {
+    char hash[HASH_LENGTH];
+    objectHash(commits1Ref[i], hash);
+    LCStringRef hashString = LCStringCreate(hash);
+    LCCommitRef result = LCMutableDictionaryValueForKey(passed2, hashString);
+    if (result) {
+      return result;
+    }
     objectRelease(hashString);
   }
   

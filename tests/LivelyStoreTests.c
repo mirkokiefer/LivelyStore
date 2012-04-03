@@ -127,7 +127,7 @@ static char* test_tree_operations() {
 
 static char* test_library_interface() {  
   LCContextRef context = create_test_context();
-  LCRepositoryRef store = LCRepositoryCreate(NULL);
+  LCRepositoryRef repo1 = LCRepositoryCreate(NULL);
   LCStringRef data1 = LCStringCreate("data1 asflöj alsfjalö");
   LCStringRef data2 = LCStringCreate("data2");
   LCStringRef data3 = LCStringCreate("data3");
@@ -143,17 +143,17 @@ static char* test_library_interface() {
     LCStageAddEntry(stage1, path2, data2);
     LCStageAddEntry(stage1, path3, data3);
     
-    LCRepositoryCommit(store, stage1);
-    LCStringRef data1Retrieved = LCRepositoryData(store, NULL, path1);
-    LCStringRef data2Retrieved = LCRepositoryData(store, NULL, path2);
-    LCStringRef data3Retrieved = LCRepositoryData(store, NULL, path3);
+    LCRepositoryCommit(repo1, stage1);
+    LCStringRef data1Retrieved = LCRepositoryData(repo1, NULL, path1);
+    LCStringRef data2Retrieved = LCRepositoryData(repo1, NULL, path2);
+    LCStringRef data3Retrieved = LCRepositoryData(repo1, NULL, path3);
     
     mu_assert("commited objects and verify", (objectCompare(data1Retrieved, data1)==LCEqual) &&
               (objectCompare(data2Retrieved, data2)==LCEqual) &&
               (objectCompare(data3Retrieved, data3)==LCEqual));
   }
   
-  LCCommitRef head1 = LCRepositoryHead(store);
+  LCCommitRef head1 = LCRepositoryHead(repo1);
   char head1Hash[HASH_LENGTH];
   objectHash(head1, head1Hash);
 
@@ -162,19 +162,19 @@ static char* test_library_interface() {
     LCStageRef stage2 = LCStageCreate();
     LCStageAddEntry(stage2, path1, data4);
     LCStageDeletePath(stage2, path3);
-    LCRepositoryCommit(store, stage2);
+    LCRepositoryCommit(repo1, stage2);
     
-    LCDataRef data4Retrieved = LCRepositoryData(store, NULL, path1);
-    LCDataRef data5Retrieved = LCRepositoryData(store, NULL, path3);
+    LCDataRef data4Retrieved = LCRepositoryData(repo1, NULL, path1);
+    LCDataRef data5Retrieved = LCRepositoryData(repo1, NULL, path3);
     mu_assert("perform subsequent commit", (objectCompare(data4Retrieved, data4)==LCEqual) &&
               data5Retrieved == NULL);
     
     
-    LCDataRef data6Retrieved = LCRepositoryData(store, head1, path1);
+    LCDataRef data6Retrieved = LCRepositoryData(repo1, head1, path1);
     mu_assert("retrieving previous commit data", objectCompare(data6Retrieved, data1)==LCEqual);
   }
 
-  LCCommitRef head2 = LCRepositoryHead(store);
+  LCCommitRef head2 = LCRepositoryHead(repo1);
   char head2Hash[HASH_LENGTH];
   objectHash(head2, head2Hash);
   
@@ -220,14 +220,30 @@ static char* test_library_interface() {
   }
   
   {
+    LCRepositoryMerge(repo1, repo2, NULL, conflictStrategyKeepLocal);
+    LCDataRef data1Retrieved = LCRepositoryData(repo1, NULL, path1);
+    LCDataRef data3Retrieved = LCRepositoryData(repo1, NULL, path3);
+    mu_assert("LCRepositoryMerge conflicts", (objectCompare(data1Retrieved, data4)==LCEqual) &&
+              data3Retrieved == NULL);
+
+    LCRepositoryMerge(repo2, repo1, NULL, conflictStrategyKeepLocal);
+    mu_assert("LCRepositoryMerge fast-forward", objectHashEqual(LCRepositoryHead(repo1), LCRepositoryHead(repo2)));
+    
+    LCRepositoryRef repo3 = LCRepositoryCreate(head2);
+    LCRepositoryMerge(repo2, repo3, NULL, conflictStrategyKeepLocal);
+    mu_assert("LCRepositoryMerge old repo", objectHashEqual(LCRepositoryHead(repo2), LCRepositoryHead(repo1)));
+
+  }
+  
+  {
     // test persistence
-    LCRepositoryPersist(store, context);
-    LCRepositoryDeleteCache(store, context);
-    LCObjectRef lazyData1 = LCRepositoryData(store, NULL, path1);
+    LCRepositoryPersist(repo1, context);
+    LCRepositoryDeleteCache(repo1, context);
+    LCObjectRef lazyData1 = LCRepositoryData(repo1, NULL, path1);
     mu_assert("persisting LCRepository", objectCompare(lazyData1, data4)==LCEqual);
   }
   
-  delete_test_context();
+  //delete_test_context();
   return 0;
 }
 

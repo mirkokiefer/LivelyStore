@@ -81,9 +81,59 @@ void LCRepositoryDeleteCache(LCRepositoryRef repo, LCContextRef context) {
   objectDeleteCache(LCRepositoryHead(repo), context);
 }
 
+static LCStageRef repositoryCreateMergedStage(LCCommitRef base, LCCommitRef local, LCCommitRef foreign,
+                                          void *cookie, createResolvedData strategy) {
+  LCArrayRef diffLocal = LCCommitDiff(base, local);
+  LCArrayRef diffForeign = LCCommitDiff(base, foreign);
+  LCMutableDictionaryRef diffMerged = LCMutableDictionaryCreate(LCArrayObjects(diffLocal), LCArrayLength(diffLocal));
+  LCKeyValueRef *diffForeignRef = LCArrayObjects(diffForeign);
+  for (LCInteger i=0; i<LCArrayLength(diffForeign); i++) {
+    LCStringRef path = LCKeyValueKey(diffForeignRef[i]);
+    LCObjectRef valueLocal = LCMutableDictionaryValueForKey(diffMerged, path);
+    if (valueLocal) {
+      LCObjectRef valueForeign = LCKeyValueValue(diffForeignRef[i]);
+      LCArrayRef resolved = strategy(cookie, path, valueLocal, valueForeign);
+      LCMutableDictionaryAddEntries(diffMerged, LCArrayObjects(resolved), LCArrayLength(resolved));
+      objectRelease(resolved);
+    } else {
+      LCMutableDictionaryAddEntry(diffMerged, diffForeignRef[i]);
+    }
+  }
+  LCStageRef mergeStage = LCStageCreate();
+  LCStageAddKeyValues(mergeStage, LCMutableDictionaryEntries(diffMerged), LCMutableDictionaryLength(diffMerged));
+  objectRelease(diffMerged);
+  objectRelease(diffLocal);
+  objectRelease(diffForeign);
+  return mergeStage;
 }
 
+void LCRepositoryMerge(LCRepositoryRef localRepo, LCRepositoryRef foreignRepo, void *cookie, createResolvedData conflictStrategy) {
+  LCCommitRef localHead = LCRepositoryHead(localRepo);
+  LCCommitRef foreignHead = LCRepositoryHead(foreignRepo);
+  if (!localHead) {
+    repositorySetHead(localRepo, foreignHead);
+    return;
   }
+  if (!foreignHead) {
+    return;
+  }
+  LCCommitRef commonCommit = LCCommitFindCommonParent(localHead, foreignHead);
+  if (objectHashEqual(foreignHead, commonCommit)) {
+    return;
+  }
+  if (objectHashEqual(localHead, commonCommit)) {
+    repositorySetHead(localRepo, foreignHead);
+  } else {
+    LCStageRef merged = repositoryCreateMergedStage(commonCommit, localHead, foreignHead, cookie, conflictStrategy);
+    LCTreeRef newTree = LCTreeCreateTreeUpdatingData(LCCommitTree(localHead), LCStageUpdates(merged), 
+                                                     LCStageUpdatesLength(merged));
+    LCCommitRef parents[] = {localHead, foreignHead};
+    LCCommitRef newHead = LCCommitCreate(newTree, parents, 2);
+    repositorySetHead(localRepo, newHead);
+    objectRelease(newHead);
+    objectRelease(merged);
+  }
+}
 
 void repositoryDealloc(LCObjectRef object) {
   objectRelease(LCRepositoryHead(object));
@@ -111,3 +161,36 @@ LCContextRef createRepositoryContext(LCStoreRef store) {
   stringToType funs[] = {livelyStoreStringToType, coreStringToType};
   return contextCreate(store, funs, 2);
 }
+
+LCArrayRef conflictStrategyKeepLocal(void *cookie, LCStringRef path, LCObjectRef localData, LCObjectRef foreignData) {
+  LCKeyValueRef resolved = LCKeyValueCreate(path, localData);
+  LCArrayRef array = LCArrayCreate(&resolved, 1);
+  objectRelease(resolved);
+  return array;
+}
+
+LCArrayRef conflictStrategyKeepForeign(void *cookie, LCStringRef path, LCObjectRef localData, LCObjectRef foreignData) {
+  LCKeyValueRef resolved = LCKeyValueCreate(path, foreignData);
+  LCArrayRef array = LCArrayCreate(&resolved, 1);
+  objectRelease(resolved);
+  return array;
+}
+
+LCArrayRef conflictStrategyKeepBoth(void *cookie, LCStringRef path, LCObjectRef localData, LCObjectRef foreignData) {
+  char foreignHash[HASH_LENGTH];
+  objectHash(foreignData, foreignHash);
+  char conflictPath[LCStringLength(path)+1+HASH_LENGTH+1];
+  strcpy(conflictPath, LCStringChars(path));
+  strcat(conflictPath, "_");
+  strcat(conflictPath, foreignHash);
+  LCStringRef conflictPathObj = LCStringCreate(conflictPath);
+  LCKeyValueRef conflictKeyValue = LCKeyValueCreate(conflictPathObj, foreignData);
+  LCKeyValueRef localKeyValue = LCKeyValueCreate(path, localData);
+  LCKeyValueRef both[] = {localKeyValue, conflictKeyValue};
+  LCArrayRef array = LCArrayCreate(both, 2);
+  objectRelease(conflictPathObj);
+  objectRelease(conflictKeyValue);
+  objectRelease(localKeyValue);
+  return array;
+}
+

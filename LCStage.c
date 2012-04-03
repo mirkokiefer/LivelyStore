@@ -49,7 +49,13 @@ void LCStageDeletePath(LCStageRef stage, char* path) {
 }
 
 void LCStageAddKeyValues(LCStageRef stage, LCKeyValueRef keyValues[], size_t length) {
-  LCMutableDictionaryAddEntries(stageUpdates(stage), keyValues, length);
+  for (LCInteger i=0; i<length; i++) {
+    LCArrayRef pathArray = createPathArray(LCKeyValueKey(keyValues[i]));
+    LCKeyValueRef pathValue = LCKeyValueCreate(pathArray, LCKeyValueValue(keyValues[i]));
+    LCMutableDictionaryAddEntry(stageUpdates(stage), pathValue);
+    objectRelease(pathArray);
+    objectRelease(pathValue);
+  }
 }
 
 LCKeyValueRef* LCStageUpdates(LCStageRef stage) {

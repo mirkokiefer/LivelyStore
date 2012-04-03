@@ -10,16 +10,9 @@
 typedef LCObjectRef LCRepositoryRef;
 extern LCTypeRef LCTypeRepository;
 
-struct commit_conflict_s {
-  char *conflictPaths;
-  LCObjectRef localData;
-  LCObjectRef foreignData;
-  LCObjectRef resolvedDataBuffer;
-};
-
 typedef struct commit_conflict_s* commit_conflict_t;
 
-typedef void(*resolveConflict)(void *cookie, commit_conflict_t conflicts[], size_t length);
+typedef LCArrayRef(*createResolvedData)(void *cookie, LCStringRef path, LCObjectRef localData, LCObjectRef foreignData);
 
 LCRepositoryRef LCRepositoryCreate(LCCommitRef head);
 void LCRepositoryPull(LCRepositoryRef target, LCRepositoryRef source);
@@ -29,7 +22,12 @@ LCCommitRef LCRepositoryHead(LCRepositoryRef store);
 LCObjectRef LCRepositoryData(LCRepositoryRef store, LCCommitRef commit, char* path);
 void LCRepositoryPersist(LCRepositoryRef repo, LCContextRef context);
 void LCRepositoryDeleteCache(LCRepositoryRef repo, LCContextRef context);
-int LCRepositoryMerge(LCRepositoryRef localRepo, LCRepositoryRef remoteRepo, resolveConflict conflictStrategy);
+void LCRepositoryMerge(LCRepositoryRef localRepo, LCRepositoryRef foreignRepo, void *cookie, createResolvedData conflictStrategy);
 
 LCContextRef createRepositoryContext(LCStoreRef store);
+
+//conflict strategies
+LCArrayRef conflictStrategyKeepLocal(void *cookie, LCStringRef path, LCObjectRef localData, LCObjectRef foreignData);
+LCArrayRef conflictStrategyKeepForeign(void *cookie, LCStringRef path, LCObjectRef localData, LCObjectRef foreignData);
+LCArrayRef conflictStrategyKeepBoth(void *cookie, LCStringRef path, LCObjectRef localData, LCObjectRef foreignData);
 #endif
