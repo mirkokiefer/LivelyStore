@@ -26,7 +26,7 @@ void LCRepositoryPull(LCRepositoryRef target, LCRepositoryRef source);
 void LCRepositoryPush(LCRepositoryRef source, LCRepositoryRef target);
 void LCRepositoryCommit(LCRepositoryRef store, LCStageRef stage);
 LCCommitRef LCRepositoryHead(LCRepositoryRef store);
-LCDataRef LCRepositoryData(LCRepositoryRef store, LCCommitRef commit, char* path);
+LCObjectRef LCRepositoryData(LCRepositoryRef store, LCCommitRef commit, char* path);
 void LCRepositoryPersist(LCRepositoryRef repo, LCContextRef context);
 void LCRepositoryDeleteCache(LCRepositoryRef repo, LCContextRef context);
 int LCRepositoryMerge(LCRepositoryRef localRepo, LCRepositoryRef remoteRepo, resolveConflict conflictStrategy);

@@ -68,7 +68,7 @@ LCCommitRef LCRepositoryHead(LCRepositoryRef store) {
   return data->head;
 }
 
-LCDataRef LCRepositoryData(LCRepositoryRef store, LCCommitRef commit, char* path) {
+LCObjectRef LCRepositoryData(LCRepositoryRef store, LCCommitRef commit, char* path) {
   if (!commit) {
     commit = LCRepositoryHead(store);
   }

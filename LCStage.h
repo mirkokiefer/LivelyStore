@@ -9,7 +9,7 @@ typedef LCObjectRef LCStageRef;
 extern LCTypeRef LCTypeStage;
 
 LCStageRef LCStageCreate(void);
-void LCStageAddEntry(LCStageRef stage, char* path, unsigned char data[], size_t length);
+void LCStageAddEntry(LCStageRef stage, char* path, LCObjectRef data);
 void LCStageDeletePath(LCStageRef stage, char* path);
 
 // private

@@ -40,14 +40,12 @@ static LCMutableArrayRef stageDeletePaths(LCStageRef stage) {
   return stageData->deletePaths;
 }
 
-void LCStageAddEntry(LCStageRef stage, char* path, unsigned char data[], size_t length) {  
+void LCStageAddEntry(LCStageRef stage, char* path, LCObjectRef data) {  
   LCStringRef lcPath = LCStringCreate(path);
   LCArrayRef pathArray = createPathArray(lcPath);
-  LCDataRef lcData = LCDataCreate(data, length);
-  LCKeyValueRef keyValue = LCKeyValueCreate(pathArray, lcData);
+  LCKeyValueRef keyValue = LCKeyValueCreate(pathArray, data);
   objectRelease(lcPath);
   objectRelease(pathArray);
-  objectRelease(lcData);
   LCMutableArrayAddObject(stageAddPaths(stage), keyValue);
 }
 

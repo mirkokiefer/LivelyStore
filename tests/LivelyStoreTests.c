@@ -128,10 +128,10 @@ static char* test_tree_operations() {
 static char* test_library_interface() {  
   LCContextRef context = create_test_context();
   LCRepositoryRef store = LCRepositoryCreate(NULL);
-  char *data1 = "123456";
-  char *data2 = "1234567";
-  char *data3 = "12345678";
-  char *data4 = "123456789";
+  LCStringRef data1 = LCStringCreate("data1 asflöj alsfjalö");
+  LCStringRef data2 = LCStringCreate("data2");
+  LCStringRef data3 = LCStringCreate("data3");
+  LCStringRef data4 = LCStringCreate("data4 asldafasödflas");
   char *path1 = "tree1/value1";
   char *path2 = "value2";
   char *path3 = "tree1/tree1_1/value3";
@@ -139,18 +139,18 @@ static char* test_library_interface() {
   {
     // commit data
     LCStageRef stage1 = LCStageCreate();
-    LCStageAddEntry(stage1, path1, (LCByte*)data1, strlen(data1));
-    LCStageAddEntry(stage1, path2, (LCByte*)data2, strlen(data2));
-    LCStageAddEntry(stage1, path3, (LCByte*)data3, strlen(data3));
+    LCStageAddEntry(stage1, path1, data1);
+    LCStageAddEntry(stage1, path2, data2);
+    LCStageAddEntry(stage1, path3, data3);
     
     LCRepositoryCommit(store, stage1);
-    LCDataRef data1Retrieved = LCRepositoryData(store, NULL, path1);
-    LCDataRef data2Retrieved = LCRepositoryData(store, NULL, path2);
-    LCDataRef data3Retrieved = LCRepositoryData(store, NULL, path3);
+    LCStringRef data1Retrieved = LCRepositoryData(store, NULL, path1);
+    LCStringRef data2Retrieved = LCRepositoryData(store, NULL, path2);
+    LCStringRef data3Retrieved = LCRepositoryData(store, NULL, path3);
     
-    mu_assert("commited objects and verify", (memcmp(LCDataDataRef(data1Retrieved), data1, sizeof(LCByte)*strlen(data1))==0) &&
-              (memcmp(LCDataDataRef(data2Retrieved), data2, sizeof(LCByte)*strlen(data2))==0) &&
-              (memcmp(LCDataDataRef(data3Retrieved), data3, sizeof(LCByte)*strlen(data3))==0));
+    mu_assert("commited objects and verify", (objectCompare(data1Retrieved, data1)==LCEqual) &&
+              (objectCompare(data2Retrieved, data2)==LCEqual) &&
+              (objectCompare(data3Retrieved, data3)==LCEqual));
   }
   
   LCCommitRef head1 = LCRepositoryHead(store);
@@ -160,18 +160,18 @@ static char* test_library_interface() {
   {
     // another commit
     LCStageRef stage2 = LCStageCreate();
-    LCStageAddEntry(stage2, path1, (LCByte*)data4, strlen(data4));
+    LCStageAddEntry(stage2, path1, data4);
     LCStageDeletePath(stage2, path3);
     LCRepositoryCommit(store, stage2);
     
     LCDataRef data4Retrieved = LCRepositoryData(store, NULL, path1);
     LCDataRef data5Retrieved = LCRepositoryData(store, NULL, path3);
-    mu_assert("perform subsequent commit", (memcmp(LCDataDataRef(data4Retrieved), data4, sizeof(LCByte)*strlen(data4))==0) &&
+    mu_assert("perform subsequent commit", (objectCompare(data4Retrieved, data4)==LCEqual) &&
               data5Retrieved == NULL);
     
     
     LCDataRef data6Retrieved = LCRepositoryData(store, head1, path1);
-    mu_assert("retrieving previous commit data", memcmp(LCDataDataRef(data6Retrieved), data1, sizeof(LCByte)*strlen(data1))==0);
+    mu_assert("retrieving previous commit data", objectCompare(data6Retrieved, data1)==LCEqual);
   }
 
   LCCommitRef head2 = LCRepositoryHead(store);
@@ -182,11 +182,11 @@ static char* test_library_interface() {
     LCArrayRef diff = LCCommitDiff(head1, head2);
     LCKeyValueRef* changes = LCArrayObjects(diff);
     LCStringRef change1Path = LCKeyValueKey(changes[0]);
-    LCDataRef change1Value = LCKeyValueValue(changes[0]);
+    LCObjectRef change1Value = LCKeyValueValue(changes[0]);
     LCStringRef change2Path = LCKeyValueKey(changes[1]);
-    LCDataRef change2Value = LCKeyValueValue(changes[1]);
+    LCObjectRef change2Value = LCKeyValueValue(changes[1]);
     bool checkPath1 = LCStringEqualCString(change1Path, path1);
-    bool checkValue1 = memcmp(LCDataDataRef(change1Value), data4, sizeof(LCByte)*strlen(data4))==0;
+    bool checkValue1 = (objectCompare(change1Value, data4)==LCEqual);
     bool checkPath2 = LCStringEqualCString(change2Path, path3);
     bool checkValue2 = change2Value == NULL;
     mu_assert("LCCommitDiff", checkPath1 && checkValue1 && checkPath2 && checkValue2);
@@ -204,7 +204,7 @@ static char* test_library_interface() {
   {
     // branch repo1
     LCStageRef stage = LCStageCreate();
-    LCStageAddEntry(stage, path1, (LCByte*)data2, strlen(data2));
+    LCStageAddEntry(stage, path1, data2);
     LCStageDeletePath(stage, path2);
     LCRepositoryCommit(repo2, stage);
     
@@ -223,9 +223,8 @@ static char* test_library_interface() {
     // test persistence
     LCRepositoryPersist(store, context);
     LCRepositoryDeleteCache(store, context);
-    LCDataRef lazyData1 = LCRepositoryData(store, NULL, path1);
-    char *lazyData1Chars = (char*)LCDataDataRef(lazyData1);
-    mu_assert("persisting LCRepository", memcmp(lazyData1Chars, data4, sizeof(LCByte)*strlen(data4))==0);
+    LCObjectRef lazyData1 = LCRepositoryData(store, NULL, path1);
+    mu_assert("persisting LCRepository", objectCompare(lazyData1, data4)==LCEqual);
   }
   
   delete_test_context();
