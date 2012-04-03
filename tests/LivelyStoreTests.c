@@ -243,7 +243,7 @@ static char* test_library_interface() {
     mu_assert("persisting LCRepository", objectCompare(lazyData1, data4)==LCEqual);
   }
   
-  //delete_test_context();
+  delete_test_context();
   return 0;
 }
 
