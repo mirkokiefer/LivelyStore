@@ -11,8 +11,6 @@ struct repositoryData {
 
 void repositoryDealloc(LCObjectRef object);
 void storeDataWithSHAs(LCRepositoryRef store, LCKeyValueRef addPaths[], size_t length, LCKeyValueRef pathSHABuffer[]);
-LCTreeRef repositoryBuildTree(LCRepositoryRef store, LCTreeRef current, LCKeyValueRef* addPaths, size_t newLength,
-                    LCStringRef* delete, size_t deleteLength);
 void repositorySetHead(LCRepositoryRef store, LCCommitRef newHead);
 
 struct LCType typeRepository = {
@@ -41,18 +39,13 @@ LCRepositoryRef LCRepositoryCreate(LCCommitRef head) {
 };
 
 void LCRepositoryCommit(LCRepositoryRef store, LCStageRef stage) {
-  LCKeyValueRef* addPaths = LCStagePathsToAdd(stage);
-  size_t addPathsLength = LCStageAddPathsCount(stage);
-  LCArrayRef* deletePaths = LCStagePathsToDelete(stage);
-  size_t deletePathsLength = LCStageDeletePathsCount(stage);
-  
   LCCommitRef head = LCRepositoryHead(store);
   LCTreeRef oldTree = NULL;
   if (head) {
     oldTree = LCCommitTree(head);
   }
-  LCTreeRef newTree = repositoryBuildTree(store, oldTree, addPaths, addPathsLength, deletePaths, deletePathsLength);
-  
+  LCTreeRef newTree = LCTreeCreateTreeUpdatingData(oldTree, LCStageUpdates(stage), LCStageUpdatesLength(stage));
+
   LCCommitRef newHead;
   if (head) {
     newHead = LCCommitCreate(newTree, &head, 1);
@@ -88,22 +81,12 @@ void LCRepositoryDeleteCache(LCRepositoryRef repo, LCContextRef context) {
   objectDeleteCache(LCRepositoryHead(repo), context);
 }
 
-void repositoryDealloc(LCObjectRef object) {
-  objectRelease(LCRepositoryHead(object));
 }
 
-LCTreeRef repositoryBuildTree(LCRepositoryRef store, LCTreeRef current, LCKeyValueRef addPaths[], size_t addPathsLength,
-                    LCArrayRef* delete, size_t deleteLength) {
-  LCMutableArrayRef updates = LCMutableArrayCreate(addPaths, addPathsLength);
-  LCKeyValueRef deleteUpdate;
-  for (LCInteger i=0; i<deleteLength; i++) {
-    deleteUpdate = LCKeyValueCreate(delete[i], NULL);
-    LCMutableArrayAddObject(updates, deleteUpdate);
-    objectRelease(deleteUpdate);
   }
-  LCTreeRef newTree = LCTreeCreateTreeUpdatingData(current, LCMutableArrayObjects(updates), LCMutableArrayLength(updates));
-  objectRelease(updates);
-  return newTree;
+
+void repositoryDealloc(LCObjectRef object) {
+  objectRelease(LCRepositoryHead(object));
 }
 
 void repositorySetHead(LCRepositoryRef store, LCCommitRef newHead) {

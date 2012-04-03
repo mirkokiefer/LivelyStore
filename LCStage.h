@@ -13,9 +13,9 @@ void LCStageAddEntry(LCStageRef stage, char* path, LCObjectRef data);
 void LCStageDeletePath(LCStageRef stage, char* path);
 
 // private
-LCKeyValueRef* LCStagePathsToAdd(LCStageRef stage);
+void LCStageAddKeyValues(LCStageRef stage, LCKeyValueRef keyValues[], size_t length);
+LCKeyValueRef* LCStageUpdates(LCStageRef stage);
 LCArrayRef* LCStagePathsToDelete(LCStageRef stage);
-size_t LCStageAddPathsCount(LCStageRef stage);
-size_t LCStageDeletePathsCount(LCStageRef stage);
+size_t LCStageUpdatesLength(LCStageRef stage);
 
 #endif

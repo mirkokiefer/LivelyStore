@@ -4,8 +4,7 @@
 typedef struct stageData* stageDataRef;
 
 struct stageData {
-  LCMutableArrayRef deletePaths;
-  LCMutableArrayRef addPathValues;
+  LCMutableDictionaryRef updates;
 };
 
 void stageDealloc(LCObjectRef object);
@@ -21,59 +20,46 @@ LCTypeRef LCTypeStage = &typeStage;
 LCStageRef LCStageCreate() {
   stageDataRef newStage = malloc(sizeof(struct stageData));
   if (newStage) {
-    newStage->addPathValues = LCMutableArrayCreate(NULL, 0);
-    newStage->deletePaths = LCMutableArrayCreate(NULL, 0);
+    newStage->updates = LCMutableDictionaryCreate(NULL, 0);
     return objectCreate(LCTypeStage, newStage);
   } else {
     return NULL;
   }
 };
 
-static LCMutableArrayRef stageAddPaths(LCStageRef stage) {
+static LCMutableDictionaryRef stageUpdates(LCStageRef stage) {
   stageDataRef stageData = objectData(stage);
-  return stageData->addPathValues;
-}
-
-
-static LCMutableArrayRef stageDeletePaths(LCStageRef stage) {
-  stageDataRef stageData = objectData(stage);
-  return stageData->deletePaths;
+  return stageData->updates;
 }
 
 void LCStageAddEntry(LCStageRef stage, char* path, LCObjectRef data) {  
   LCStringRef lcPath = LCStringCreate(path);
   LCArrayRef pathArray = createPathArray(lcPath);
-  LCKeyValueRef keyValue = LCKeyValueCreate(pathArray, data);
+  LCMutableDictionarySetValueForKey(stageUpdates(stage), pathArray, data);
   objectRelease(lcPath);
   objectRelease(pathArray);
-  LCMutableArrayAddObject(stageAddPaths(stage), keyValue);
 }
 
 void LCStageDeletePath(LCStageRef stage, char* path) {
   LCStringRef lcPath = LCStringCreate(path);
   LCArrayRef pathArray = createPathArray(lcPath);
-  LCMutableArrayAddObject(stageDeletePaths(stage), pathArray);
+  LCMutableDictionarySetValueForKey(stageUpdates(stage), pathArray, NULL);
   objectRelease(lcPath);
   objectRelease(pathArray);
 }
 
-LCKeyValueRef* LCStagePathsToAdd(LCStageRef stage) {
-  return LCMutableArrayObjects(stageAddPaths(stage));
+void LCStageAddKeyValues(LCStageRef stage, LCKeyValueRef keyValues[], size_t length) {
+  LCMutableDictionaryAddEntries(stageUpdates(stage), keyValues, length);
 }
 
-LCArrayRef* LCStagePathsToDelete(LCStageRef stage) {
-  return LCMutableArrayObjects(stageDeletePaths(stage));
+LCKeyValueRef* LCStageUpdates(LCStageRef stage) {
+  return LCMutableDictionaryEntries(stageUpdates(stage));
 }
 
-size_t LCStageAddPathsCount(LCStageRef stage) {
-  return LCMutableArrayLength(stageAddPaths(stage));
-}
-
-size_t LCStageDeletePathsCount(LCStageRef stage) {
-  return LCMutableArrayLength(stageDeletePaths(stage));
+size_t LCStageUpdatesLength(LCStageRef stage) {
+  return LCMutableDictionaryLength(stageUpdates(stage));
 }
 
 void stageDealloc(LCObjectRef stage) {
-  objectRelease(stageAddPaths(stage));
-  objectRelease(stageDeletePaths(stage));
+  objectRelease(stageUpdates(stage));
 }
