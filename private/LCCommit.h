@@ -12,7 +12,7 @@ LCCommitRef LCCommitCreate(LCTreeRef tree, LCCommitRef parents[], size_t parents
 LCCommitRef* LCCommitParents(LCCommitRef commit);
 size_t LCCommitParentsLength(LCCommitRef commit);
 LCTreeRef LCCommitTree(LCCommitRef commit);
-LCCommitRef LCCommitFindParent(LCCommitRef commit, char hash[HASH_LENGTH]);
+LCCommitRef LCCommitFindParent(LCCommitRef commit, LCCommitRef potentialParent);
 LCCommitRef LCCommitFindCommonParent(LCCommitRef commits[], size_t length);
 LCArrayRef LCCommitDiff(LCCommitRef oldCommit, LCCommitRef newCommit);
 #endif

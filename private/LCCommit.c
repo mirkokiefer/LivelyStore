@@ -62,7 +62,9 @@ size_t LCCommitParentsLength(LCCommitRef commit) {
   return LCArrayLength(commitParents(commit));
 }
 
-LCCommitRef LCCommitFindParent(LCCommitRef commit, char hash[HASH_LENGTH]) {
+LCCommitRef LCCommitFindParent(LCCommitRef commit, LCCommitRef potentialParent) {
+  char hash[HASH_LENGTH];
+  objectHash(potentialParent, hash);
   return findCommit(&commit, 1, hash);
 }
 

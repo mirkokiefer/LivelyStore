@@ -194,9 +194,7 @@ static char* test_library_interface() {
   
   {
     // find parent commit
-    char head1Hash[HASH_LENGTH];
-    objectHash(head1, head1Hash);
-    LCCommitRef foundHead = LCCommitFindParent(head2, head1Hash);
+    LCCommitRef foundHead = LCCommitFindParent(head2, head1);
     mu_assert("LCCommitFindParent", objectHashEqual(foundHead, head1));
   }
   
