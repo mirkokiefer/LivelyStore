@@ -212,10 +212,12 @@ static char* test_library_interface() {
   LCCommitRef repo2_head1 = LCRepositoryHead(repo2);
   
   {
-    LCCommitRef commonCommit1 = LCCommitFindCommonParent(head1, head2);
+    LCCommitRef heads1[] = {head1, head2};
+    LCCommitRef commonCommit1 = LCCommitFindCommonParent(heads1, 2);
     mu_assert("LCCommitFindCommonParent direct descendant", objectHashEqual(head1, commonCommit1));
     
-    LCCommitRef commonCommit2 = LCCommitFindCommonParent(repo2_head1, head2);
+    LCCommitRef heads2[] = {repo2_head1, head2};
+    LCCommitRef commonCommit2 = LCCommitFindCommonParent(heads2, 2);
     mu_assert("LCCommitFindCommonParent two branches", objectHashEqual(head1, commonCommit2));
   }
   

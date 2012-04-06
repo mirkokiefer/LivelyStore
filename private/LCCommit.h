@@ -13,6 +13,6 @@ LCCommitRef* LCCommitParents(LCCommitRef commit);
 size_t LCCommitParentsLength(LCCommitRef commit);
 LCTreeRef LCCommitTree(LCCommitRef commit);
 LCCommitRef LCCommitFindParent(LCCommitRef commit, char hash[HASH_LENGTH]);
-LCCommitRef LCCommitFindCommonParent(LCCommitRef commit1, LCCommitRef commit2);
+LCCommitRef LCCommitFindCommonParent(LCCommitRef commits[], size_t length);
 LCArrayRef LCCommitDiff(LCCommitRef oldCommit, LCCommitRef newCommit);
 #endif

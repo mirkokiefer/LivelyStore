@@ -117,7 +117,8 @@ void LCRepositoryMerge(LCRepositoryRef localRepo, LCRepositoryRef foreignRepo, v
   if (!foreignHead) {
     return;
   }
-  LCCommitRef commonCommit = LCCommitFindCommonParent(localHead, foreignHead);
+  LCCommitRef heads[] = {localHead, foreignHead};
+  LCCommitRef commonCommit = LCCommitFindCommonParent(heads, 2);
   if (objectHashEqual(foreignHead, commonCommit)) {
     return;
   }

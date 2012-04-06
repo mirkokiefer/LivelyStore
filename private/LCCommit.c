@@ -76,74 +76,81 @@ static void addHashObjectsToDict(LCObjectRef objects[], size_t length, LCMutable
   }
 }
 
-static LCCommitRef commitFindCommonParent(LCArrayRef commits1, LCArrayRef commits2, LCMutableDictionaryRef passed1, LCMutableDictionaryRef passed2) {
-  if (LCArrayLength(commits1) == 0 && LCArrayLength(commits2) == 0) {
+static LCCommitRef hashObjectInAllDicts(LCObjectRef objects[], size_t objectsLength, LCMutableDictionaryRef dicts[], size_t dictsLength) {
+  for (LCInteger i=0; i<objectsLength; i++) {
+    LCStringRef hash = objectCreateHashString(objects[i]);
+    bool partOfAll = true;
+    for (LCInteger j=0; j<dictsLength; j++) {
+      LCObjectRef object = LCMutableDictionaryValueForKey(dicts[j], hash);
+      if (!object) {
+        partOfAll = false;
+        break;
+      }
+    }
+    objectRelease(hash);
+    if (partOfAll) {
+      return objects[i];
+    }
+  }
+  return NULL;
+}
+
+static LCArrayRef commitsToParents(LCArrayRef commitArray) {
+  LCCommitRef *commits = LCArrayObjects(commitArray);
+  LCMutableArrayRef parents = LCMutableArrayCreate(NULL, 0);
+  for (LCInteger i=0; i<LCArrayLength(commitArray); i++) {
+    LCMutableArrayAddObjects(parents, LCCommitParents(commits[i]), LCCommitParentsLength(commits[i]));
+  }
+  return parents;
+}
+
+static LCCommitRef commitFindCommonParent(LCArrayRef commitArrays[], LCMutableDictionaryRef passed[], size_t length) {
+  bool allLengthZero = true;
+  for (LCInteger i=0; i<length; i++) {
+    if(LCArrayLength(commitArrays[i]) > 0) {
+      allLengthZero = false;
+      LCCommitRef *commits = LCArrayObjects(commitArrays[i]);
+      addHashObjectsToDict(commits, LCArrayLength(commitArrays[i]), passed[i]);
+    }
+  }
+  for (LCInteger i=0; i<length; i++) {
+    LCCommitRef *commits = LCArrayObjects(commitArrays[i]);
+    LCCommitRef result = hashObjectInAllDicts(commits, LCArrayLength(commitArrays[i]), passed, length);
+    if (result) {
+      return result;
+    }
+  }
+  if (allLengthZero) {
     return NULL;
-  }
-  LCCommitRef *commits1Ref = LCArrayObjects(commits1);
-  LCCommitRef *commits2Ref = LCArrayObjects(commits2);
-  for (LCInteger i=0; i<LCArrayLength(commits1); i++) {
-    char hash[HASH_LENGTH];
-    objectHash(commits1Ref[i], hash);
-    LCStringRef hashString = LCStringCreate(hash);
-    LCCommitRef result = LCMutableDictionaryValueForKey(passed2, hashString);
-    if (result) {
-      return result;
+  } else {
+    LCArrayRef commitParentsArray[length];
+    for (LCInteger i=0; i<length; i++) {
+      commitParentsArray[i] = commitsToParents(commitArrays[i]);
     }
-    LCMutableDictionarySetValueForKey(passed1, hashString, commits1Ref[i]);
-    objectRelease(hashString);
-  }
-  for (LCInteger i=0; i<LCArrayLength(commits2); i++) {
-    char hash[HASH_LENGTH];
-    objectHash(commits2Ref[i], hash);
-    LCStringRef hashString = LCStringCreate(hash);
-    LCCommitRef result = LCMutableDictionaryValueForKey(passed1, hashString);
-    if (result) {
-      return result;
+    LCCommitRef result = commitFindCommonParent(commitParentsArray, passed, length);
+    for (LCInteger i=0; i<length; i++) {
+      objectRelease(commitParentsArray[i]);
     }
-    LCMutableDictionarySetValueForKey(passed2, hashString, commits2Ref[i]);
-    objectRelease(hashString);
+    return result;
   }
-  for (LCInteger i=0; i<LCArrayLength(commits1); i++) {
-    char hash[HASH_LENGTH];
-    objectHash(commits1Ref[i], hash);
-    LCStringRef hashString = LCStringCreate(hash);
-    LCCommitRef result = LCMutableDictionaryValueForKey(passed2, hashString);
-    if (result) {
-      return result;
-    }
-    objectRelease(hashString);
+}
+
+LCCommitRef LCCommitFindCommonParent(LCCommitRef commits[], size_t length) {
+  LCMutableDictionaryRef passed[length];
+  LCArrayRef commitArrays[length];
+  for (LCInteger i=0; i<length; i++) {
+    passed[i] = LCMutableDictionaryCreate(NULL, 0);
+    commitArrays[i] = LCArrayCreate(&commits[i], 1);
   }
-  
-  LCMutableArrayRef commits1Parents = LCMutableArrayCreate(NULL, 0);
-  for (LCInteger i=0; i<LCArrayLength(commits1); i++) {
-    LCMutableArrayAddObjects(commits1Parents, LCCommitParents(commits1Ref[i]), LCCommitParentsLength(commits1Ref[i]));
+  LCCommitRef result = commitFindCommonParent(commitArrays, passed, length);
+  for (LCInteger i=0; i<length; i++) {
+    objectRelease(passed[i]);
+    objectRelease(commitArrays[i]);
   }
-  LCMutableArrayRef commits2Parents = LCMutableArrayCreate(NULL, 0);
-  for (LCInteger i=0; i<LCArrayLength(commits2); i++) {
-    LCMutableArrayAddObjects(commits2Parents, LCCommitParents(commits2Ref[i]), LCCommitParentsLength(commits2Ref[i]));
-  }
-  LCCommitRef result = commitFindCommonParent(commits1Parents, commits2Parents, passed1, passed2);
-  objectRelease(commits1Parents);
-  objectRelease(commits2Parents);
   return result;
 }
 
-LCCommitRef LCCommitFindCommonParent(LCCommitRef commit1, LCCommitRef commit2) {
-  LCMutableDictionaryRef passed1 = LCMutableDictionaryCreate(NULL, 0);
-  LCMutableDictionaryRef passed2 = LCMutableDictionaryCreate(NULL, 0);
-  LCArrayRef commits1 = LCArrayCreate(&commit1, 1);
-  LCArrayRef commits2 = LCArrayCreate(&commit2, 1);
-  LCCommitRef result = commitFindCommonParent(commits1, commits2, passed1, passed2);
-  objectRelease(passed1);
-  objectRelease(passed2);
-  objectRelease(commits1);
-  objectRelease(commits2);
-  return result;
-}
-
-static void* pathArrayToPathString(LCInteger i, void* info, void* each) {
-  LCKeyValueRef keyValue = (LCKeyValueRef)each;
+static LCKeyValueRef pathArrayToPathString(LCInteger i, void* info, LCKeyValueRef keyValue) {
   LCArrayRef pathArray = LCKeyValueKey(keyValue);
   LCStringRef path = LCStringCreateFromStringsWithDelim(LCArrayObjects(pathArray), LCArrayLength(pathArray), "/");
   LCKeyValueRef pathValue = LCKeyValueCreate(path, LCKeyValueValue(keyValue));
