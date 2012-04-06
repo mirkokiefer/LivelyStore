@@ -21,7 +21,7 @@ void LCRepositoryCommit(LCRepositoryRef store, LCStageRef stage);
 LCCommitRef LCRepositoryHead(LCRepositoryRef store);
 LCObjectRef LCRepositoryData(LCRepositoryRef store, LCCommitRef commit, char* path);
 void LCRepositoryPersist(LCRepositoryRef repo, LCContextRef context);
-void LCRepositoryDeleteCache(LCRepositoryRef repo, LCContextRef context);
+void LCRepositoryDeleteCache(LCRepositoryRef repo, LCContextRef storedContext);
 void LCRepositoryMerge(LCRepositoryRef localRepo, LCRepositoryRef foreignRepo, void *cookie, createResolvedData conflictStrategy);
 
 LCContextRef createRepositoryContext(LCStoreRef store);
