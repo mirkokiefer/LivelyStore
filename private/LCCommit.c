@@ -68,11 +68,10 @@ LCCommitRef LCCommitFindParent(LCCommitRef commit, char hash[HASH_LENGTH]) {
 
 static void addHashObjectsToDict(LCObjectRef objects[], size_t length, LCMutableDictionaryRef dict) {
   for (LCInteger i=0; i<length; i++) {
-    char hash[HASH_LENGTH];
-    objectHash(objects[i], hash);
-    LCStringRef hashString = LCStringCreate(hash);
+    LCStringRef hashString = objectCreateHashString(objects[i]);
     LCMutableDictionarySetValueForKey(dict, hashString, objects[i]);
     objectRelease(objects[i]);
+    objectRelease(hashString);
   }
 }
 
