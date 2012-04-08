@@ -9,10 +9,10 @@ typedef LCObjectRef LCHttpInterfaceRef;
 extern LCTypeRef LCTypeHttpInterface;
 
 LCHttpInterfaceRef LCHttpInterfaceCreate();
-void LCHttpInterfaceStart(LCInteger port);
-void LCHttpInterfaceStop();
-void LCHttpInterfaceRegisterRepository(LCRepositoryRef repo, char *name);
-void LCHttpInterfaceSendPullRequest(char *remoteRepo, char *localRepoName, char commit[HASH_LENGTH]);
-void LCHttpInterfaceLoadData(char *remoteRepo, char fromCommit[HASH_LENGTH], char toCommit[HASH_LENGTH], LCStoreRef store);
+void LCHttpInterfaceStart(LCHttpInterfaceRef http, char *port);
+void LCHttpInterfaceStop(LCHttpInterfaceRef http);
+void LCHttpInterfaceRegisterRepository(LCHttpInterfaceRef http, LCRepositoryRef repo, char *name);
+void LCHttpInterfaceSendPullRequest(LCHttpInterfaceRef http, char *remoteRepo, char *localRepoName, char commit[HASH_LENGTH]);
+void LCHttpInterfaceLoadData(LCHttpInterfaceRef http, char *remoteRepo, char fromCommit[HASH_LENGTH], char toCommit[HASH_LENGTH], LCStoreRef store);
 
 #endif
