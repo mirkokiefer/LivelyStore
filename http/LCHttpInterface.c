@@ -30,28 +30,32 @@ static httpInterfaceDataRef httpInterfaceInit() {
   return data;
 }
 
-LCHttpInterfaceRef LCHttpInterfaceCreate() {
+LCHttpInterfaceRef LCHttpInterfaceCreate(authorizeFun authorizationHandler) {
   httpInterfaceDataRef data = httpInterfaceInit();
   return objectCreate(LCTypeHttpInterface, data);
 }
 
 static void http_repo_action(char *repo, char *action, struct mg_connection *conn, const struct mg_request_info *request_info) {
-  
+  mg_printf(conn, "HTTP/1.1 200 OK\r\n"
+            "Content-Type: text/plain\r\n\r\n"
+            "%s", "todo");
 }
 
-static void *mg_callback(enum mg_event event,
-                         struct mg_connection *conn,
-                         const struct mg_request_info *request_info) {
+static void http_test_request(struct mg_connection *conn) {
+  mg_printf(conn, "HTTP/1.1 200 OK\r\n"
+            "Content-Type: text/plain\r\n\r\n"
+            "%s", "/test");
+}
+
+static void *mg_callback(enum mg_event event, struct mg_connection *conn, const struct mg_request_info *request_info) {
   if (event == MG_NEW_REQUEST) {
     LCStringRef uri = LCStringCreate(request_info->uri);
     LCArrayRef uriComps = createPathArray(uri);
-    char *repo = LCStringChars(LCArrayObjectAtIndex(uriComps, 1));
-    char *action = LCStringChars(LCArrayObjectAtIndex(uriComps, 2));
-    if (strcmp(action, "test") == 0) {
-      mg_printf(conn, "HTTP/1.1 200 OK\r\n"
-                "Content-Type: text/plain\r\n\r\n"
-                "%s", "/test");
+    if (LCArrayLength(uriComps) < 3) {
+      http_test_request(conn);
     } else {
+      char *repo = LCStringChars(LCArrayObjectAtIndex(uriComps, 1));
+      char *action = LCStringChars(LCArrayObjectAtIndex(uriComps, 2));
       http_repo_action(repo, action, conn, request_info);
     }
     return "";  // Mark as processed
@@ -78,11 +82,12 @@ void LCHttpInterfaceRegisterRepository(LCHttpInterfaceRef http, LCRepositoryRef 
   objectRelease(nameString);
 }
 
-void LCHttpInterfaceSendPullRequest(LCHttpInterfaceRef http, char *remoteRepo, char *localRepoName, char commit[HASH_LENGTH]) {
+void LCHttpInterfaceSendPullRequest(LCHttpInterfaceRef http, char *remoteRepo, LCRepositoryRef localRepo,
+                                    char commit[HASH_LENGTH], char *message) {
   
 }
 
-void LCHttpInterfaceLoadData(LCHttpInterfaceRef http, char *remoteRepo, char fromCommit[HASH_LENGTH], 
+void LCHttpInterfacePullData(LCHttpInterfaceRef http, char *remoteRepo, char fromCommit[HASH_LENGTH], 
                              char toCommit[HASH_LENGTH], LCStoreRef store) {
   
 }
