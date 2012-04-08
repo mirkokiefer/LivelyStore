@@ -35,14 +35,25 @@ LCHttpInterfaceRef LCHttpInterfaceCreate() {
   return objectCreate(LCTypeHttpInterface, data);
 }
 
+static void http_repo_action(char *repo, char *action, struct mg_connection *conn, const struct mg_request_info *request_info) {
+  
+}
+
 static void *mg_callback(enum mg_event event,
                          struct mg_connection *conn,
                          const struct mg_request_info *request_info) {
   if (event == MG_NEW_REQUEST) {
-    // Echo requested URI back to the client
-    mg_printf(conn, "HTTP/1.1 200 OK\r\n"
-              "Content-Type: text/plain\r\n\r\n"
-              "%s", request_info->uri);
+    LCStringRef uri = LCStringCreate(request_info->uri);
+    LCArrayRef uriComps = createPathArray(uri);
+    char *repo = LCStringChars(LCArrayObjectAtIndex(uriComps, 1));
+    char *action = LCStringChars(LCArrayObjectAtIndex(uriComps, 2));
+    if (strcmp(action, "test") == 0) {
+      mg_printf(conn, "HTTP/1.1 200 OK\r\n"
+                "Content-Type: text/plain\r\n\r\n"
+                "%s", "/test");
+    } else {
+      http_repo_action(repo, action, conn, request_info);
+    }
     return "";  // Mark as processed
   } else {
     return NULL;
