@@ -252,7 +252,7 @@ static char* test_library_interface() {
 static char* test_http_interface() {
   LCHttpInterfaceRef http = LCHttpInterfaceCreate(NULL);
   LCHttpInterfaceStart(http, "8080s");
-  URL_FILE *url = url_fopen("https:/localhost:8080/repo/test", "r");
+  URL_FILE *url = url_fopen("https://localhost:8080/test", "r");
   LCMutableDataRef data = LCMutableDataCreate(NULL, 0);
   FILE* wstream = createMemoryWriteStream(data, LCMutableDataAppendAlt, NULL);
   pipeURLToFile(url, wstream, 1024);
