@@ -1,5 +1,7 @@
 
 #include "LivelyStoreTests.h"
+#include "url_open.h"
+
 #include "minuit.h"
 
 int tests_run = 0;
@@ -247,11 +249,27 @@ static char* test_library_interface() {
   return 0;
 }
 
+static char* test_http_interface() {
+  LCHttpInterfaceRef http = LCHttpInterfaceCreate();
+  LCHttpInterfaceStart(http, "8080s");
+  URL_FILE *url = url_fopen("https://localhost:8080/test", "r");
+  LCMutableDataRef data = LCMutableDataCreate(NULL, 0);
+  FILE* wstream = createMemoryWriteStream(data, LCMutableDataAppendAlt, NULL);
+  pipeURLToFile(url, wstream, 1024);
+  fflush(wstream);
+  char *test = (char*)LCMutableDataDataRef(data);
+  
+  mu_assert("test http server", strcmp(test, "/test")==0);
+  
+  LCHttpInterfaceStop(http);
+  return 0;
+}
+
 static char* all_tests() {
   mu_run_test(test_tree);
   mu_run_test(test_tree_operations);
   mu_run_test(test_library_interface);
-
+  mu_run_test(test_http_interface);
   return 0;
 }
 
