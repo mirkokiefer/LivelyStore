@@ -15,11 +15,9 @@ LCHttpInterfaceRef LCHttpInterfaceCreate(authorizeFun authorizationHandler);
 void LCHttpInterfaceStart(LCHttpInterfaceRef http, char *port);
 void LCHttpInterfaceStop(LCHttpInterfaceRef http);
 void LCHttpInterfaceRegisterRepository(LCHttpInterfaceRef http, LCRepositoryRef repo, char *name);
-void LCHttpInterfaceSendNewHead(LCHttpInterfaceRef http, LCRemoteRepositoryRef remote, LCRepositoryRef localRepo, char commit[HASH_LENGTH]);
-void LCHttpInterfacePullCommitList(LCHttpInterfaceRef http, LCRemoteRepositoryRef remote, char fromCommit[HASH_LENGTH],
+void LCHttpInterfaceSendNewHead(LCHttpInterfaceRef http, LCRemoteRepositoryRef remote, LCRepositoryRef local, char commit[HASH_LENGTH]);
+void LCHttpInterfacePullMetaData(LCHttpInterfaceRef http, LCRemoteRepositoryRef remote, char fromCommit[HASH_LENGTH],
                                 char toCommit[HASH_LENGTH], LCStoreRef store);
-void LCHttpInterfacePullCommits(LCHttpInterfaceRef http, LCRemoteRepositoryRef remote, char* commits[], size_t length, LCStoreRef store);
-void LCHttpInterfacePullTrees(LCHttpInterfaceRef http, LCRemoteRepositoryRef remote, char* trees[], size_t length, LCStoreRef store);
 void LCHttpInterfacePullData(LCHttpInterfaceRef http, LCRemoteRepositoryRef remote, char* data[], LCStoreRef store);
 
 #endif
