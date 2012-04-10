@@ -11,5 +11,5 @@ LCRemoteRepositoryRef LCRemoteRepositoryCreate(char *url, char *login, char *pas
 char* LCRemoteRepositoryUrl(LCRemoteRepositoryRef repo);
 char* LCRemoteRepositoryLogin(LCRemoteRepositoryRef repo);
 char* LCRemoteRepositoryPassword(LCRemoteRepositoryRef repo);
-
+int LCRemoteRepositoryURLForPath(LCRemoteRepositoryRef repo, char *path, char buffer[], size_t length);
 #endif

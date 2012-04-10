@@ -56,6 +56,16 @@ char* LCRemoteRepositoryPassword(LCRemoteRepositoryRef repo) {
   return LCStringChars(remoteRepoData(repo)->password);
 }
 
+int LCRemoteRepositoryURLForPath(LCRemoteRepositoryRef repo, char *path, char buffer[], size_t length) {
+  strcpy(buffer, LCRemoteRepositoryUrl(repo));
+  strcat(buffer, path);
+  strcat(buffer, "?user=");
+  strcat(buffer, LCRemoteRepositoryLogin(repo));
+  strcat(buffer, "&password=");
+  strcat(buffer, LCRemoteRepositoryPassword(repo));
+  return 0;
+}
+
 void remoteRepoDealloc(LCRemoteRepositoryRef repo) {
   remoteRepoDataRef data = remoteRepoData(repo);
   objectRelease(data->url);
