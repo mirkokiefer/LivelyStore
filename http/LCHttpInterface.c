@@ -82,14 +82,15 @@ void LCHttpInterfaceRegisterRepository(LCHttpInterfaceRef http, LCRepositoryRef 
   objectRelease(nameString);
 }
 
-void LCHttpInterfaceSendPullRequest(LCHttpInterfaceRef http, char *remoteRepo, LCRepositoryRef localRepo,
-                                    char commit[HASH_LENGTH], char *message) {
+void LCHttpInterfaceSendNewHead(LCHttpInterfaceRef http, LCRemoteRepositoryRef remote, LCRepositoryRef localRepo, char commit[HASH_LENGTH]) {
   
 }
 
-void LCHttpInterfacePullData(LCHttpInterfaceRef http, char *remoteRepo, char fromCommit[HASH_LENGTH], 
-                             char toCommit[HASH_LENGTH], LCStoreRef store) {
-  
-}
+void LCHttpInterfacePullCommitList(LCHttpInterfaceRef http, LCRemoteRepositoryRef remote, char fromCommit[HASH_LENGTH],
+                                   char toCommit[HASH_LENGTH], LCStoreRef store);
+void LCHttpInterfacePullCommits(LCHttpInterfaceRef http, LCRemoteRepositoryRef remote, char* commits[], size_t length, LCStoreRef store);
+void LCHttpInterfacePullTrees(LCHttpInterfaceRef http, LCRemoteRepositoryRef remote, char* trees[], size_t length, LCStoreRef store);
+void LCHttpInterfacePullData(LCHttpInterfaceRef http, LCRemoteRepositoryRef remote, char* data[], LCStoreRef store);
+
 
 
