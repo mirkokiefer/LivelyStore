@@ -3,4 +3,5 @@
 #include "LCStage.h"
 #include "LCCommit.h"
 #include "LCTree.h"
-#include "LCHttpInterface.h"
+#include "LCRepoServer.h"
+#include "LCRepoClient.h"

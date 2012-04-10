@@ -250,8 +250,8 @@ static char* test_library_interface() {
 }
 
 static char* test_http_interface() {
-  LCHttpInterfaceRef http = LCHttpInterfaceCreate(NULL);
-  LCHttpInterfaceStart(http, "8080s");
+  LCRepoServer http = LCRepoServerCreate(NULL);
+  LCRepoServerStart(http, "8080s");
   URL_FILE *url = url_fopen("https://localhost:8080/test?user=mirko&password=test", "r");
   LCMutableDataRef data = LCMutableDataCreate(NULL, 0);
   FILE* wstream = createMemoryWriteStream(data, LCMutableDataAppendAlt, NULL);
@@ -260,7 +260,7 @@ static char* test_http_interface() {
   char *test = (char*)LCMutableDataDataRef(data);
   
   mu_assert("test http server", strcmp(test, "/test")==0);
-  LCHttpInterfaceStop(http);
+  LCRepoServerStop(http);
   return 0;
 }
 

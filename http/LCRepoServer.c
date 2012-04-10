@@ -1,28 +1,28 @@
 
-#include "LCHttpInterface.h"
+#include "LCRepoServer.h"
 #include "mongoose.h"
 
 
-typedef struct httpInterfaceData* httpInterfaceDataRef;
+typedef struct repoServerData* repoServerDataRef;
 
-struct httpInterfaceData {
+struct repoServerData {
   struct mg_context *mg_context;
   LCMutableDictionaryRef registeredRepos;
 };
 
-struct LCType typeHttpInterface = {
-  .name = "LCHttpInterface",
+struct LCType typeRepoServer = {
+  .name = "LCRepoServer",
   .immutable = true,
 };
 
-LCTypeRef LCTypeHttpInterface = &typeHttpInterface;
+LCTypeRef LCTypeRepoServer = &typeRepoServer;
 
-static httpInterfaceDataRef httpInterfaceData(LCHttpInterfaceRef http) {
+static repoServerDataRef repoServerData(LCRepoServer http) {
   return objectData(http);
 }
 
-static httpInterfaceDataRef httpInterfaceInit() {
-  httpInterfaceDataRef data = malloc(sizeof(struct httpInterfaceData));
+static repoServerDataRef repoServerInit() {
+  repoServerDataRef data = malloc(sizeof(struct repoServerData));
   if (data) {
     data->mg_context = NULL;
     data->registeredRepos = LCMutableDictionaryCreate(NULL, 0);
@@ -30,9 +30,9 @@ static httpInterfaceDataRef httpInterfaceInit() {
   return data;
 }
 
-LCHttpInterfaceRef LCHttpInterfaceCreate(authorizeFun authorizationHandler) {
-  httpInterfaceDataRef data = httpInterfaceInit();
-  return objectCreate(LCTypeHttpInterface, data);
+LCRepoServer LCRepoServerCreate(authorizeFun authorizationHandler) {
+  repoServerDataRef data = repoServerInit();
+  return objectCreate(LCTypeRepoServer, data);
 }
 
 static void http_repo_action(char *repo, char *action, struct mg_connection *conn, const struct mg_request_info *request_info) {
@@ -64,31 +64,21 @@ static void *mg_callback(enum mg_event event, struct mg_connection *conn, const 
   }
 }
 
-void LCHttpInterfaceStart(LCHttpInterfaceRef http, char *port) {
+void LCRepoServerStart(LCRepoServer http, char *port) {
   const char *options[] = {
     "listening_ports", port,
     "ssl_certificate", "resources/ssl_cert.pem", NULL
   };
-  httpInterfaceData(http)->mg_context = mg_start(&mg_callback, NULL, options);
+  repoServerData(http)->mg_context = mg_start(&mg_callback, NULL, options);
 }
 
-void LCHttpInterfaceStop(LCHttpInterfaceRef http) {
-  mg_stop(httpInterfaceData(http)->mg_context);
+void LCRepoServerStop(LCRepoServer http) {
+  mg_stop(repoServerData(http)->mg_context);
 }
 
-void LCHttpInterfaceRegisterRepository(LCHttpInterfaceRef http, LCRepositoryRef repo, char *name) {
+void LCRepoServerRegisterRepository(LCRepoServer http, LCRepositoryRef repo, char *name) {
   LCStringRef nameString = LCStringCreate(name);
-  LCMutableDictionarySetValueForKey(httpInterfaceData(http)->registeredRepos, nameString, repo);
+  LCMutableDictionarySetValueForKey(repoServerData(http)->registeredRepos, nameString, repo);
   objectRelease(nameString);
 }
-
-void LCHttpInterfaceSendNewHead(LCHttpInterfaceRef http, LCRemoteRepositoryRef remote, LCRepositoryRef localRepo, char commit[HASH_LENGTH]) {
-  
-}
-
-void LCHttpInterfacePullMetaData(LCHttpInterfaceRef http, LCRemoteRepositoryRef remote, char fromCommit[HASH_LENGTH],
-                                   char toCommit[HASH_LENGTH], LCStoreRef store);
-void LCHttpInterfacePullData(LCHttpInterfaceRef http, LCRemoteRepositoryRef remote, char* data[], LCStoreRef store);
-
-
 
