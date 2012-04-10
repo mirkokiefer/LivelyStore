@@ -5,9 +5,10 @@
 typedef struct repoClientData* repoClientDataRef;
 
 struct repoClientData {
+  pushChanges pushChangesHandler;
   metaDataPull metaDataPullHandler;
   dataPull dataPullHandler;
-  LCStoreRef store;
+  void *cookie;
 };
 
 struct LCType typeRepoClient = {
@@ -17,8 +18,8 @@ struct LCType typeRepoClient = {
 
 LCTypeRef LCTypeRepoClient = &typeRepoClient;
 
-static repoClientDataRef repoClientData(LCRepoClient http) {
-  return objectData(http);
+static repoClientDataRef repoClientData(LCRepoClient client) {
+  return objectData(client);
 }
 
 static repoClientDataRef repoClientInit() {
@@ -26,15 +27,27 @@ static repoClientDataRef repoClientInit() {
   return data;
 }
 
-LCRepoClient LCRepoClientCreate(metaDataPull metaDataPullHandler, dataPull dataPullHandler, LCStoreRef store) {
+LCRepoClient LCRepoClientCreate(void *cookie, pushChanges pushChangesHandler, metaDataPull metaDataPullHandler, 
+                                dataPull dataPullHandler) {
   repoClientDataRef data = repoClientInit();
+  data->cookie = cookie;
+  data->pushChangesHandler = pushChangesHandler;
   data->metaDataPullHandler = metaDataPullHandler;
   data->dataPullHandler = dataPullHandler;
-  data->store = store;
   return objectCreate(LCTypeRepoClient, data);
 }
 
-void LCRepoClientSendNewHead(LCRepoClient client, LCRemoteRepositoryRef remote, LCRepositoryRef local, char commit[HASH_LENGTH]);
-void LCRepoClientPullMetaData(LCRepoClient client, LCRemoteRepositoryRef remote, char fromCommit[HASH_LENGTH], char toCommit[HASH_LENGTH]);
-void LCRepoClientPullData(LCRepoClient client, LCRemoteRepositoryRef remote, char* data[], LCStoreRef store);
+void LCRepoClientPush(LCRepoClient client, LCRemoteRepositoryRef remote, LCRepositoryRef local, char commit[HASH_LENGTH]) {
+  repoClientDataRef data = repoClientData(client);
+  data->pushChangesHandler(data->cookie, remote, local, commit);
+}
 
+void LCRepoClientPullMetaData(LCRepoClient client, LCRemoteRepositoryRef remote, char fromCommit[HASH_LENGTH], char toCommit[HASH_LENGTH]) {
+  repoClientDataRef data = repoClientData(client);
+  data->metaDataPullHandler(data->cookie, remote, fromCommit, toCommit);
+}
+
+void LCRepoClientPullData(LCRepoClient client, LCRemoteRepositoryRef remote, char* dataHashes[], size_t length) {
+  repoClientDataRef data = repoClientData(client);
+  data->dataPullHandler(data->cookie, remote, dataHashes, length);
+}

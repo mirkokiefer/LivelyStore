@@ -9,12 +9,14 @@
 typedef LCObjectRef LCRepoClient;
 extern LCTypeRef LCTypeRepoClient;
 
-typedef void(*metaDataPull)(LCRemoteRepositoryRef remote, char fromCommit[HASH_LENGTH], char toCommit[HASH_LENGTH], LCStoreRef store);
-typedef void(*dataPull)(LCRemoteRepositoryRef remote, char* data[], LCStoreRef store);
+typedef void(*pushChanges)(void *cookie, LCRemoteRepositoryRef remote, LCRepositoryRef local, char commit[HASH_LENGTH]);
+typedef void(*metaDataPull)(void *cookie, LCRemoteRepositoryRef remote, char fromCommit[HASH_LENGTH], char toCommit[HASH_LENGTH]);
+typedef void(*dataPull)(void *cookie, LCRemoteRepositoryRef remote, char* data[], size_t length);
 
-LCRepoClient LCRepoClientCreate(metaDataPull metaDataPullHandler, dataPull dataPullHandler, LCStoreRef store);
-void LCRepoClientSendNewHead(LCRepoClient client, LCRemoteRepositoryRef remote, LCRepositoryRef local, char commit[HASH_LENGTH]);
+LCRepoClient LCRepoClientCreate(void *cookie, pushChanges pushChangesHandler, metaDataPull metaDataPullHandler, 
+                                dataPull dataPullHandler);
+void LCRepoClientPush(LCRepoClient client, LCRemoteRepositoryRef remote, LCRepositoryRef local, char commit[HASH_LENGTH]);
 void LCRepoClientPullMetaData(LCRepoClient client, LCRemoteRepositoryRef remote, char fromCommit[HASH_LENGTH], char toCommit[HASH_LENGTH]);
-void LCRepoClientPullData(LCRepoClient client, LCRemoteRepositoryRef remote, char* data[], LCStoreRef store);
+void LCRepoClientPullData(LCRepoClient client, LCRemoteRepositoryRef remote, char* data[], size_t length);
 
 #endif
