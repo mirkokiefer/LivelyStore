@@ -9,14 +9,18 @@
 typedef LCObjectRef LCRepoClient;
 extern LCTypeRef LCTypeRepoClient;
 
-typedef void(*pushChanges)(void *cookie, LCRemoteRepositoryRef remote, LCRepositoryRef local, char commit[HASH_LENGTH]);
-typedef void(*metaDataPull)(void *cookie, LCRemoteRepositoryRef remote, char fromCommit[HASH_LENGTH], char toCommit[HASH_LENGTH]);
-typedef void(*dataPull)(void *cookie, LCRemoteRepositoryRef remote, char* data[], size_t length);
+typedef void(*pushChanges)(LCRemoteRepositoryRef remote, LCCommitRef commit);
+typedef LCCommitRef(*metaDataPull)(LCStoreRef store, LCRemoteRepositoryRef remote, char fromCommit[HASH_LENGTH],
+                                   char toCommit[HASH_LENGTH]);
+typedef void(*dataPull)(LCStoreRef store, LCRemoteRepositoryRef remote, char* data[], size_t length);
 
-LCRepoClient LCRepoClientCreate(void *cookie, pushChanges pushChangesHandler, metaDataPull metaDataPullHandler, 
+LCRepoClient LCRepoClientCreate(LCStoreRef store, pushChanges pushChangesHandler, metaDataPull metaDataPullHandler, 
                                 dataPull dataPullHandler);
-void LCRepoClientPush(LCRepoClient client, LCRemoteRepositoryRef remote, LCRepositoryRef local, char commit[HASH_LENGTH]);
-void LCRepoClientPullMetaData(LCRepoClient client, LCRemoteRepositoryRef remote, char fromCommit[HASH_LENGTH], char toCommit[HASH_LENGTH]);
-void LCRepoClientPullData(LCRepoClient client, LCRemoteRepositoryRef remote, char* data[], size_t length);
+void LCRepoClientPush(LCRepoClient client, LCRemoteRepositoryRef remote, LCCommitRef commit);
+LCCommitRef LCRepoClientPullMetaData(LCRepoClient client, LCRemoteRepositoryRef remote, char fromCommit[HASH_LENGTH],
+                                     char toCommit[HASH_LENGTH]);
+void LCRepoClientPullData(LCRepoClient client, LCRemoteRepositoryRef remote, char* dataHashs[], size_t length);
 
+LCRepoClient LCRepoClientCreateToPeer(char *baseURL, LCStoreRef store);
+LCRepoClient LCRepoClientCreateToAWS(LCStoreRef store);
 #endif
