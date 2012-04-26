@@ -4,4 +4,4 @@
 #include "LCCommit.h"
 #include "LCTree.h"
 #include "LCRepoServer.h"
-#include "LCRepoClient.h"
+#include "LCPeerClient.h"

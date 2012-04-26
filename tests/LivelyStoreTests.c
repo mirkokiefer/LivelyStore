@@ -250,6 +250,7 @@ static char* test_library_interface() {
 }
 
 static char* test_http_interface() {
+  LCHttpGlobalInit();
   LCRepoServer http = LCRepoServerCreate(NULL);
   LCRepoServerStart(http, "8080s");
   URL_FILE *url = url_fopen("https://localhost:8080/test?user=mirko&password=test", "r");
@@ -261,6 +262,8 @@ static char* test_http_interface() {
   
   mu_assert("test http server", strcmp(test, "/test")==0);
   LCRepoServerStop(http);
+  
+  LCHttpGlobalCleanup();
   return 0;
 }
 

@@ -4,7 +4,6 @@
 
 #include "LivelyStoreInternal.h"
 #include "LCRepository.h"
-#include "LCRemoteRepository.h"
 
 typedef LCObjectRef LCRepoServer;
 extern LCTypeRef LCTypeRepoServer;
