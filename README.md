@@ -11,4 +11,4 @@ This implementation was abandoned in favor of [synclib (Node.js based)](https://
 
 ##Documentation
 I can only serve with the tests:  
-[LivelyStoreTests.c](https://github.com/livelycode/LivelyStore/blob/master/tests/LivelyStoreTests.c)
+[LivelyStoreTests.c](https://github.com/mirkok/LivelyStore/blob/master/tests/LivelyStoreTests.c)
